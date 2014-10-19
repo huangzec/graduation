@@ -1,0 +1,44 @@
+ul li{list-style-type: none;}
+/* 子课题显示控制 */
+.topId { text-decoration: none; color:#8B8970; position: relative; z-index: 2; }
+.topId:hover { z-index: 3; background: none;text-decoration:none; color:#8B8878;cursor:pointer; }
+.topId table{ display:none;}
+.topId:hover table { /*table 鼠标移动显示效果ʾ*/
+	display: block; position: absolute; width: 700px;
+	border: 1px solid #DFDFDF; background-color: #F0F0F0;
+	padding: 3px; color: black;
+}
+.trClass{border-bottom: 1px dashed #C2C2C2; height:33px; border-right: 1px dashed #C2C2C2; text-align: center;}
+.tdClass{border-right: 1px dashed #C2C2C2; text-align: center;}
+.tabletr{height:35px;}
+.textarea-medium{width: 350px;}
+.text-left{text-align: left;}
+.text-center{text-align: center;}
+.text-right{text-align: right;}
+.line-height{line-height: 30px;}
+.text-font{font-size: 14px; font-weight: normal;}
+.control-label{float: left;width: 240px;padding-top: 5px;text-align: right;}
+.controls{text-align: left; margin-left: 300px;}
+.input-mlarge{width: 350px;}
+.height-60{height: 60px;}
+.height-100{height: 100px;}
+.left-100{margin-left: 100px;}
+.openapply{display: none;}
+.openreport{display: none;}
+.hidden{display: none;}
+.show{dispaly: block;}
+.lfloat{float: left;}
+.rfloat{float: right;}
+.title{line-height: 40px; border-bottom: 1px dashed #e2e2e2;}
+.title span{width: 80%; display: inline-block;margin-left:70px;}
+.title-main{margin-top: 30px;}
+.maincontent{font-size: 14px;}
+.maincontent li{border-bottom: 1px dashed #e2e2e2;}
+.maincontent li span{float: right;}
+.maincontent li a{text-decoration: none; color: #525252;}
+.maincontent li a:hover{color: #fc7a07}
+
+/*---- rejoinInfo->grade-graduate ----*/
+.marginright{margin-right: 110px;}
+.marginleft{margin-left: 77px;}
+.gradetable{margin-top:30px;}

@@ -1,0 +1,11 @@
+#Fri Oct 10 17:54:44 CST 2014
+connectionInfoProperty=mysql
+detect.m2m=false
+detect.o2o=false
+eclipse.preferences.version=1
+enableAnalysisProperty=true
+generate.version=false
+newCatalogProperty=graduation
+re.settings=/graduation/jpa.reveng.xml
+re.strategy=
+schemaProperty=graduation

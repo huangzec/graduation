@@ -1,0 +1,121 @@
+<%@page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@page import="com.mvc.common.*, com.mvc.entity.*" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<jsp:include page="../common/header.jsp" flush="true" />
+</head>
+
+<body background="<%=basePath %>cscon/body-bg.png">
+
+<div class="navbar navbar-fixed-top">
+	
+	<jsp:include page="../common/top.jsp" flush="true" />
+	<!-- /navbar-inner -->
+	
+</div> <!-- /navbar -->
+
+<div id="content">
+	
+	<div class="container">
+		
+		<div class="row">
+			<jsp:include page="../common/navmenu_tea.jsp" flush="true" />
+			<!-- /span3 -->
+			
+			<div class="span9">
+				
+				<h1 class="page-title">
+					<i class="icon-home"></i>
+					我的主页					
+				</h1>
+				
+				<jsp:include page="../common/center-stat.jsp" flush="true" />
+				<!-- /stat-container -->
+				
+				<div class="widget">
+					<div class="widget-content">
+						<div id="w_list_print">
+							<form action="<%=basePath %>user/message/unread.do" method="post">
+								<table class="table_list">
+									<thead>
+										<tr style="border-bottom: 1px dashed #e2e2e2;">
+											<th colspan="4">未读消息</th>
+										</tr>
+										<tr style="border-bottom: 1px dashed #e2e2e2;">
+											<th>标题</th>
+											<th>内容</th>
+											<th>发送人</th>
+											<th>时间</th>
+										</tr>
+									</thead>
+									<tbody>
+										<%
+											List<Message> list = (List<Message>)request.getAttribute("list");
+											for(int i = 0; null != list && i < list.size(); i ++) {
+												Message message = list.get(i);
+										%>
+											<tr style="border-bottom: 1px dashed #e2e2e2;">
+												<td width="20%"><%=StringUtil.cutString(message.getName(), 10) %></td>
+												<td width="55%">
+													<a href="<%=basePath %>user/message/read.do?id=<%=message.getId() %>" title="<%=StringUtil.cutString(message.getContent(), 80) %>">
+														<%=StringUtil.cutString(message.getContent(), 35) %>
+													</a>
+												</td>
+												<td align="center"><%=HResponse.formatValue("from_id", message.getFromId(), request) %></td>
+												<td align="center"><%=message.getCreateTime() %></td>
+											</tr>
+										<%
+											}
+										 %>
+										<c:if test="${empty list }">
+											<tr>
+												<th colspan="4">暂无相关记录</th>
+											</tr>
+										</c:if>
+									</tbody>
+								</table>
+							</form>
+						</div>
+					</div> <!-- /widget-content -->
+					
+				</div> <!-- /widget -->
+			</div> <!-- /span9 -->
+			
+			
+		</div> <!-- /row -->
+		
+	</div> <!-- /container -->
+	
+</div> <!-- /content -->
+					
+	
+<div id="footer">
+	
+	<div class="container">				
+		<hr />
+		<jsp:include page="../common/footer.jsp" flush="true" />
+	</div> <!-- /container -->
+	
+</div> <!-- /footer -->
+
+
+    
+
+<!-- Le javascript
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="<%=basePath %>cscon/js/jquery-1.7.2.min.js"></script>
+<script src="<%=basePath %>cscon/js/excanvas.min.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.pie.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.orderBars.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.resize.js"></script>
+
+
+<script src="<%=basePath %>cscon/js/bootstrap.js"></script>
+<script src="<%=basePath %>cscon/js/charts/bar.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,96 @@
+package com.mvc.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import static javax.persistence.GenerationType.IDENTITY;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ * Sontopic entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+public class Sontopic implements java.io.Serializable {
+
+	// Fields
+
+	private Integer stId;
+	private String stName;
+	private String stTec;
+	private String stuSTId;
+
+	// Constructors
+
+	/** default constructor */
+	public Sontopic() {
+	}
+
+	/** minimal constructor */
+	public Sontopic(String stName) {
+		this.stName = stName;
+	}
+
+	/** full constructor */
+	public Sontopic(String stName, String stTec, String stuSTId) {
+		this.stName = stName;
+		this.stTec = stTec;
+		this.stuSTId = stuSTId;
+	}
+
+	// Property accessors
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "sT_ID", unique = true, nullable = false)
+	public Integer getStId() {
+		return this.stId;
+	}
+
+	public void setStId(Integer stId) {
+		this.stId = stId;
+	}
+
+	@Column(name = "sT_Name", nullable = false, length = 100)
+	public String getStName() {
+		return this.stName;
+	}
+
+	public void setStName(String stName) {
+		this.stName = stName;
+	}
+
+	@Column(name = "sT_Tec", length = 100)
+	public String getStTec() {
+		return this.stTec;
+	}
+
+	public void setStTec(String stTec) {
+		this.stTec = stTec;
+	}
+
+	@Column(name = "stu_sT_ID", length = 12)
+	public String getStuSTId() {
+		return this.stuSTId;
+	}
+
+	public void setStuSTId(String stuSTId) {
+		this.stuSTId = stuSTId;
+	}
+	
+	
+	private Tbtopic tbtopic;
+	
+	@ManyToOne
+	@JoinColumn(name="top_ID", nullable=false)
+	public Tbtopic getTbtopic() {
+		return tbtopic;
+	}
+
+	public void setTbtopic(Tbtopic tbtopic) {
+		this.tbtopic = tbtopic;
+	}
+
+}

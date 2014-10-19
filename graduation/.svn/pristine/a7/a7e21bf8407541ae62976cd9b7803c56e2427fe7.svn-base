@@ -1,0 +1,129 @@
+package com.mvc.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.mvc.common.HResponse;
+import com.mvc.common.Pagination;
+import com.mvc.common.Verify;
+import com.mvc.entity.Department;
+import com.mvc.entity.Settime;
+import com.mvc.entity.Tbtopic;
+import com.mvc.service.SettimeService;
+import com.mvc.service.TbtopicService;
+
+/**
+ * 评审课题控制器类
+ * @author huangzec@foxmail.com
+ *
+ */
+@Controller
+@RequestMapping(value="/judge")
+public class JudgeController {
+	
+	@Autowired
+	private TbtopicService tbtopicService;
+	
+	@Autowired
+	private SettimeService settimeService;
+	
+	private Pagination pagination;	
+	private List<Tbtopic> list = new ArrayList<Tbtopic>();
+	private int pageNum = 1;//页数
+	private int numPerPage = 10;//每页显示多少条
+	
+	public int getPageNum() {
+		return pageNum;
+	}
+
+	public void setPageNum(int pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	public void setNumPerPage(int numPerPage) {
+		this.numPerPage = numPerPage;
+	}
+
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
+	}
+
+	public List<Tbtopic> getList() {
+		return list;
+	}
+
+	public void setList(List<Tbtopic> list) {
+		this.list = list;
+	}
+
+	/**
+	 * 评审课题视图
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-4 下午08:58:22
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="/judgeview.do")
+	public ModelAndView judgeView(HttpServletRequest request, ModelMap modelMap)
+	{
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("user/teacher/judge-list");
+		_assignJudgeSetTime(request);
+		if(pagination == null){
+			pagination = new Pagination(numPerPage);
+		}
+		if(!Verify.isEmpty(request.getParameter("page"))) {
+			System.out.println("page " + request.getParameter("page"));
+			pageNum = Integer.parseInt(request.getParameter("page"));
+		}
+		pagination.setSize(numPerPage);
+		pagination.setCurrentPage(pageNum);
+		if(pagination.getCurrentPage() <= 0) {
+			pagination.setCurrentPage(1);
+		}
+		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
+			pagination.setCurrentPage(pagination.getTotalPage());
+		}
+		String where = "from Tbtopic where 1 = 1";
+		list 	= tbtopicService.getAllRecordByPages(where, pagination);
+		mav.addObject("list", list);
+		mav.addObject("pagination", pagination);
+		
+		return mav;
+	}
+
+	/**
+	 * 加载评审时间
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-5 下午05:54:32
+	 * @return void
+	 */
+	private void _assignJudgeSetTime(HttpServletRequest request) {
+		Department department = (Department) request.getSession().getAttribute("department");
+		String where = "from Settime where deptId = '" + "064" + "' AND mark = '2' AND ('" + HResponse.formatDateTime(new Date()) + "' between startTime and endTime )";
+		Settime judgeTime 	= settimeService.getOneByWhere(where);
+		request.getSession().setAttribute("judge-time", judgeTime);
+	}
+
+}

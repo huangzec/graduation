@@ -1,0 +1,104 @@
+package com.mvc.entity;
+
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hsqldb.lib.HashSet;
+
+/**
+ * Profession entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+@Table(name = "profession", catalog = "graduation")
+public class Profession implements java.io.Serializable {
+
+	// Fields
+
+	private String proId;
+	private Integer graId;
+	private String proName;
+	private Set<Tbclass> tbclass = (Set<Tbclass>) new HashSet(0);
+
+	// Constructors
+
+	/** default constructor */
+	public Profession() {
+	}
+
+	/** minimal constructor */
+	public Profession(String proId, String proName) {
+		this.proId = proId;
+		this.proName = proName;
+	}
+
+	/** full constructor */
+	public Profession(String proId, Integer graId, String proName) {
+		this.proId = proId;
+		this.graId = graId;
+		this.proName = proName;
+	}
+
+	public Profession(String proId) {
+		this.proId = proId;
+	}
+
+	// Property accessors
+	@Id
+	@Column(name = "pro_ID", unique = true, nullable = false, length = 10)
+	public String getProId() {
+		return this.proId;
+	}
+
+	public void setProId(String proId) {
+		this.proId = proId;
+	}
+
+	@Column(name = "gra_ID")
+	public Integer getGraId() {
+		return this.graId;
+	}
+
+	public void setGraId(Integer graId) {
+		this.graId = graId;
+	}
+
+	@Column(name = "pro_Name", nullable = false, length = 50)
+	public String getProName() {
+		return this.proName;
+	}
+
+	public void setProName(String proName) {
+		this.proName = proName;
+	}
+	
+	private Department department;	
+	
+	@ManyToOne
+	@JoinColumn(name="dept_ID", nullable=false)
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	@OneToMany(targetEntity=Tbclass.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	public Set<Tbclass> getTbclass() {
+		return tbclass;
+	}
+
+	public void setTbclass(Set<Tbclass> tbclass) {
+		this.tbclass = tbclass;
+	}
+
+}

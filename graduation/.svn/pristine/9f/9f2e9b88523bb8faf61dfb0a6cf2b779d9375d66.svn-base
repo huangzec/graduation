@@ -1,0 +1,153 @@
+<%@page language="java" import="java.util.*" pageEncoding="UTF-8" %>
+<%@page contentType="text/html; charset=utf-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+	<script language="JavaScript">
+		function tick() {
+		var date = new Date();
+		var y = date.getYear();
+		var month = date.getMonth() + 1;
+		var d = date.getDate();
+		var hr = date.getHours();
+		var m = date.getMinutes();
+		var s = date.getSeconds();
+		var day = date.getDay();
+		y = y > 200 ? y : 1900 + y;
+		if (month < 10) month = "0" + month;
+		if (d < 10) d = "0" + d;
+		if (hr < 10) hr = "0" + hr;
+		if (m < 10) m = "0" + m;
+		if (s < 10) s = "0" + s;
+		timeString = y + "" + month + "" + d + "" + hr + "" + m + "" + s;				
+		document.getElementById("topId").value = timeString;
+	}
+	</script>
+	<script language="JavaScript">
+		function Display(sid)
+		{
+			var rad2 = document.getElementById("radio2");				
+			var rad3 = document.getElementById("radio3");
+			if(sid == 1){
+				rad2.style.display = 'none';
+				rad3.style.display = 'none';
+			}else if(sid == 2){
+				rad2.style.display = 'block';
+				rad3.style.display = 'none';
+			}else{
+				rad2.style.display = 'none';
+				rad3.style.display = 'block';
+			}
+		}
+	</script>
+	<style type="text/css">
+		.input_required{
+			height:28px;
+		}
+	</style>
+	<c:import url="header.jsp" />
+	</head>
+<body>
+<div class="navbar navbar-fixed-top">
+	<c:import url="top.jsp" />
+	<!-- /navbar-inner -->
+</div> <!-- /navbar -->
+<div id="content">
+	<div class="container">
+		<div class="row">
+			<%if( (Integer) request.getSession().getAttribute("user_status") == 1){ %>
+				<c:import url="navmenu.jsp" />
+			<%}else if( (Integer) request.getSession().getAttribute("user_status") == 2){ %>
+				<c:import url="navmenu_tea.jsp" />
+			<%} %>
+			<!-- /span3 -->
+			<div class="span9">
+				<h1 class="page-title">
+					<i class="icon-th-list"></i>
+					提交课题					
+				</h1>
+				<div class="widget">
+					
+					<div class="widget-content">
+						<form method="post" action="<%=basePath %>user/topic/submitTopic.do" class="required-validate" onsubmit="return validateCallback(this, navTabAjaxDone);">
+							<div><font color="red" size="4">${message }</font></div>
+							<div>
+								<p>
+									课题编号：<input name="topId" id="topId" type="text" onclick="javascript:tick();" class="input_required"/>
+								</p>
+								<p>
+									课题名称：<input name="topName" class="input_required" type="text" size="30" />
+								</p>
+								<div class="divider"></div>
+								完成人数：
+								<input type="radio" id="tp1" name="topNum" value="1" onclick="Display(1)">1
+								<input type="radio" id="tp2" name="topNum" value="2" onclick="Display(2)">2
+								<input type="radio" id="tp3" name="topNum" value="3" onclick="Display(3)">3
+							
+								<div style="display:none" id="radio2">
+									<div class="control-group">											
+										<div class="controls">
+											子课题名称一：<input name="sTName1" class="input_required" id="firstname1" type="text" size="30" />
+										</div> <!-- /controls -->
+									</div> <!-- /control-group -->
+									<hr />
+									<div class="control-group">											
+										<div class="controls">
+											子课题名称二：<input name="sTName2" class="input_required" id="firstname2" type="text" size="30" />
+										</div> <!-- /controls -->		
+									</div> <!-- /control-group -->
+								</div>
+							
+								<div style="display:none" id="radio3">
+									<div class="control-group">											
+										<div class="controls">
+											子课题名称一：<input name="sTName1" class="input_required" id="firstname1" type="text" size="30" />
+										</div> <!-- /controls -->
+									</div> <!-- /control-group -->
+									<hr />
+									<div class="control-group">											
+										<div class="controls">
+											子课题名称二：<input name="sTName2" class="input_required" id="firstname2" type="text" size="30" />
+										</div> <!-- /controls -->		
+									</div> <!-- /control-group -->
+									<hr />
+									<div class="control-group">											
+										<div class="controls">
+											子课题名称三：<input name="sTName3" class="input_required" id="firstname3" type="text" size="30" />
+										</div> <!-- /controls -->
+									</div> <!-- /control-group -->
+								</div>
+								<hr />
+								<p>
+									<label>采用技术：</label>
+									<div><textarea name="topTec" rows="6" cols="100" tools="mfull"></textarea></div>
+								</p>
+							</div>
+							<div class="form-actions">
+								<button type="submit" class="btn btn-primary">Save</button>
+								<button class="btn">Cancel</button>
+							</div>
+						</form>
+						<div class="pricing-plans plans-3">
+					</div> <!-- /pricing-plans -->
+					</div> <!-- /widget-content -->
+				</div> <!-- /widget -->
+			</div> <!-- /span9 -->
+		</div> <!-- /row -->
+	</div> <!-- /container -->
+</div> <!-- /content -->
+<div id="footer">
+	<div class="container">				
+		<hr />
+		<c:import url="footer.jsp" />
+	</div> <!-- /container -->
+</div> <!-- /footer -->
+<!-- Le javascript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="<%=basePath %>cscon/js/jquery-1.7.2.min.js"></script>
+<script src="<%=basePath %>cscon/js/bootstrap.js"></script>
+</body>
+</html>

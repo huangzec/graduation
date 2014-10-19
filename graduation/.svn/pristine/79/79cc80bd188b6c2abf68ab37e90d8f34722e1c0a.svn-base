@@ -1,0 +1,73 @@
+package com.mvc.entity;
+
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hsqldb.lib.HashSet;
+
+/**
+ * Department entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+@Table(name = "department", catalog = "graduation")
+public class Department implements java.io.Serializable {
+
+	// Fields
+
+	private String deptId;
+	private String deptName;
+	private Set<Profession> profession = (Set<Profession>) new HashSet(0);
+
+	// Constructors
+
+	/** default constructor */
+	public Department() {
+	}
+
+	/** full constructor */
+	public Department(String deptId, String deptName) {
+		this.deptId = deptId;
+		this.deptName = deptName;
+	}
+
+	public Department(String deptId) {
+		this.deptId = deptId;
+	}
+
+	// Property accessors
+	@Id
+	@Column(name = "dept_ID", unique = true, nullable = false, length = 10)
+	public String getDeptId() {
+		return this.deptId;
+	}
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
+
+	@Column(name = "dept_Name", nullable = false, length = 50)
+	public String getDeptName() {
+		return this.deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	@OneToMany(targetEntity=Profession.class, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	public Set<Profession> getProfession() {
+		return profession;
+	}
+
+	public void setProfession(Set<Profession> profession) {
+		this.profession = profession;
+	}
+
+}

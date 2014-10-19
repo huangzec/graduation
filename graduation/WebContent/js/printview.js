@@ -1,0 +1,13 @@
+HHJsLib.register({
+	init:function(){
+		this.bindPrintviewClick();
+	},
+	bindPrintviewClick:function(){
+		HHJsLib.printPriview("#print-view",
+			function(){
+				alert($("#printarea").text());
+				$("#printarea").text();
+			},
+ 			"");
+	}
+});

@@ -1,0 +1,27 @@
+package com.mvc.common;
+
+/**
+ * 字符串处理工具类
+ * @author huangzec@foxmail.com
+ *
+ */
+public class StringUtil {
+	
+	/**
+	 * 剪切字符串
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-3 上午10:52:54
+	 * @return String
+	 */
+	public static String cutString(String str, int length)
+	{
+		if(null != str && length < str.length()) {
+			return str.substring(0, length) + "...";
+		}
+		
+		return str;
+	}
+
+}

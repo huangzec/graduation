@@ -1,0 +1,68 @@
+package com.mvc.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ * Gradeall entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+@Table(name = "gradeall", catalog = "graduation")
+public class Gradeall implements java.io.Serializable {
+
+	// Fields
+
+	private Integer gaId;
+	private String stuId;
+	private Float gaGrade;
+
+	// Constructors
+
+	/** default constructor */
+	public Gradeall() {
+	}
+
+	/** minimal constructor */
+	public Gradeall(Integer gaId) {
+		this.gaId = gaId;
+	}
+
+	/** full constructor */
+	public Gradeall(Integer gaId, String stuId, Float gaGrade) {
+		this.gaId = gaId;
+		this.stuId = stuId;
+		this.gaGrade = gaGrade;
+	}
+
+	// Property accessors
+	@Id
+	@Column(name = "gA_ID", unique = true, nullable = false)
+	public Integer getGaId() {
+		return this.gaId;
+	}
+
+	public void setGaId(Integer gaId) {
+		this.gaId = gaId;
+	}
+
+	@Column(name = "stu_ID", length = 12)
+	public String getStuId() {
+		return this.stuId;
+	}
+
+	public void setStuId(String stuId) {
+		this.stuId = stuId;
+	}
+
+	@Column(name = "gA_Grade", precision = 12, scale = 0)
+	public Float getGaGrade() {
+		return this.gaGrade;
+	}
+
+	public void setGaGrade(Float gaGrade) {
+		this.gaGrade = gaGrade;
+	}
+
+}

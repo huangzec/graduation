@@ -1,0 +1,20 @@
+DWZ.regPlugins.push(function($p){
+	$("#judge-btn").click(function() {
+		var ids = [];
+		$("#judge-form").find("input[name='id']:checked").each(function() {
+			var _root = $(this);
+			ids.push("'" + _root.val() + "'");
+		});
+		$.ajax({
+            type: "POST",
+            url: basePath + "admin/topic/judgeorder.do",
+            data: {ids:ids},
+            dataType: "json",
+            success: function(data){
+            	if(data == true) {
+            		alert("已完成评审老师选择");
+            	}
+             }
+        });
+	});
+});

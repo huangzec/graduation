@@ -1,0 +1,92 @@
+package com.mvc.entity;
+
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+/**
+ * Graduateinfo entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+@Table(name = "graduateinfo", catalog = "graduation")
+public class Graduateinfo implements java.io.Serializable {
+
+	// Fields
+
+	private Integer gdiId;
+	private String stuId;
+	private Date gdiDate;
+	private String gdiPlace;
+	private Integer gdiNumber;
+
+	// Constructors
+
+	/** default constructor */
+	public Graduateinfo() {
+	}
+
+	/** full constructor */
+	public Graduateinfo(String stuId, Date gdiDate, String gdiPlace,
+			Integer gdiNumber) {
+		this.stuId = stuId;
+		this.gdiDate = gdiDate;
+		this.gdiPlace = gdiPlace;
+		this.gdiNumber = gdiNumber;
+	}
+
+	// Property accessors
+	@Id
+	@GeneratedValue(strategy = IDENTITY)
+	@Column(name = "gdi_ID", unique = true, nullable = false)
+	public Integer getGdiId() {
+		return this.gdiId;
+	}
+
+	public void setGdiId(Integer gdiId) {
+		this.gdiId = gdiId;
+	}
+
+	@Column(name = "stu_ID", length = 12)
+	public String getStuId() {
+		return this.stuId;
+	}
+
+	public void setStuId(String stuId) {
+		this.stuId = stuId;
+	}
+
+	@Temporal(TemporalType.DATE)
+	@Column(name = "gdi_Date", length = 10)
+	public Date getGdiDate() {
+		return this.gdiDate;
+	}
+
+	public void setGdiDate(Date gdiDate) {
+		this.gdiDate = gdiDate;
+	}
+
+	@Column(name = "gdi_Place", length = 20)
+	public String getGdiPlace() {
+		return this.gdiPlace;
+	}
+
+	public void setGdiPlace(String gdiPlace) {
+		this.gdiPlace = gdiPlace;
+	}
+
+	@Column(name = "gdi_Number")
+	public Integer getGdiNumber() {
+		return this.gdiNumber;
+	}
+
+	public void setGdiNumber(Integer gdiNumber) {
+		this.gdiNumber = gdiNumber;
+	}
+
+}

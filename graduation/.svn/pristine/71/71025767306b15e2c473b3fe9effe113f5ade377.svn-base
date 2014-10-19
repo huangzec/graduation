@@ -1,0 +1,29 @@
+<%@page contentType="text/html; charset=UTF-8"%>
+<%@ page isELIgnored="false" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<h2 class="contentTitle">课题评审安排</h2>
+<form method="post" action="<%=basePath %>admin/topic/judgeorder.do" id="judge-form" class="pageForm required-validate" onsubmit="return validateCallback(this, dialogAjaxDone)">
+	<div class="pageFormContent" layoutH="98">
+		<label>请选择参与评审的老师</label>
+		<div class="divider"></div>
+		<c:forEach items="${list}" var="item">
+			<label><input type="checkbox" name="id" value="${item.teaId }" ${item.teaJudge == true ? "checked" : "" } />${item.teaName }</label>
+		</c:forEach>
+		<c:if test="${empty list }">
+			<label class="txt-center" style="color: red;">暂无相关评审老师</label>
+		</c:if>
+	</div>
+	<div class="formBar">
+		<label style="float:left"><input type="checkbox" class="checkboxCtrl" group="id" />全选</label>
+		<ul>
+			<li><div class="button"><div class="buttonContent"><button type="button" class="checkboxCtrl" group="id" selectType="invert">反选</button></div></div></li>
+			<li><div class="buttonActive"><div class="buttonContent"><button id="judge-btn" type="button">提交</button></div></div></li>
+		</ul>
+	</div>
+</form>
+

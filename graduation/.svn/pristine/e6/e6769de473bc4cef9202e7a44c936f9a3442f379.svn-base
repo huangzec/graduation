@@ -1,0 +1,591 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>表单设计器</title>
+    <link href="../../lib/ligerUI/skins/Aqua/css/ligerui-all.css" rel="stylesheet" type="text/css" />
+    <link href="../../lib/ligerUI/skins/Gray/css/all.css" rel="stylesheet" type="text/css" /> 
+    <link href="../../lib/ligerUI/skins/ligerui-icons.css" rel="stylesheet" />
+    <script src="../../lib/jquery/jquery-1.5.2.min.js"></script>
+    <script src="../../lib/ligerUI/js/ligerui.all.js" type="text/javascript"></script> 
+    <script src="../../lib/ligerUI/js/plugins/ligerForm.js"></script>
+    <script src="../../lib/json2.js" type="text/javascript"></script>
+    <link href="style.css" rel="stylesheet" />
+    
+</head>
+<body style="padding:0px;">   
+  <div id="layout1" style="width:99.2%; margin:0 auto; margin-top:4px; "> 
+        <div position="center"  title="设计表单" id="designPanel"> 
+            <div id="btnSaveToFile" style="margin:5px;"></div>
+                  <div id="formDesign"></div>
+        </div>
+        <div position="right" id="framecenter" title="属性设置">  
+                <div id="formProperty">
+                    
+
+                </div>
+            <div id="btnSaveProperty" style="margin:5px;"></div>
+        </div>  
+    </div> 
+    <script type="text/javascript">
+        var ICONS = {
+            Group: "group.gif"
+        };
+        var demoData = [], demoGrid = { columns: [] };
+        for (var i = 0; i < 9; i++) demoData.push({ id: i, value: i, text: '[数据' + i + ']' });
+        demoGrid.columns.push({ display: 'ID', name: 'id' });
+        demoGrid.columns.push({ display: 'Text', name: 'text' });
+        demoGrid.data = { Rows: demoData };
+
+        var dragging = false;
+        var contextMenu = null; 
+        var fieldReplace = $("<li class='l-fieldcontainer l-fieldcontainer-r'></li>").appendTo("body").hide();
+        var fieldReplaceStatue = null;
+        var options = { 
+            labelCss: 'labelcontainer',
+            fieldCss: 'fieldcontainer',
+            fields: [],
+            onAfterSetFields: function ()
+            {
+                var g = this, p = this.options; 
+                f_setDrag();
+                //f_setReadonly();
+                if (formProperty)
+                {
+                    formProperty.set('fields', []);
+                }
+                $(".l-fieldcontainer-first").removeClass("l-fieldcontainer-first"); 
+                setTimeout(function ()
+                { 
+                    $(".l-group")
+                       .width($("#designPanel").width() * 0.95)
+                       .find(".togglebtn").remove();
+                    $(".l-group").append("<div class='togglebtn'></div>");
+                      
+                }, 10);
+            }
+        };
+        $.ligerui.controls.Form.prototype.getNextField = function (field)
+        {
+            var g = this, p = this.options,	visited = false;
+            for (var i = 0, l = p.fields.length; i < l; i++)
+            {
+                if (visited) return p.fields[i];
+                if (p.fields[i] == field) visited = true; 
+            }
+            return null;
+        };
+        $.ligerui.controls.Form.prototype.moveField = function (fromIndex, toIndex, isAfter)
+        {
+            var g = this, p = this.options;
+            if (!p.fields) return;
+            var fromField = g.getField(fromIndex);
+            var toField = g.getField(toIndex);
+            if (fromField.newline != false)
+            {
+                var next = g.getNextField(fromField);
+                if (next)
+                {
+                    if (next.newline == false) next.newline = true;
+                }
+            }
+            if (!isAfter)
+            {
+                if (toField.newline != false)
+                {
+                    toField.newline = false;
+                    fromField.newline = true;
+                }
+            }
+            else
+            {
+                fromField.newline = false;
+            }
+            fromField.group = toField.group;
+            //先移除欲移动的field
+            p.fields.splice(fromIndex, 1);
+            //重新计算 目标位置field的 index
+            toIndex = $.inArray(toField, p.fields);
+            //插入
+            p.fields.splice(toIndex + (isAfter ? 1 : 0), 0, fromField);
+
+            g.set('fields', p.fields);
+        };
+
+
+        $("#layout1").ligerLayout({ 
+            rightWidth: 250,
+            height: '100%',
+            heightDiff: -4,
+            space: 4 
+        }); 
+      
+        var formDesign = $("#formDesign").ligerForm(options);
+        var formProperty = $("#formProperty").ligerForm({
+            onAfterSetFields: function ()
+            {
+                var g = this, p = this.options;
+                if (!p.fields || !p.fields.length)
+                {
+                    $("#btnSaveProperty").hide();
+                }
+                else
+                {
+                    $("#btnSaveProperty").show();
+                }
+            }
+        });
+        var btnSave = $("#btnSaveProperty").ligerButton({
+            click: f_saveProperty,text:'保存'
+        });
+        var btnSaveToFile = $("#btnSaveToFile").ligerButton({
+            click: f_saveToFile, text: '保存'
+        }); 
+        
+        
+        $("#formDesign li.l-fieldcontainer").live('mouseover', function ()
+        {
+            if (dragging) return;
+            $(this).addClass("l-fieldcontainer-over");
+        }).live('mouseout', function ()
+        {
+            $(this).removeClass("l-fieldcontainer-over");
+        }).live('click', function ()
+        {
+            if (dragging) return;
+            var selected = $(this).hasClass("l-fieldcontainer-selected");
+            $("li.l-fieldcontainer-selected").removeClass("l-fieldcontainer-selected");
+            if (!selected)
+            { 
+                $(this).addClass("l-fieldcontainer-selected");
+            }
+            f_setProperty();
+        });
+
+        f_setMenu();
+        f_loadFile();
+
+        function f_loadFile()
+        {
+            formDesign.set({
+                inputWidth: 170,
+                labelWidth: 90,
+                space: 40,
+                fields: [ 
+                { name: "ProductID", type: "hidden" },
+                { label: "产品名称", name: "ProductName", width: 170, labelWidth: 90, space: 40, newline: true, type: "text", group: "基础信息", groupicon: ICONS.Group },
+                {
+                    label: "供应商", name: "SupplierID", width: 170, labelWidth: 90, space: 40, newline: false, type: "combobox", textField: "CompanyName", editor: {
+                        data: demoData,grid:demoGrid,selectBoxWidth:400,selectBoxHeight:200
+                    }
+                },
+                 
+                {
+                    label: "类别 ", name: "CategoryID", width: 170, labelWidth: 90, space: 40, newline: true, type: "select", textField: "CategoryName", editor: {
+                        data: demoData
+                    }
+                },
+                {
+                    label: "供应商2", name: "SupplierID2", width: 170, labelWidth: 90, space: 40, newline: false, type: "popup", textField: "CompanyName2", editor: {
+                        data: demoData, grid: demoGrid, selectBoxWidth: 400, selectBoxHeight: 200
+                    }
+                },
+                { label: "日期 ", name: "AddTime", width: 170, labelWidth: 90, space: 40, newline: true, type: "date" },
+                { label: "折扣", name: "QuantityPerUnit", width: 170, labelWidth: 90, space: 40, newline: false, type: "number" },
+                { label: "单价", name: "UnitPrice", width: 170, labelWidth: 90, space: 40, newline: true, type: "number" },
+                { label: "库存量", name: "UnitsInStock", width: 170, labelWidth: 90, space: 40, newline: true, type: "digits", group: "库存", groupicon: ICONS.Group },
+                { label: "订购量", name: "UnitsOnOrder", width: 170, labelWidth: 90, space: 40, newline: false, type: "digits" },
+                { label: "备注", name: "Remark", labelWidth: 90, space: 40, newline: true, type: "textarea", width: 470 },
+                   { label: "产品名称", name: "ProductName", width: 170, labelWidth: 90, space: 40, newline: true, type: "text", group: "基础信息 ", groupicon: ICONS.Group }
+                ]
+            });
+            //$.ajax({
+            //    type: "GET",
+            //    url: "data.json",
+            //    dataType: "json",
+            //    success: function (data)
+            //    { 
+            //        if (!data || !data.Fields) return;
+            //        var fields = convertToFields(data.Fields);
+            //        formDesign.set({
+            //            labelWidth: data.LabelWidth,
+            //            inputWidth: data.InputWidth,
+            //            space: data.Space,
+            //            fields: fields
+            //        });
+            //    },
+            //    error: function ()
+            //    {
+            //    }
+            //});
+        }
+        function showMessage(message)
+        {
+            var input = $("<textarea style='width:99%;height:220px' />").val(message);
+            $.ligerDialog.show({
+                target: input,
+                width: 400,
+                height:290,
+                showMax: false,
+                showToggle: false,
+                showMin: false 
+            });
+        }
+        function f_saveToFile()
+        {
+            showMessage(JSON.stringify(formDesign.get('fields')));
+            //$.ajax({
+            //    type: "post",
+            //    url: "save.ashx",
+            //    data: {
+            //        fields: JSON.stringify(formDesign.get('fields'))
+            //    },
+            //    dataType: "json",
+            //    success: function (data) {
+            //        if (!data) return;
+            //        if (data.error) alert('保存发生错误');
+            //        else alert('保存成功');
+            //    },
+            //    error: function () {
+            //        alert('保存发生错误');
+            //    }
+            //});
+        }
+
+        function convertToFields(FormFields) {
+            var fields = [];
+            $(FormFields).each(function ()
+            {
+                var o = {
+                    name: this.Name,
+                    type: this.Type || 'text',
+                    width: this.Width,
+                    newline: this.NewLine,
+                    label: this.Label,
+                    group: this.Group
+                };
+                o.editor = getEditorByType(o.type); 
+                if (o.group) o.groupicon = ICONS.Group;
+                fields.push(o);
+            }); 
+            return fields;
+        }
+
+        function getEditorByType(type)
+        {
+            if ($.inArray(type, ["select", "radiolist", "checkboxlist", "listbox"]) != -1)
+            {
+                return { data: demoData };
+            }
+            if ($.inArray(type, ["combobox", "popup"]) != -1)
+            {
+                return {
+                    grid: demoGrid,
+                    selectBoxWidth: 400,
+                    selectBoxHeight: 170,
+                    textField: 'text',
+                    valueField: 'id'
+                };
+            }
+            return null;
+        }
+        function f_init() {
+        }
+
+
+        function f_setDrag()
+        { 
+            
+            $('li.l-fieldcontainer').ligerDrag({ 
+                revert: true, handler: '.labelcontainer',
+                proxy: function ()
+                {
+                    var div = $("<div class='fieldproxy'></div>");
+                    //$(this).clone().appendTo(div);
+                    div.add(fieldReplace).width($(this).width());
+                    div.add(fieldReplace).height($(this).height());
+                    div.appendTo('body');
+                    return div;
+                },
+                onrevert: function ()
+                {
+                    return false;
+                },
+                ondrag: function (current, e)
+                {
+                    dragging = true;
+                    var pageX = e.pageX || e.screenX, pageY = e.pageY || e.screenY;
+                    var height = this.proxy.height(), width = this.proxy.width();
+                    var centerX = pageX , centerY = pageY - height / 2;
+                    this.target.hide();
+
+                    var result = getPositionIn($('li.l-fieldcontainer').not(this.handler), centerX, centerY); 
+                    if (result)
+                    {
+                        if (result != true)
+                        { 
+                            fieldReplace.show();
+                            //判断是否跟上次匹配的位置一致
+                            if (fieldReplaceStatue &&
+                            fieldReplaceStatue.fieldindex == result.fieldindex &&
+                            fieldReplaceStatue.position == result.position)
+                            {
+                                return;
+                            } 
+                            if (result.position == "left")
+                            {
+                                fieldReplace.insertBefore(result.element);
+                            } else if (result.position = "right")
+                            {
+                                fieldReplace.insertAfter(result.element);
+                            }
+                            fieldReplaceStatue = result;
+                        }
+                    }
+                    //没有匹配到
+                    else
+                    { 
+                        fieldReplacePosition = null;
+                        fieldReplace.hide();
+                    }
+                },
+                onStopDrag: function (current, e)
+                {
+                    dragging = false;
+                    fieldReplacePosition = null;
+                    fieldReplace.hide();
+                    this.target.show();
+                    if (fieldReplaceStatue)
+                    {
+                        var fromIndex = parseInt(this.target.attr("fieldindex"));
+                        var toIndex = parseInt(fieldReplaceStatue.fieldindex);
+                        formDesign.moveField(fromIndex, toIndex, fieldReplaceStatue.position == "right")
+                    }
+                }
+            });
+        }
+
+
+        //从指定的元素集合匹配位置
+        function getPositionIn(jelements,x,y)
+        {
+            for (var i = 0, l = jelements.length; i < l;i++)
+            {
+                var element = jelements[i];
+                var r = positionIn($(element), x, y);
+                if (r) return r;
+            }
+            return null;
+        }
+
+        //坐标在目标区域范围内
+        function positionIn(jelement,x,y)
+        { 
+            var height = jelement.height(), width = jelement.width();
+            var left = jelement.position().left, top = jelement.position().top;
+            var diff = 3;
+            if (y > top + diff && y < top + height -diff)
+            {
+                if (x > left + diff && x < left + width/2 - diff)
+                {
+                    if (jelement.hasClass("l-fieldcontainer-r")) return true;
+                    return {
+                        element: jelement,
+                        fieldindex: jelement.attr("fieldindex"),
+                        position: "left"
+                    };
+                }
+                if (x > left + width / 2 + diff && x < left + width - diff)
+                {
+                    if (jelement.hasClass("l-fieldcontainer-r")) return true;
+                    return {
+                        element: jelement,
+                        fieldindex: jelement.attr("fieldindex"),
+                        position: "right"
+                    }; 
+                }
+            }
+            return null;
+        }
+
+        function f_addGroup()
+        {
+            
+        }
+        function f_deleteField()
+        {
+            
+        }
+ 
+
+        function f_setMenu()
+        {
+            contextMenu = $.ligerMenu({
+                width: 120,
+                height : 400,
+                items:
+                    [
+                    { text: '增加分组', click: f_addGroup } ,
+                    { line: true },
+                    { text: '删除项', click: f_deleteField }
+                    ]
+            });
+            $(".l-layout-header,.l-group").bind("contextmenu", function (e)
+            {
+                contextMenu.show({ top: e.pageY, left: e.pageX });
+                return false;
+            });
+        }
+        function f_setReadonly()
+        {
+            $("input").attr("readonly", true);
+        }
+        
+        
+        //保存，更新值
+        function f_saveProperty()
+        { 
+            var changed = false;
+            $("#formProperty input").each(function ()
+            {
+                var name = this.name, value = this.value;
+                if ($(this).is(":checkbox,:radio")) value = this.checked;
+                var fieldindex = name.split('_')[0].replace("field", "");
+                name = name.split('_')[1];
+                var field = formDesign.getField(fieldindex);
+                for (var proName in field)
+                {
+                    var oldValue = field[proName];
+                    if (proName == name && oldValue != value)
+                    {
+                        var type = typeof (oldValue);
+                        field[proName] = getValueByType(value, type);
+                        if (proName == "type")
+                            field.editor = getEditorByType(value);  
+                        changed = true;
+                        return;
+                    }
+                }
+            });
+            if (changed)
+            {
+                formDesign.set('fields', formDesign.options.fields);
+            }
+        }
+
+        function getValueByType(value, type)
+        {
+            if (type == "number")
+            {
+                return parseInt(value);
+            }
+            if (type == "boolean")
+            {
+                return value == "true" || value == true ? true : false;
+            }
+            return value;
+        }
+        //获取field属性编辑框列表，初始化值
+        function f_setProperty()
+        {
+            var selected = $("li.l-fieldcontainer-selected");
+            if (!selected.length)
+            {
+                formProperty.set('fields', []);
+            }
+            var fieldindex = selected.attr("fieldindex");
+            var field = formDesign.getField(fieldindex);
+            if (field == null)
+            {
+                formProperty.set('fields', []);
+            }
+            var fields = f_setFieldProperties(field,fieldindex);
+            formProperty.set('fields', fields);
+            for (var name in field)
+            {
+                var value = field[name];
+                var jinput = $("#field" + fieldindex + "_" + name);
+                if (jinput.is(":checkbox,:radio"))
+                {
+                    jinput.attr("checked", value ? true : false);
+                    var o = liger.get($("#field" + fieldindex + "_" + name));
+                    if (o) o.updateStyle();
+                }
+                else
+                {
+                    $("#field" + fieldindex + "_" + name).val(value);
+                    var ligerId = $("#field" + fieldindex + "_" + name).attr("data-ligerid");
+                    if (ligerId)
+                    {
+                        liger.get(ligerId).updateStyle();
+                    }
+                }
+            }
+        }
+
+        function f_setFieldProperties(field,fieldIndex)
+        {
+            var properties = [];
+            for (var name in field) {
+                if (name == "name" || name == "groupicon" || name == "editor") continue; 
+                var editor = propFieldEditors[name];
+                var pro = $.extend({
+                    name: "field" + fieldIndex + "_" + name,
+                    label: name,
+                    width: 110,
+                    newline: true,
+                    type: 'text'
+                }, editor);
+                properties.push(pro);
+            }
+            return properties;
+        }
+        var propFieldEditors = {
+            newline: {
+                label: '在新行显示',
+                type: 'checkbox'
+            },
+            width: {
+                label: '宽度',
+                type: 'int'
+            },
+            labelWidth: {
+                label: '标签宽度',
+                type: 'int'
+            },
+            space: {
+                label: '间隔',
+                type: 'int'
+            },
+            label: {
+                label: '标签' 
+            },
+            group: {
+                label: '分组'
+            },
+            type: {
+                label: '编辑器类型',
+                type: 'select',
+                editor: {
+                    data: [ 
+                        { id: 'text', text: '文本框' },
+                        { id: 'int', text: '整数编辑框' },
+                        { id: 'number', text: '浮点数编辑框' },
+                        { id: 'currency', text: '货币编辑框' },
+                        { id: 'combobox', text: '表格下拉框' },
+                        { id: 'select', text: '简单下拉框' },
+                        { id: 'popup', text: '弹出选取框' },
+                        { id: 'date', text: '日期编辑' },
+                        { id: 'checkbox', text: '复选框' },
+                        { id: 'listbox', text: '列表框' },
+                        { id: 'radiolist', text: '单选框列表' },
+                        { id: 'checkboxlist', text: '多选复选框' },
+                        { id: 'textarea', text: '多行编辑框' },
+                        { id: 'htmleditor', text: 'HTML编辑框' }
+                    ]
+                }
+            }
+        };
+     </script> 
+</body>
+</html>

@@ -1,0 +1,11 @@
+/* 子课题显示控制 */
+.topId { text-decoration: none; color:#8B8970; position: relative; z-index: 2; }
+.topId:hover { z-index: 3; background: none;text-decoration:none; color:#8B8878;cursor:pointer; }
+.topId table{ display:none;}
+.topId:hover table { /*table 鼠标移动显示效果ʾ*/
+	display: block; position: absolute; width: 700px;
+	border: 1px solid #DFDFDF; background-color: #F0F0F0;
+	padding: 3px; color: black;
+}
+.trClass{border-bottom: 1px dashed #C2C2C2; height:33px; border-left: 1px dashed #C2C2C2;}
+.tabletr{height:35px;}

@@ -1,0 +1,28 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="com.mvc.common.*" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+总记录数：${pagination.totalRecord } 条
+	每页：${pagination.size } 条
+	第  ${pagination.currentPage } 页/
+	共 ${pagination.totalPage } 页
+	
+	<c:if test="${pagination.currentPage == 1 }">
+		<span class="current">首页</span>
+		<span class="current">上一页</span>
+	</c:if>
+	<c:if test="${pagination.currentPage != 1 }">
+		<a href="?page=1">首页</a>
+		<a href="?page=${pagination.currentPage - 1 }">上一页</a>
+	</c:if>
+	<c:if test="${pagination.currentPage == pagination.totalPage || pagination.totalPage == 0 }">
+		<span class="current">下一页</span>
+		<span class="current">末页</span>
+	</c:if>
+	<c:if test="${pagination.currentPage != pagination.totalPage && pagination.totalPage != 0 }">
+		<a href="?page=${pagination.currentPage + 1 }">下一页</a>
+		<a href="?page=${pagination.totalPage }">末页</a>
+	</c:if>

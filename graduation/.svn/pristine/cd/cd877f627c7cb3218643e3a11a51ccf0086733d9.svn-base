@@ -1,0 +1,47 @@
+<%@page language="java" import="java.util.*,java.util.Map.*" pageEncoding="utf-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="com.mvc.entity.*, com.mvc.common.*" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<%
+	List<Tbgrade> list 	= (List<Tbgrade>) request.getAttribute("gradeList");
+	Department department 		= (Department) request.getSession().getAttribute("department");
+ %>
+<div class="pageContent">
+	<form method="post" action="<%=basePath %>admin/revieworder/addview.do" class="pageForm required-validate" onsubmit="return navTabSearch(this);">
+		<div class="pageFormContent" layoutH="56">
+			<div class="divider"></div>
+			<p>
+				<label>安排毕业评阅教师</label>
+			</p>
+			<div class="divider"></div>
+			<p>
+				<label>请选择要安排的年级：</label>
+				<select name="grade" class="required">
+					<option>-- 请选择 --</option>
+					<%
+						if(null != list && 0 < list.size()) {
+							for(int i = 0; i < list.size(); i ++) {
+							Tbgrade grade = list.get(i);
+					 %>
+					 		<option value="<%=grade.getGraId() %>"><%=grade.getGraNumber() %></option>
+					 <%
+					 		}
+					 	}
+					  %>
+				</select>
+			</p>
+			<div class="divider"></div>
+		</div>
+		<div class="formBar">
+			<ul>
+				<li><div class="buttonActive"><div class="buttonContent"><button type="submit">确定</button></div></div></li>
+				<li>
+					<div class="button"><div class="buttonContent"><button type="button" class="close">取消</button></div></div>
+				</li>
+			</ul>
+		</div>
+	</form>
+</div>

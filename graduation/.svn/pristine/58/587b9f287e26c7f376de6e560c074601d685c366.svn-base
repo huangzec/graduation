@@ -1,0 +1,632 @@
+-- phpMyAdmin SQL Dump
+-- version 2.10.2
+-- http://www.phpmyadmin.net
+-- 
+-- 主机: localhost
+-- 生成日期: 2014 年 08 月 14 日 11:36
+-- 服务器版本: 5.0.67
+-- PHP 版本: 5.2.3
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+-- 
+-- 数据库: `graduation`
+-- 
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `department`
+-- 
+
+CREATE TABLE `department` (
+  `dept_ID` varchar(10) NOT NULL COMMENT '系部ID',
+  `dept_Name` varchar(50) NOT NULL COMMENT '系部名称',
+  PRIMARY KEY  (`dept_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='系部表';
+
+-- 
+-- 导出表中的数据 `department`
+-- 
+
+INSERT INTO `department` VALUES ('064', '计算机工程系3');
+INSERT INTO `department` VALUES ('065', '教育科学系');
+INSERT INTO `department` VALUES ('066', '人文教育系');
+INSERT INTO `department` VALUES ('068', '外国语言文学系');
+INSERT INTO `department` VALUES ('069', '计算机工程系');
+INSERT INTO `department` VALUES ('070', '教育科学系');
+INSERT INTO `department` VALUES ('061', '单端放大');
+INSERT INTO `department` VALUES ('072', 'dffdfds');
+INSERT INTO `department` VALUES ('073', 'jkjjkj');
+INSERT INTO `department` VALUES ('063', 'fsfsfsd');
+INSERT INTO `department` VALUES ('074', 'klpkopjo');
+INSERT INTO `department` VALUES ('075', '564511');
+INSERT INTO `department` VALUES ('076', '5645644');
+INSERT INTO `department` VALUES ('077', 'fdafdasffdsfew');
+INSERT INTO `department` VALUES ('012', '大学体育部');
+INSERT INTO `department` VALUES ('090', '数学系');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `deptmanager`
+-- 
+
+CREATE TABLE `deptmanager` (
+  `dm_ID` varchar(12) NOT NULL COMMENT '系管编号',
+  `dept_ID` varchar(10) default NULL COMMENT '系部ID',
+  `dm_Name` varchar(16) default NULL COMMENT '系管姓名',
+  `dm_Sex` varchar(4) default NULL COMMENT '性别',
+  `dm_Tel` varchar(15) default NULL COMMENT '联系电话',
+  `dm_Email` varchar(30) NOT NULL COMMENT '电子邮箱',
+  PRIMARY KEY  (`dm_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='系部管理员表';
+
+-- 
+-- 导出表中的数据 `deptmanager`
+-- 
+
+INSERT INTO `deptmanager` VALUES ('1106401042', '064', '黄泽西', '1', '15111592794', '2');
+INSERT INTO `deptmanager` VALUES ('1106401001', '1', '11111', NULL, NULL, '');
+INSERT INTO `deptmanager` VALUES ('06033', '065', '黄泽西', '1', '111', '1111');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `gradeall`
+-- 
+
+CREATE TABLE `gradeall` (
+  `gA_ID` int(11) NOT NULL COMMENT '综合成绩编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `gA_Grade` float default NULL COMMENT '综合成绩',
+  PRIMARY KEY  (`gA_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='综合成绩表';
+
+-- 
+-- 导出表中的数据 `gradeall`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `gradeone`
+-- 
+
+CREATE TABLE `gradeone` (
+  `go_ID` int(11) NOT NULL COMMENT '表一编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `go_One` float default NULL COMMENT '项一成绩',
+  `go_Two` float default NULL COMMENT '项二成绩',
+  `go_Three` float default NULL COMMENT '项三成绩',
+  `go_Four` float default NULL COMMENT '项四成绩',
+  `go_Five` float default NULL COMMENT '项五成绩',
+  `go_Six` float default NULL COMMENT '项六成绩',
+  `go_All` float default NULL COMMENT '总成绩',
+  PRIMARY KEY  (`go_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='成绩表一';
+
+-- 
+-- 导出表中的数据 `gradeone`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `gradethree`
+-- 
+
+CREATE TABLE `gradethree` (
+  `gtr_ID` int(11) NOT NULL COMMENT '表三编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `gtr_One` float default NULL COMMENT '项一成绩',
+  `gtr_Two` float default NULL COMMENT '项二成绩',
+  `gtr_Three` float default NULL COMMENT '项三成绩',
+  `gtr_Four` float default NULL COMMENT '项四成绩',
+  `gtr_Five` float default NULL COMMENT '项五成绩',
+  `gtr_Six` float default NULL COMMENT '项六成绩',
+  `gtr_All` float default NULL COMMENT '总成绩',
+  PRIMARY KEY  (`gtr_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='成绩表三';
+
+-- 
+-- 导出表中的数据 `gradethree`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `gradetwo`
+-- 
+
+CREATE TABLE `gradetwo` (
+  `gt_ID` int(11) NOT NULL COMMENT '表二编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `gt_One` float default NULL COMMENT '项一成绩',
+  `gt_Two` float default NULL COMMENT '项二成绩',
+  `gt_Three` float default NULL COMMENT '项三成绩',
+  `gt_Four` float default NULL COMMENT '项四成绩',
+  `gt_Five` float default NULL COMMENT '项五成绩',
+  `gt_Six` float default NULL COMMENT '项六成绩',
+  `gt_All` float default NULL COMMENT '总成绩',
+  PRIMARY KEY  (`gt_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='成绩表二';
+
+-- 
+-- 导出表中的数据 `gradetwo`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `graduateinfo`
+-- 
+
+CREATE TABLE `graduateinfo` (
+  `gdi_ID` int(11) NOT NULL auto_increment COMMENT '答辩ID',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `gdi_Date` date default NULL COMMENT '答辩日期',
+  `gdi_Place` varchar(20) default NULL COMMENT '答辩地点',
+  `gdi_Number` int(11) default NULL COMMENT '答辩序号',
+  PRIMARY KEY  (`gdi_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='毕业答辩信息表' AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `graduateinfo`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `hjz_actor`
+-- 
+
+CREATE TABLE `hjz_actor` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `hjz_actor`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `message`
+-- 
+
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL auto_increment COMMENT '编号|系统自动生成|show|hidden',
+  `name` varchar(255) default NULL COMMENT '标题|信息标题',
+  `content` text COMMENT '内容|详细内容',
+  `to_id` varchar(255) NOT NULL COMMENT '收件人|收件人编号|show|linked',
+  `from_id` varchar(255) NOT NULL COMMENT '发送人|发送人编号|show|linked',
+  `status` tinyint(4) NOT NULL default '1' COMMENT '查看状态|1->未查看,2->已查看|show|select',
+  `create_time` varchar(255) default NULL COMMENT '创建时间|格式：2013-04-10 08:09:09',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='消息|消息模块' AUTO_INCREMENT=4 ;
+
+-- 
+-- 导出表中的数据 `message`
+-- 
+
+INSERT INTO `message` VALUES (1, 'admin', 'aaaaaaaa', '12', '11', 1, '1406782203000');
+INSERT INTO `message` VALUES (2, '云翻涌 成夏眼泪被岁月蒸发这条路上的 你我她有谁迷路了', '测试测试测试测试测试风吹雨 成花时间追不上白马你年少 掌心的梦话依然紧握着吗云翻涌 成夏眼泪被岁月蒸发这条路上的 你我她有谁迷路了吗我们说好不分离要一直一直在一起就算与时间为敌就算与全世界背离佘朝文与赵敏共同签署了《怀化学院--昆山杰普软件软件工程师校企联合专业共建人才培养协议书》。根据协议，双方共建怀化学院软件工程师班，在专业建设规划、课程体系建设、校内实验室和校内外实习实训基地建设、学生就业和职业发展及“双师型”教师培养等方面展开紧密合作，创建校企合作应用型人才培养新模式。\r\n　　杰普软件是一家软件外包、研发咨询、高端IT培训多元化发展的集团公司，总部位于上海，分别成立了研发中心、实训中心、软件外包中心，专注于物联网、移动互联、电子商务及云计算等领域的产品研发及人才培养。', '11', '12', 2, '2014.08.03 13:16:02');
+INSERT INTO `message` VALUES (3, '测试', '测试大赛测试测试测试测试', '11', '11', 1, '1406788637000');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `opentopicinfo`
+-- 
+
+CREATE TABLE `opentopicinfo` (
+  `opi_ID` int(11) NOT NULL auto_increment COMMENT '开题编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `opi_Date` date default NULL COMMENT '开题日期',
+  `opi_Place` varchar(20) default NULL COMMENT '开题地点',
+  `opi_Number` int(11) default NULL COMMENT '开题答辩序号',
+  PRIMARY KEY  (`opi_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='开题答辩信息表' AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `opentopicinfo`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `profession`
+-- 
+
+CREATE TABLE `profession` (
+  `pro_ID` varchar(10) NOT NULL COMMENT '专业编号',
+  `gra_ID` int(11) default NULL COMMENT '年级编号',
+  `pro_Name` varchar(50) NOT NULL COMMENT '专业名称',
+  `dept_ID` varchar(255) default NULL COMMENT '系部编号',
+  PRIMARY KEY  (`pro_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='专业表';
+
+-- 
+-- 导出表中的数据 `profession`
+-- 
+
+INSERT INTO `profession` VALUES ('06001', 8, '计算机科学与技术', NULL);
+INSERT INTO `profession` VALUES ('06002', 5, '网络工程', NULL);
+INSERT INTO `profession` VALUES ('06006', 5, '软件工程', '064');
+INSERT INTO `profession` VALUES ('06007', 8, '计算机科学与技术', '064');
+INSERT INTO `profession` VALUES ('06008', 8, '网络工程', '064');
+INSERT INTO `profession` VALUES ('15401', 2, '人文教育', '065');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `reviewresult`
+-- 
+
+CREATE TABLE `reviewresult` (
+  `id` int(11) NOT NULL auto_increment COMMENT '编号|系统自动生成',
+  `top_ID` varchar(255) NOT NULL COMMENT '课题ID',
+  `judge_ID` varchar(255) NOT NULL COMMENT '评审人ID',
+  `status` varchar(255) NOT NULL default '1' COMMENT '评审结果|1 通过 2 不通过',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='课题评审结果' AUTO_INCREMENT=15 ;
+
+-- 
+-- 导出表中的数据 `reviewresult`
+-- 
+
+INSERT INTO `reviewresult` VALUES (1, '20140804170649', '010', '1');
+INSERT INTO `reviewresult` VALUES (2, '20140804170649', '010', '1');
+INSERT INTO `reviewresult` VALUES (3, '20140804170649', '010', '1');
+INSERT INTO `reviewresult` VALUES (4, '20140804170649', '010', '2');
+INSERT INTO `reviewresult` VALUES (5, '4', '010', '1');
+INSERT INTO `reviewresult` VALUES (6, '20140802164843', '010', '2');
+INSERT INTO `reviewresult` VALUES (7, '20140805150626', '010', '2');
+INSERT INTO `reviewresult` VALUES (8, '20140804170649', '010', '1');
+INSERT INTO `reviewresult` VALUES (9, '20140804170649', '', '2');
+INSERT INTO `reviewresult` VALUES (10, '20140802164843', '1115403025', '2');
+INSERT INTO `reviewresult` VALUES (11, '20140805150626', '1115403025', '1');
+INSERT INTO `reviewresult` VALUES (13, '20140804170649', '010', '2');
+INSERT INTO `reviewresult` VALUES (14, '20140807105535', '010', '1');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `selectfirst`
+-- 
+
+CREATE TABLE `selectfirst` (
+  `sel_ID` int(11) NOT NULL auto_increment COMMENT '标号',
+  `top_ID` varchar(255) NOT NULL COMMENT '课题ID',
+  `sT_ID` int(11) NOT NULL COMMENT '子课题ID',
+  `stu_ID` varchar(12) NOT NULL COMMENT '选择人学号',
+  `sel_knowing` text NOT NULL COMMENT '对课题的认识',
+  `sel_status` varchar(10) NOT NULL COMMENT '状态--默认0未被选择，1确定为任务人',
+  PRIMARY KEY  (`sel_ID`),
+  KEY `FKD355B34BE9E36BC` (`top_ID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='课题的初步选择记录表' AUTO_INCREMENT=5 ;
+
+-- 
+-- 导出表中的数据 `selectfirst`
+-- 
+
+INSERT INTO `selectfirst` VALUES (1, '20140807164146', 2, '1106401001', '是哥伦比亚作家加西亚·马尔克斯的代表作，也是拉丁美洲魔幻现实主义文学的代表作，被誉为“再现拉丁美洲历史社会图景的鸿篇巨著”。作品描写了布恩迪亚家族七代人的传奇故事', '0');
+INSERT INTO `selectfirst` VALUES (2, '20140807164146', 3, '1106401002', '作品融入神话传说、民间故事、宗教典故等神秘因素，巧妙地糅合了现实与虚幻，展现出一个瑰丽的想象世界，成为20世纪最重要的经典文学巨著之一', '0');
+INSERT INTO `selectfirst` VALUES (3, '20140807164146', 4, '1106401023', '新中国三十年改革开放而重新崛起的历程。《百年孤独》的作者加西亚·马尔克斯在完成巨著后曾有一个夙愿：希望一百年孤独的历史永远消失并再也不会出现。但愿，作者的苦心和夙愿梦想成真。', '0');
+INSERT INTO `selectfirst` VALUES (4, '20140807164146', 5, '1106401042', '不管走到哪，都要永远记住：过去是虚假的，往事时不能返回的，每一个消逝的春天都一去不复返了。最狂热、最坚贞的爱情也只是过眼云烟', '0');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `settime`
+-- 
+
+CREATE TABLE `settime` (
+  `id` int(11) NOT NULL auto_increment COMMENT '系统自动生成',
+  `name` varchar(255) default NULL COMMENT '标题',
+  `dept_ID` varchar(255) default NULL COMMENT '系部编号',
+  `gra_number` varchar(255) default NULL COMMENT '届数|对应哪一届',
+  `start_time` varchar(255) default NULL COMMENT '开始时间',
+  `end_time` varchar(255) default NULL COMMENT '结束时间',
+  `mark` varchar(255) default NULL COMMENT '1 提交课题 2 审核课题 3 选择课题',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
+
+-- 
+-- 导出表中的数据 `settime`
+-- 
+
+INSERT INTO `settime` VALUES (7, '2015届课题提交时间安排', '064', '8', '2014-07-17 11:31:04', '2014-08-17 11:31:06', '1');
+INSERT INTO `settime` VALUES (2, '2014届毕业课题提交时间', '064', '5', '2014-06-01 00:00:00', '2014-06-30 23:59:59', '1');
+INSERT INTO `settime` VALUES (3, '2013届毕业生课题提交时间', '064', '1', '2014-07-17 11:05:52', '2014-07-25 11:05:55', '1');
+INSERT INTO `settime` VALUES (4, '2015届课题选择时间安排', '064', '7', '2014-07-17 11:22:22', '2014-08-19 11:22:24', '3');
+INSERT INTO `settime` VALUES (8, '2015届课题提交时间安排', '064', '8', '2014-07-17 12:56:28', '2014-08-19 12:56:31', '2');
+INSERT INTO `settime` VALUES (9, '2014届审核课题时间', '064', '5', '2014-07-17 12:58:30', '2014-07-17 12:58:32', '2');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `student`
+-- 
+
+CREATE TABLE `student` (
+  `stu_ID` varchar(12) NOT NULL COMMENT '学号',
+  `gdi_ID` int(11) default NULL COMMENT '答辩ID',
+  `opi_ID` int(11) default NULL COMMENT '开题编号',
+  `tR_ID` int(11) default NULL COMMENT '开题报告书编号',
+  `gt_ID` int(11) default NULL COMMENT '表二编号',
+  `gtr_ID` int(11) default NULL COMMENT '表三编号',
+  `go_ID` int(11) default NULL COMMENT '表一编号',
+  `tD_ID` int(11) default NULL COMMENT '任务书编号',
+  `stt_ID` int(11) default NULL COMMENT '关系编号',
+  `cla_ID` int(11) default NULL COMMENT '班级编号',
+  `gA_ID` int(11) default NULL COMMENT '综合成绩编号',
+  `stu_Name` varchar(16) default NULL COMMENT '姓名',
+  `stu_Sex` varchar(4) default NULL COMMENT '性别',
+  `stu_Tel` varchar(15) default NULL COMMENT '电话',
+  `stu_Email` varchar(30) NOT NULL COMMENT '邮箱',
+  PRIMARY KEY  (`stu_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='学生表';
+
+-- 
+-- 导出表中的数据 `student`
+-- 
+
+INSERT INTO `student` VALUES ('1106401042', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 201104, NULL, '黄泽西', '1', '15111592794', 'huangzec@foxmail.com');
+INSERT INTO `student` VALUES ('1115403025', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1115403, NULL, '冯傲雪', '2', '', '1059033846@qq.com');
+INSERT INTO `student` VALUES ('1106401001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 201103, NULL, '张海兰', '2', '', '1505388138@qq.com');
+INSERT INTO `student` VALUES ('1106401002', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, '李靖文', '1', '', 'xjiujiu@foxmail.com');
+INSERT INTO `student` VALUES ('1106401023', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, NULL, '贺盼华', '2', '', 'huangzec@foxmail.com');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `stu_tea_topic`
+-- 
+
+CREATE TABLE `stu_tea_topic` (
+  `stt_ID` int(11) NOT NULL auto_increment COMMENT '关系编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `tea_ID` varchar(12) default NULL COMMENT '教师工号',
+  `Tea_tea_ID` varchar(12) default NULL COMMENT '教师工号',
+  `stt_Status` tinyint(1) default NULL COMMENT '开题答辩通过与否',
+  PRIMARY KEY  (`stt_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `stu_tea_topic`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `taskdoc`
+-- 
+
+CREATE TABLE `taskdoc` (
+  `tD_ID` int(11) NOT NULL auto_increment COMMENT '任务书编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `tea_ID` varchar(12) default NULL COMMENT '教师工号',
+  `tD_conRequest` text COMMENT '毕业设计内容要求',
+  `tD_devTools` text COMMENT '开发工具',
+  `tD_refMaterial` text COMMENT '参考资料',
+  `tD_workPlane` text COMMENT '工作计划',
+  PRIMARY KEY  (`tD_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='毕业设计任务书' AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `taskdoc`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `tbclass`
+-- 
+
+CREATE TABLE `tbclass` (
+  `cla_ID` int(11) NOT NULL COMMENT '班级编号',
+  `cla_Name` varchar(255) default NULL COMMENT '班级名称',
+  `pro_ID` varchar(10) default NULL COMMENT '专业编号',
+  PRIMARY KEY  (`cla_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='班级表';
+
+-- 
+-- 导出表中的数据 `tbclass`
+-- 
+
+INSERT INTO `tbclass` VALUES (2011, '11计算机1班', '06007');
+INSERT INTO `tbclass` VALUES (2, '11计算机3班', '06008');
+INSERT INTO `tbclass` VALUES (201103, '11网络工程4班', '06008');
+INSERT INTO `tbclass` VALUES (201104, '11网络工程5班', '06008');
+INSERT INTO `tbclass` VALUES (1115403, '11人文教育3班', '15401');
+INSERT INTO `tbclass` VALUES (201102, '11计算机2班', '06007');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `tbgrade`
+-- 
+
+CREATE TABLE `tbgrade` (
+  `gra_ID` int(11) NOT NULL auto_increment COMMENT '年级编号',
+  `dept_ID` varchar(10) default NULL COMMENT '系部ID',
+  `gra_Number` varchar(8) NOT NULL COMMENT '届数',
+  PRIMARY KEY  (`gra_ID`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='年级表' AUTO_INCREMENT=9 ;
+
+-- 
+-- 导出表中的数据 `tbgrade`
+-- 
+
+INSERT INTO `tbgrade` VALUES (1, '064', '2013');
+INSERT INTO `tbgrade` VALUES (7, '064', '2012');
+INSERT INTO `tbgrade` VALUES (5, '064', '2014');
+INSERT INTO `tbgrade` VALUES (8, '064', '2015');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `tboffice`
+-- 
+
+CREATE TABLE `tboffice` (
+  `off_ID` varchar(12) NOT NULL COMMENT '管理员ID',
+  `off_Name` varchar(16) default NULL COMMENT '姓名',
+  `off_Sex` varchar(4) default NULL COMMENT '性别',
+  `off_Tel` varchar(15) default NULL COMMENT '电话',
+  `off_Email` varchar(30) NOT NULL COMMENT '邮箱',
+  PRIMARY KEY  (`off_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='教务处管理员表';
+
+-- 
+-- 导出表中的数据 `tboffice`
+-- 
+
+INSERT INTO `tboffice` VALUES ('admin', 'admin', 'man', '123456', '123456');
+INSERT INTO `tboffice` VALUES ('123456', '123456', '1', '123456', '123456');
+INSERT INTO `tboffice` VALUES ('11', '11', NULL, NULL, '');
+INSERT INTO `tboffice` VALUES ('22', '22', '22', NULL, '');
+INSERT INTO `tboffice` VALUES ('1234', '1234', NULL, NULL, '');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `tbtopic`
+-- 
+
+CREATE TABLE `tbtopic` (
+  `top_ID` varchar(255) NOT NULL COMMENT '课题ID',
+  `top_commitID` varchar(12) default NULL COMMENT '提交人ID',
+  `top_Name` varchar(100) NOT NULL COMMENT '课题名称',
+  `top_Number` int(11) default NULL COMMENT '完成人数',
+  `top_Status` varchar(255) default NULL COMMENT '0-未审核 | 1-通过 | 2-未通过',
+  `top_Tec` text COMMENT '采用技术',
+  `top_Flag` varchar(10) character set ucs2 default NULL COMMENT '标记提交人类型',
+  `dept_ID` varchar(255) default NULL COMMENT '所属系部',
+  `parent_ID` varchar(255) default NULL COMMENT '父课题ID',
+  `completer_ID` varchar(12) default NULL COMMENT '任务人学号',
+  PRIMARY KEY  (`top_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- 
+-- 导出表中的数据 `tbtopic`
+-- 
+
+INSERT INTO `tbtopic` VALUES ('20140807164146', '010', 'Html标签w3school网上学习', 1, '1', 'w3school在线测试工具', '2', '064', NULL, NULL);
+INSERT INTO `tbtopic` VALUES ('20140808090451', '1106401001', '学生提交课题', 1, '0', '学生', '1', '064', NULL, NULL);
+INSERT INTO `tbtopic` VALUES ('20140808090550', '1106401001', '风吹雨 成花时间追不上白马你年少 掌心的梦话依然紧握着吗云翻涌 成夏眼泪被岁月蒸发这条', 1, '1', '风吹雨 成花时间追不上白马你年少 掌心的梦话依然紧握着吗云翻涌 成夏眼泪被岁月蒸发这条', '1', '064', NULL, NULL);
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `teacher`
+-- 
+
+CREATE TABLE `teacher` (
+  `tea_ID` varchar(12) NOT NULL COMMENT '教师工号',
+  `opi_ID` int(11) default NULL COMMENT '开题编号',
+  `stt_ID` int(11) default NULL COMMENT '关系编号',
+  `stu_stt_ID` int(11) default NULL COMMENT '关系编号',
+  `dept_ID` varchar(10) default NULL COMMENT '系部ID',
+  `gdi_ID` int(11) default NULL COMMENT '答辩ID',
+  `tea_Name` varchar(16) default NULL COMMENT '教师姓名',
+  `tea_Sex` varchar(4) default NULL COMMENT '性别',
+  `tea_Pos` varchar(20) default NULL COMMENT '职称',
+  `tea_Judge` tinyint(1) default NULL COMMENT '课题审核',
+  `tea_Group` tinyint(1) default NULL COMMENT '答辩组长',
+  `tea_Tel` varchar(15) default NULL COMMENT '联系电话',
+  `tea_Email` varchar(30) NOT NULL COMMENT '电子邮箱',
+  PRIMARY KEY  (`tea_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='教师信息表';
+
+-- 
+-- 导出表中的数据 `teacher`
+-- 
+
+INSERT INTO `teacher` VALUES ('06033', NULL, NULL, NULL, '', NULL, '黄隆华', '1', '1', NULL, NULL, '224544444', '1505388138@qq.com');
+INSERT INTO `teacher` VALUES ('06034', NULL, NULL, NULL, '', NULL, '411', '1', '1', NULL, NULL, '15111592794', '1505388138@qq.com');
+INSERT INTO `teacher` VALUES ('001', NULL, NULL, NULL, '', NULL, '黄泽西', '1', '1', NULL, NULL, '15111592794', 'huangzec@foxmail.com');
+INSERT INTO `teacher` VALUES ('002', NULL, NULL, NULL, NULL, NULL, '黄泽西', '1', '0', NULL, NULL, '15874592649', 'xjiujiu@foxmail.com');
+INSERT INTO `teacher` VALUES ('079', NULL, NULL, NULL, '064', NULL, '唐波', '1', '1', 1, NULL, '', '1059033846@qq.com');
+INSERT INTO `teacher` VALUES ('010', NULL, NULL, NULL, '064', NULL, '蒋启明', '2', '1', 1, NULL, '15874592649', '1505388138@qq.com');
+INSERT INTO `teacher` VALUES ('1115403025', NULL, NULL, NULL, '064', NULL, '冯傲雪', '2', '3', 1, NULL, '15874592649', '1505388138@qq.com');
+INSERT INTO `teacher` VALUES ('1115403026', NULL, NULL, NULL, '064', NULL, '汪婷婷', '2', '2', 1, NULL, '1555', '1505388138@qq.com');
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `topicreport`
+-- 
+
+CREATE TABLE `topicreport` (
+  `tR_ID` int(11) NOT NULL auto_increment COMMENT '开题报告书编号',
+  `stu_ID` varchar(12) default NULL COMMENT '学号',
+  `tR_One` text COMMENT '意义、研究动向和见解',
+  `tR_Two` text COMMENT '课题内容',
+  `tR_Three` text COMMENT '设计方案、研究方法',
+  `tR_Four` text COMMENT '工作计划',
+  `tR_Five` text COMMENT '参考资料',
+  `tR_Six` text COMMENT '指导老师意见',
+  `tR_Seven` text COMMENT '开题报告会纪要',
+  `tR_Eight` text COMMENT '答辩组意见',
+  `tR_Nine` text COMMENT '系部意见',
+  PRIMARY KEY  (`tR_ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='开题报告书' AUTO_INCREMENT=1 ;
+
+-- 
+-- 导出表中的数据 `topicreport`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- 表的结构 `user`
+-- 
+
+CREATE TABLE `user` (
+  `userid` int(11) NOT NULL auto_increment COMMENT 'id编号',
+  `username` varchar(255) NOT NULL COMMENT '用户账号',
+  `password` varchar(255) default NULL COMMENT '登陆密码',
+  `permissions` int(11) default NULL COMMENT '用户类型',
+  PRIMARY KEY  (`userid`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COMMENT='用户表' AUTO_INCREMENT=123468 ;
+
+-- 
+-- 导出表中的数据 `user`
+-- 
+
+INSERT INTO `user` VALUES (1, '123456', '123456', 1);
+INSERT INTO `user` VALUES (2, 'admin', '21232F297A57A5A743894A0E4A801FC3', 4);
+INSERT INTO `user` VALUES (3, '11', '6512BD43D9CAA6E02C990B0A82652DCA', 4);
+INSERT INTO `user` VALUES (4, '22', 'B6D767D2F8ED5D21A44B0E5886680CB9', 4);
+INSERT INTO `user` VALUES (5, '1234', '81DC9BDB52D04DC20036DBD8313ED055', 4);
+INSERT INTO `user` VALUES (6, '1106401042', 'F9A6736C8EC591A6B1632A8D31FD8B29', 3);
+INSERT INTO `user` VALUES (123463, '1106401001', '35D1C06469FB5E7A9F4E7312FFF1A4BE', 1);
+INSERT INTO `user` VALUES (123464, '06033', '6398796F364CE2E7005F31BBD08BA210', 3);
+INSERT INTO `user` VALUES (123465, '1115403025', 'F9A6736C8EC591A6B1632A8D31FD8B29', 2);
+INSERT INTO `user` VALUES (123466, '010', 'EA20A043C08F5168D4409FF4144F32E2', 2);
+INSERT INTO `user` VALUES (123467, '001', 'DC5C7986DAEF50C1E02AB09B442EE34F', 2);
+
+-- 
+-- 限制导出的表
+-- 
+
+-- 
+-- 限制表 `selectfirst`
+-- 
+ALTER TABLE `selectfirst`
+  ADD CONSTRAINT `FKD355B34BE9E36BC` FOREIGN KEY (`top_ID`) REFERENCES `tbtopic` (`top_ID`);

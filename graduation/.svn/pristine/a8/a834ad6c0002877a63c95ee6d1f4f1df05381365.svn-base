@@ -1,0 +1,103 @@
+package com.mvc.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ * Tbtopic entity. @author MyEclipse Persistence Tools
+ */
+@Entity
+@Table(name = "tbtopic", catalog = "graduation")
+public class Tbtopic implements java.io.Serializable {
+
+	// Fields
+
+	private String topId;
+	private String topName;
+	private Integer topNumber;
+	private String topTec;
+	private String topCommitId;
+	private String topStatus;
+
+	// Constructors
+
+	/** default constructor */
+	public Tbtopic() {
+	}
+
+	/** minimal constructor */
+	public Tbtopic(String topId, String topName) {
+		this.topId = topId;
+		this.topName = topName;
+	}
+
+	/** full constructor */
+	public Tbtopic(String topId, String topName, Integer topNumber,
+			String topTec, String topCommitId, String topStatus) {
+		this.topId = topId;
+		this.topName = topName;
+		this.topNumber = topNumber;
+		this.topTec = topTec;
+		this.topCommitId = topCommitId;
+		this.topStatus = topStatus;
+	}
+
+	// Property accessors
+	@Id
+	@Column(name = "top_ID", unique = true, nullable = false)
+	public String getTopId() {
+		return this.topId;
+	}
+
+	public void setTopId(String topId) {
+		this.topId = topId;
+	}
+
+	@Column(name = "top_Name", nullable = false, length = 100)
+	public String getTopName() {
+		return this.topName;
+	}
+
+	public void setTopName(String topName) {
+		this.topName = topName;
+	}
+
+	@Column(name = "top_Number")
+	public Integer getTopNumber() {
+		return this.topNumber;
+	}
+
+	public void setTopNumber(Integer topNumber) {
+		this.topNumber = topNumber;
+	}
+
+	@Column(name = "top_Tec", length = 100)
+	public String getTopTec() {
+		return this.topTec;
+	}
+
+	public void setTopTec(String topTec) {
+		this.topTec = topTec;
+	}
+
+	@Column(name = "top_commitID", length = 12)
+	public String getTopCommitId() {
+		return this.topCommitId;
+	}
+
+	public void setTopCommitId(String topCommitId) {
+		this.topCommitId = topCommitId;
+	}
+
+	@Column(name = "top_Status")
+	public String getTopStatus() {
+		return this.topStatus;
+	}
+
+	public void setTopStatus(String topStatus) {
+		this.topStatus = topStatus;
+	}
+
+}

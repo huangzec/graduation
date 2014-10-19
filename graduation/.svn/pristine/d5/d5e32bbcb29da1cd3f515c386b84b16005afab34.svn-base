@@ -1,0 +1,19 @@
+HHJsLib.register({
+	init: function() {
+		this.bindPrintbtnClick();
+		this.bindGobackbtnClick();
+	},
+	bindPrintbtnClick: function() {
+		$("#printbtn").click(function() {
+			$("#taskdoc-form")
+			.attr("action", siteUrl + "user/taskdoc/preview.do")
+			.attr("target", "_back")
+			.submit();
+		});
+	},
+	bindGobackbtnClick: function() {
+		$("#gobackbtn").click(function() {
+			history.go(-1);
+		});
+	}
+});

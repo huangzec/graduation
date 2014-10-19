@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	<context:annotation-config/>
+	<context:component-scan base-package="com.mvc"/>  <!-- 自动扫描所有注解该路径 -->
+    <context:property-placeholder location="classpath:config/jdbc.properties"/>
+    
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>		
+	</bean>
+	
+	<bean class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" id="sessionFactory">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.EhCacheProvider
+				</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>				
+			</props>	
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.mvc.entity</value>
+				<!-- 扫描实体类，也就是平时所说的model -->
+			</list>
+	   </property>
+	</bean>
+	
+	<bean class="org.springframework.orm.hibernate3.HibernateTransactionManager" id="transactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!-- Transaction -->
+	<!-- <bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean> -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED"/>
+			<tx:method name="add*" propagation="REQUIRED"/>
+			<tx:method name="remove*" propagation="REQUIRED"/>
+			<tx:method name="edit*" propagation="REQUIRED"/>
+			<tx:method name="*" propagation="REQUIRED" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(* com.mvc.service.*.*(..))" id="serviceMethods"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethods"/>
+	</aop:config>
+	
+	<!--  <context:property-placeholder location="classpath:/hibernate.properties" />-->
+
+	<bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate" p:dataSource-ref="dataSource"/>
+	
+	<!-- Dao的实现 -->
+	<bean class="com.mvc.dao.EntityDaoImpl" id="entityDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- wizardDao 的实现 -->
+	<bean class="com.mvc.dao.WizardDao" id="wizardDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- userDao 的实现  -->
+	<bean class="com.mvc.dao.UserDao" id="userDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- tbofficeDao 的实现 -->
+	<bean class="com.mvc.dao.TbofficeDao" id="tbofficeDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- deptmanagerDao 的实现 -->
+	<bean class="com.mvc.dao.DeptmanagerDao" id="deptmanagerDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- deptDao 的实现 -->
+	<bean class="com.mvc.dao.DeptDao" id="deptDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- teacherDao 的实现 -->
+	<bean class="com.mvc.dao.TeacherDao" id="teacherDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- tbgradeDao 的实现  -->
+	<bean class="com.mvc.dao.TbgradeDao" id="tbgradeDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- professionDao 的实现 -->
+	<bean class="com.mvc.dao.ProfessionDao" id="professionDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- tbclassDao 的实现 -->
+	<bean class="com.mvc.dao.TbclassDao" id="tbclassDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- settimeDao 的实现 -->
+	<bean class="com.mvc.dao.SettimeDao" id="settimeDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- studentDao 的实现 -->
+	<bean class="com.mvc.dao.StudentDao" id="studentDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- tbtopicDao 的实现 -->
+	<bean class="com.mvc.dao.TbtopicDao" id="tbtopicDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- messageDao 的实现 -->
+	<bean class="com.mvc.dao.MessageDao" id="messageDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- judgeDao 的实现 -->
+	<bean class="com.mvc.dao.JudgeDao" id="judgeDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- selectfirstDao 的实现 -->
+	<bean class="com.mvc.dao.SelectfirstDao" id="selectfirstDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<!-- taskdocDao 的实现 -->
+	<bean class="com.mvc.dao.TaskdocDao" id="taskdocDao">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<bean class="com.mvc.dao.ApplyDao" id="applyDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.OpentopicinfoDao" id="opentopicinfoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TopicapplyDao" id="topicapplyDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TopicreportDao" id="topicreportDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TopicfinishDao" id="topicfinishDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.RoomDao" id="roomDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.GraduateinfoDao" id="graduateinfoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.GradeoneDao" id="gradeoneDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.RevieworderDao" id="revieworderDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.GradetwoDao" id="gradetwoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.OpentopicscoreDao" id="opentopicscoreDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.MeetingDao" id="meetingDao">
+<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+<bean class="com.mvc.dao.GradethreeDao" id="gradethreeDao">
+<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+<bean class="com.mvc.dao.GradeallDao" id="gradeallDao">
+<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+<bean class="com.mvc.dao.ActorDaoImpl" id="actorDaoImpl">  
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	<tx:annotation-driven mode="aspectj"/>
+  
+    <aop:aspectj-autoproxy/>  
+</beans>

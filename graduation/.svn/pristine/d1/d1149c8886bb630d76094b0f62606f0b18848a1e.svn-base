@@ -1,0 +1,25 @@
+HHJsLib.register({
+	init: function() {
+		this.bindPrintbtnClick();
+		this.bindGobackbtnClick();
+		this.bindSenddocbtnClick();
+	},
+	bindPrintbtnClick: function() {
+		$("#printbtn").click(function() {
+			$("#taskdoc-form")
+			.attr("action", siteUrl + "user/taskdoc/preview.do")
+			.attr("target", "_blank")
+			.submit();
+		});
+	},
+	bindGobackbtnClick: function() {
+		$("#gobackbtn").click(function() {
+			history.go(-1);
+		});
+	},
+	bindSenddocbtnClick: function() {
+		$(".senddocbtn").click(function() {
+			window.location.href = siteUrl + "user/taskdoc/senddocview.do";
+		});
+	}
+});

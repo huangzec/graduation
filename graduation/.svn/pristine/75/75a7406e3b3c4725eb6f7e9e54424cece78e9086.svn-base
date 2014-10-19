@@ -1,0 +1,37 @@
+package com.mvc.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.mvc.common.Path;
+import com.mvc.common.WordUtil;
+
+/**
+ * word文档控制器
+ * 
+ * @author 		huangzec<huangzec@foxmail.com>
+ * @date 		2014-10-14 下午7:11:18 
+ * @version 	1.0
+ */
+@Controller
+@RequestMapping(value="/user/word")
+public class WordController {
+
+	@RequestMapping(value="/exportword.do")
+	public void exportWord(HttpServletRequest request, HttpServletResponse response)
+	{
+		String path = request.getContextPath();
+		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+		WordUtil wordUtil = new WordUtil();
+		try {
+			wordUtil.createDoc(Path.getWebRootPath(request) + "\\");
+			System.out.println("成功");
+		} catch (Exception e) {
+			System.out.println("error");
+		}
+		
+	}
+}

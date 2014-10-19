@@ -1,0 +1,105 @@
+HHJsLib.register({
+	init: function() {
+		this.bindSuccessbtnClick();
+		this.bindInfobtnClick();
+	},
+	bindPrintbtnClick: function() {
+		$("#printbtn").click(function() {
+			$("#taskdoc-form")
+			.attr("action", siteUrl + "user/taskdoc/preview.do")
+			.attr("target", "_blank")
+			.submit();
+		});
+	},
+	bindSuccessbtnClick: function() {
+		$(".btn-success").click(function() {
+			var _root 	= $(this);
+			var id 		= _root.parents("tr").children("input[name='id']").val();
+			var pass 	= _root.attr("pass");
+			var type 	= _root.parents("tr").children("input[name='type']").val();
+			var userId 	= _root.parents("tr").children("input[name='user_id']").val();
+			if(confirm("确认" + _root.text())) {
+				if(type == 2) {
+					$('#myModal').modal('show');
+					$('.modal-btn').unbind().click(function() {
+						var _base 	= $('.modal-body');
+						var one 	= _base.find("input[name='one']").val();
+						var two 	= _base.find("input[name='two']").val();
+						var three 	= _base.find("input[name='three']").val();
+						var four 	= _base.find("input[name='four']").val();
+						var five 	= _base.find("input[name='five']").val();
+						var all 	= _base.find("input[name='all']").val();
+						var content = _base.find("textarea[name='content']").val();
+						var inputFalse;
+						var data 	= {userId: userId, one: one, two: two, three: three, four: four, five: five, all: all, content: content};
+						_base.find('input').each(function(index) {
+							var $inputValue = $(this).val();
+							if('' == $inputValue.trim()) {
+								alert("第 " + (index + 1) + " 项的分值不能为空！");
+								inputFalse = 1;
+								return false;
+							}
+						});
+						if(inputFalse == 1) {
+							return false;
+						}
+						if('' == _base.find('textarea').val().trim()) {
+							alert("评定意见不能为空");
+							return false;
+						}
+						$.post(
+								siteUrl + 'user/apply/scoreteacher.do',
+								data,
+								function(response) {
+									if(response.rs === false) {
+										alert(response.message);
+										return;
+									}
+									$('#myModal').modal('hide');
+									_base.find('input').each(function() {
+										$(this).attr("value", "");
+									});
+									_base.find('textarea').val('');
+									$.getJSON(
+											siteUrl + 'user/apply/agree.do',
+											{id: id, pass: pass},
+											function(response) {
+												alert(response.message);
+												if(response.rs === true) {
+													window.location.reload();
+												}							
+											}
+									);
+								},
+								"json"
+						);
+					});
+				}
+				if(type == 1) {
+					$.getJSON(
+							siteUrl + 'user/apply/agree.do',
+							{id: id, pass: pass},
+							function(response) {
+								alert(response.message);
+								if(response.rs === true) {
+									window.location.reload();
+								}							
+							}
+					);
+				}
+			}
+		});
+	},
+	bindInfobtnClick: function() {
+		$(".btn-info").click(function() {
+			var _root 	= $(this);
+			var type 	= _root.parents("tr").children("input[name='type']").val();
+			var userId 	= _root.parents("tr").children("input[name='user_id']").val();
+			if(type == 1) {
+				window.open(siteUrl + "user/apply/opentopicword.do?userid=" + userId);
+			} else if(type == 2){
+				window.open(siteUrl + "user/apply/finishtopicword.do?userid=" + userId);
+			}
+		});
+	}
+});

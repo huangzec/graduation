@@ -1,0 +1,35 @@
+package com.mvc.common;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 数组工具类
+ * @author huangzec@foxmail.com
+ *
+ */
+public class ArrayUtil {
+	
+	/**
+	 * 把列表转换成 哈希键值
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-3 下午09:03:52
+	 * @return Map<String,Map<String,String>>
+	 */
+	public static Map<String, Map<String, String>> turnListMapToMapMap(String key, List<Map<String, String>> list)
+	{
+		Map<String, Map<String, String>> data 	= new LinkedHashMap<String, Map<String,String>>();
+		for(int i = 0; list != null && i < list.size(); i ++) {
+			if(null == list.get(i) || null == list.get(i).get(key)) {
+				continue;
+			}
+			data.put(list.get(i).get(key), list.get(i));
+		}
+		
+		return data;
+	}
+
+}

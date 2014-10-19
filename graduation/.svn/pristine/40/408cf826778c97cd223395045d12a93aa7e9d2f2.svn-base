@@ -1,0 +1,84 @@
+<%@page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="com.mvc.entity.*" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<%
+	List<Message> totalMessage = (List<Message>) request.getAttribute("total_message");
+ %>
+<jsp:include page="../common/header.jsp" flush="true" />
+</head>
+
+<body background="<%=basePath %>cscon/body-bg.png">
+
+<div class="navbar navbar-fixed-top">
+	
+	<jsp:include page="../common/top.jsp" flush="true" />
+	<!-- /navbar-inner -->
+	
+</div> <!-- /navbar -->
+
+<div id="content">
+	
+	<div class="container">
+		
+		<div class="row">
+			<jsp:include page="../common/navmenu_tea.jsp" flush="true" />
+			<!-- /span3 -->
+			
+			<div class="span9">
+				
+				<h1 class="page-title">
+					<i class="icon-home"></i>
+					我的主页					
+				</h1>
+				
+				<jsp:include page="../common/center-stat.jsp" flush="true" />
+				<!-- /stat-container -->
+				
+				<div class="widget">
+										
+					<div class="widget-content">
+						
+					</div> <!-- /widget-content -->
+					
+				</div> <!-- /widget -->
+			</div> <!-- /span9 -->
+			
+			
+		</div> <!-- /row -->
+		
+	</div> <!-- /container -->
+	
+</div> <!-- /content -->
+					
+	
+<div id="footer">
+	
+	<div class="container">				
+		<hr />
+		<jsp:include page="../common/footer.jsp" flush="true" />
+	</div> <!-- /container -->
+	
+</div> <!-- /footer -->
+
+
+    
+
+<!-- Le javascript
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="<%=basePath %>cscon/js/jquery-1.7.2.min.js"></script>
+<script src="<%=basePath %>cscon/js/excanvas.min.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.pie.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.orderBars.js"></script>
+<script src="<%=basePath %>cscon/js/jquery.flot.resize.js"></script>
+
+
+<script src="<%=basePath %>cscon/js/bootstrap.js"></script>
+<script src="<%=basePath %>cscon/js/charts/bar.js"></script>
+
+  </body>
+</html>

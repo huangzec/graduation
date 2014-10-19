@@ -1,0 +1,49 @@
+package com.mvc.common;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * 请求响应类
+ * @author huangzec@foxmail.com
+ *
+ */
+public class HResponse {
+
+	/**
+	 * 格式化数据值
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-3 下午01:52:00
+	 * @return String
+	 */
+	public static String formatValue(String field, String value, HttpServletRequest request)
+	{
+		if(Verify.isEmpty(value) || "null".equals(value)) {
+			return "";
+		}
+		
+		return _isFormatMap(field, value, request);
+	}
+
+	/**
+	 * 是不是Map类的格式化数据 
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-3 下午01:53:13
+	 * @return String
+	 */
+	@SuppressWarnings("unchecked")
+	private static String _isFormatMap(String field, String value,HttpServletRequest request)
+	{
+		Map<String, Map<String, String>> dataMap = (Map<String, Map<String, String>>) request.getAttribute(field + "_map");
+		if(null != dataMap) {
+			return null != dataMap.get(value) ? dataMap.get(value).get("name") : "无";
+		}
+		
+		return value;
+	}
+}

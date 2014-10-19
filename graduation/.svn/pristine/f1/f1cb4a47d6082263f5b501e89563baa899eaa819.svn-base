@@ -1,0 +1,104 @@
+<%@page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page import="com.mvc.entity.*,com.mvc.common.*"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
+%>
+
+<%
+	Opentopicscore opiscore = (Opentopicscore) request.getAttribute("opiscore");
+%>
+
+<jsp:include page="../common/header.jsp" flush="true" />
+<style type="text/css">
+.trClass {
+	height: 35px;
+}
+</style>
+
+<body>
+	<div class="navbar navbar-fixed-top">
+		<jsp:include page="../common/top.jsp" flush="true" />
+		<!-- /navbar-inner -->
+	</div>
+	<!-- /navbar -->
+	<div id="content">
+		<div class="container">
+			<div class="row">
+				<jsp:include page="../common/navmenu.jsp" flush="true" />
+				<div class="span9">
+					<h1 class="page-title">
+						<i class="icon-list-alt"></i>答辩信息
+					</h1>
+					<jsp:include page="../common/center-stat.jsp" flush="true" />
+					<div class="row">
+						<div class="span9">
+							<%	if(!Verify.isEmpty(request.getAttribute("message"))){ %>
+							<div class="widget">
+								<div class="widget-content">
+									<div style="text-align: center">
+										<span style="color: red; font-size: 15px;"> 
+											<br /> 
+											<%=request.getAttribute("message")%>
+											<br /> <br />
+										</span>
+									</div>
+								</div>
+							</div>
+							<%	} else if (!Verify.isEmpty(opiscore)) { %>
+							<div class="widget">
+								<div class="widget-header">
+									<i class="icon-ok-sign"></i>
+									<h3>开题答辩成绩</h3>
+								</div>
+								<div class="widget-content">
+									<div class="tabbable">
+										<div class="tab-content">
+											<div class="tab-pane active" id="1">
+												<fieldset>
+													<div class="control-group">
+														<label class="control-label" for="topTec">
+															成绩
+														</label>
+														<div class="controls" style="padding-top: 5px;">
+															<%=opiscore.getScore()%>
+														</div>
+													</div>
+												</fieldset>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<%	} %>
+						</div>
+						<!-- /widget -->
+					</div>
+					<!-- /span9 -->
+				</div>
+				<!-- /row -->
+			</div>
+			<!-- /span9 -->
+		</div>
+		<!-- /row -->
+	</div>
+
+	<div id="footer">
+		<div class="container">
+			<hr />
+			<jsp:include page="../common/footer.jsp" flush="true" />
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /footer -->
+	<!-- Le javascript
+================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="<%=basePath%>cscon/js/jquery-1.7.2.min.js"></script>
+	<script src="<%=basePath%>cscon/js/bootstrap.js"></script>
+	<script src="<%=basePath%>vendor/hhjslib/hhjslib.js"></script>
+	<script src="<%=basePath%>vendor/hhjslib/hhjslib.dialog.js"></script>
+	<script src="<%=basePath%>js/site-judge.js"></script>
+</body>
+</html>

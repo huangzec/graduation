@@ -1,0 +1,560 @@
+package com.mvc.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.mvc.common.HResponse;
+import com.mvc.common.Pagination;
+import com.mvc.common.Verify;
+import com.mvc.dao.SelectfirstDao;
+import com.mvc.entity.Department;
+import com.mvc.entity.Selectfirst;
+import com.mvc.entity.Settime;
+import com.mvc.entity.Tbtopic;
+import com.mvc.service.SettimeService;
+import com.mvc.service.TbtopicService;
+
+/**
+ * 课题
+ * 
+ * @author Happy_Jqc@163.com
+ *
+ */
+
+@Controller
+@RequestMapping(value="user/topic/")
+public class TopicController {
+	
+	@Autowired
+	private TbtopicService tbtopicService;
+	
+	@Autowired
+	private SettimeService settimeService;
+	
+	@Autowired
+	private SelectfirstDao selectfirstDao;
+	
+	private Pagination pagination;
+	
+	private Integer pageNum = 1;
+
+	private int numPerPage = 10;//每页显示多少条
+	
+	private List<Tbtopic> topicList;
+	
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
+	}
+
+	public Integer getPageNum() {
+		return pageNum;
+	}
+
+	public void setPageNum(Integer pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	public void setNumPerPage(int numPerPage) {
+		this.numPerPage = numPerPage;
+	}
+
+	public List<Tbtopic> getTopicList() {
+		return topicList;
+	}
+
+	public void setTopicList(List<Tbtopic> topicList) {
+		this.topicList = topicList;
+	}
+
+	/**
+	 * 
+	 * 进入课题提交页面 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-22 下午5:16:02
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="intoSubmitTopic.do")
+	public ModelAndView intoSubmitTopic(HttpServletRequest request, ModelMap modelMap){
+		Integer userStatus = (Integer) request.getSession().getAttribute("user_status");
+		_assignSubmitTime(request);
+		if (userStatus == 1) {
+			return new ModelAndView("user/student/submitTopic");
+		} else {
+			return new ModelAndView("user/teacher/submitTopic");
+		}
+	}
+	
+	/**
+	 * 
+	 * 加载提交课题时间 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-11 下午05:08:42
+	 * @return void
+	 */
+	private void _assignSubmitTime(HttpServletRequest request){
+		Department department = (Department) request.getSession().getAttribute("dept");
+		String where = "from Settime where deptId = '" + department.getDeptId() + "' AND mark = '1' AND ('" + HResponse.formatDateTime(new Date()) + "' between startTime and endTime )";
+		Settime submitTime 	= settimeService.getOneByWhere(where);
+		request.getSession().setAttribute("submit-time", submitTime);
+	}
+		
+	/**
+	 * 
+	 * 教师课题提交 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-22 下午5:18:00
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="tea_submitTopic.do")
+	public ModelAndView tea_submitTopic(HttpServletRequest request, ModelMap modelMap){
+		if(!this._verifyData(request)){
+			return new ModelAndView("forward:/user/topic/tea_submitTopic.do");
+		}
+
+		String user_id = (String) request.getSession().getAttribute("user_id");
+		String topId = request.getParameter("topId");
+		String topName = request.getParameter("topName");
+		String topTec = request.getParameter("topTec");
+		int topNum = Integer.parseInt(request.getParameter("topNum"));
+		
+		topTec = topTec.substring(topTec.indexOf(">")+1, topTec.lastIndexOf("<"));
+		Department dept = (Department) request.getSession().getAttribute("dept");
+		
+		this._saveTopic(request, topId, topName, topNum, topTec, user_id, dept.getDeptId());
+		
+		return new ModelAndView("forward:/user/topic/lookTopic.do");
+	}
+	
+	/**
+	 * 
+	 * 学生提交课题 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-7 下午09:21:22
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="stu_submitTopic.do")
+	public ModelAndView stu_submitTopic(HttpServletRequest request, ModelMap modelMap){
+		if(!this._verifyData(request)){
+			return new ModelAndView("public/ajaxDone");
+		}
+		
+		String user_id = (String) request.getSession().getAttribute("user_id");
+		Department dept = (Department) request.getSession().getAttribute("dept");
+		
+		Tbtopic topic = new Tbtopic();
+		topic.setTopId(request.getParameter("topId"));
+		topic.setTopName(request.getParameter("topName"));
+		topic.setTopNumber(1);
+		topic.setTopTec(request.getParameter("topTec"));
+		topic.setTopStatus("0");
+		topic.setTopCommitId(user_id);
+		topic.setTopFlag("1");
+		topic.setDeptId(dept.getDeptId());
+		topic.setParentId("0");
+		try {
+			tbtopicService.save(topic);
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		return new ModelAndView("public/ajaxDone");
+	}
+	
+	/**
+	 * 
+	 * 查看个人提交的课题 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-28 上午9:45:33
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="lookTopic.do")
+	public ModelAndView lookTopic(HttpServletRequest request, ModelMap modelMap){
+		String username = (String) request.getSession().getAttribute("user_id");
+		Integer userStatus = (Integer) request.getSession().getAttribute("user_status");
+		
+		if(!(request.getParameter("pageNum") == null))
+		{
+			pageNum = Integer.parseInt(request.getParameter("pageNum"));
+		}
+		System.out.println("pageNum =  " + pageNum);
+		int size = 20;
+		if(pagination == null){
+			pagination = new Pagination(size);
+		}
+		pagination.setSize(size);
+		pagination.setCurrentPage(pageNum);
+		if(pagination.getCurrentPage() <= 0) {
+			pagination.setCurrentPage(1);
+		}
+		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
+			pagination.setCurrentPage(pagination.getTotalPage());
+		}
+		String where = "from Tbtopic where topCommitId='" + username +"' order by topId asc";
+		topicList = tbtopicService.getAllRecordByPages(where, pagination);
+		if(topicList == null || topicList.size() < 1) {
+			if (userStatus == 1) {
+				return new ModelAndView("user/student/lookTopic");
+			} else {
+				return new ModelAndView("user/teacher/lookTopic");
+			}
+		}
+		if(this.topicList.size() == 0 && pagination.getCurrentPage() != 1) {
+			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+			topicList = (List<Tbtopic>) tbtopicService.getAllRecordByPages(where, pagination);
+		}
+		modelMap.put("topicList", topicList);
+		if (userStatus == 1) {
+			return new ModelAndView("user/student/lookTopic");
+		} else {
+			return new ModelAndView("user/teacher/lookTopic");
+		}
+	}
+
+	/**
+	 * 
+	 * 学生进入选择课题页面 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-8 上午10:54:14
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="intoSelectTopic.do")
+	public ModelAndView selectTopic(HttpServletRequest request, ModelMap modelMap){
+		
+		String username = (String) request.getSession().getAttribute("user_id");
+		_assignSelectTime(request);
+		
+		if(pagination == null){
+			pagination = new Pagination(numPerPage);
+		}
+		if(!Verify.isEmpty(request.getParameter("page"))) {
+			System.out.println("page " + request.getParameter("page"));
+			pageNum = Integer.parseInt(request.getParameter("page"));
+		}
+		pagination.setSize(numPerPage);
+		pagination.setCurrentPage(pageNum);
+		if(pagination.getCurrentPage() <= 0) {
+			pagination.setCurrentPage(1);
+		}
+		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
+			pagination.setCurrentPage(pagination.getTotalPage());
+		}
+		String where = "from Tbtopic where (topCommitId='" + username +"' and topStatus='1') or (topStatus='1' and topFlag='2') order by topId asc";
+		topicList = tbtopicService.getAllRecordByPages(where, pagination);
+		modelMap.put("pagination", pagination);
+		modelMap.put("topicList", topicList);
+		return new ModelAndView("user/student/selectTopic");
+	}
+	
+	/**
+	 * 
+	 * 学生选择课题进入填写课题认识页面 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-11 下午09:28:41
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="intoWriteKnowing.do")
+	public ModelAndView intoWriteKnow(HttpServletRequest request, ModelMap modelMap){
+		String topID = request.getParameter("id");
+		if(Verify.isEmpty(topID)){
+			request.setAttribute("message", "请选择相应课题！");
+			return new ModelAndView("forward:/user/topic/intoWriteKnowing.do");
+		}
+		String where = "from Tbtopic where topId = '" + topID + "'";
+		System.out.println(where+".........");
+		Tbtopic topic = tbtopicService.getAll(where).get(0);
+		modelMap.put("topic", topic);
+		return new ModelAndView("user/student/writeKnowing");
+	}
+	
+	/**
+	 * 
+	 * TODO 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-12 下午05:23:50
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="writeKnowing.do")
+	public ModelAndView writeKnowing(HttpServletRequest request, ModelMap modelMap){
+		String topId = request.getParameter("topicId");
+		System.out.println(topId+".......");
+		Tbtopic topic = tbtopicService.getByTopId(topId);
+		Selectfirst selectfirst = new Selectfirst();
+		selectfirst.setStuId((String) request.getSession().getAttribute("user_id"));
+		selectfirst.setTbtopic(topic);
+		selectfirst.setSelKnowing(request.getParameter("knowing"));
+		selectfirst.setSelStatus("0");
+		return new ModelAndView("");
+	}
+	
+	/**
+	 * 
+	 * 加载选择课题时间 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-11 下午05:25:22
+	 * @return void
+	 */
+	private void _assignSelectTime(HttpServletRequest request) {
+		Department dept = (Department) request.getSession().getAttribute("dept");
+		String where  = "from Settime where deptId = '" + dept.getDeptId() + "' AND mark = '3' AND ('" + HResponse.formatDateTime(new Date()) + "' between startTime and endTime )";
+		System.out.println(where+"---------");
+		Settime selectTime = settimeService.getOneByWhere(where);
+		request.setAttribute("select-time", selectTime);
+	}
+
+
+	/**
+	 * 
+	 * 信息确认 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-24 上午11:24:05
+	 * @return boolean
+	 */
+	private boolean _verifyData(HttpServletRequest request) {
+		String topId = request.getParameter("topId");
+		String topName = request.getParameter("topName");
+		
+		if(topId.equals("") || topId == null){
+			request.setAttribute("message", "课题编号不能为空！");
+			return false;
+		}
+		if(!this._isTopIdExist(topId)){
+			request.setAttribute("message", "课题编号冲突！");
+			return false;
+		}
+		if(topName.equals("") || topName == null){
+			request.setAttribute("message", "课题名称不能为空！");
+			return false;
+		}
+		if(!this._isTopNameExist(topName)){
+			request.setAttribute("message", "课题名称冲突！");
+			return false;
+		}
+		if( (Integer) request.getSession().getAttribute("user_status") == 2){
+			String topNum = request.getParameter("topNum");
+			if(topNum.equals("") || topNum == null){
+				request.setAttribute("message", "请选择课题完成人数！");
+				return false;
+			}
+		}
+		
+		int topNum = Integer.parseInt(request.getParameter("topNum"));
+		
+		if(topNum== 2){
+			if(!this._isTopNameExist(request.getParameter("sTName1")) 
+				|| !this._isTopNameExist(request.getParameter("sTName2"))){
+				request.setAttribute("message", "子课题名称冲突！");
+				return false;
+			}
+		}
+		if(topNum == 3){
+			if(!this._isTopNameExist(request.getParameter("sTName3")) ||
+				!this._isTopNameExist(request.getParameter("sTName4")) || 
+				!this._isTopNameExist(request.getParameter("sTName5"))){
+				request.setAttribute("message", "子课题名称冲突！");
+				return false;
+			}
+		}
+		if(topNum == 4){
+			if(!this._isTopNameExist(request.getParameter("sTName6")) || 
+				!this._isTopNameExist(request.getParameter("sTName7")) || 
+				!this._isTopNameExist(request.getParameter("sTName8")) || 
+				!this._isTopNameExist(request.getParameter("sTName9"))){
+				request.setAttribute("message", "子课题名称冲突！");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * 教师提交添加课题 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-14 上午09:38:18
+	 * @return void
+	 */
+	private void _saveTopic(HttpServletRequest request, String topId, String topName, int topNum,
+			String topTec, String userId, String deptId) {
+		Tbtopic topic = new Tbtopic();
+		topic.setTopId(topId);
+		topic.setTopName(topName);
+		topic.setTopNumber(topNum);
+		topic.setTopTec(topTec);
+		topic.setTopCommitId(userId);
+		topic.setDeptId(deptId);
+		topic.setTopFlag("2");
+		topic.setTopStatus("0");
+		topic.setParentId("0");
+		try{
+			tbtopicService.save(topic);
+			if(topNum == 2){
+				this._saveSonTopic(topId+"1", request.getParameter("sTName1"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"2", request.getParameter("sTName2"), userId, 
+					topId, deptId, topTec);
+			}
+			if(topNum == 3){
+				this._saveSonTopic(topId+"1", request.getParameter("sTName3"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"2", request.getParameter("sTName4"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"3", request.getParameter("sTName5"), userId, 
+					topId, deptId, topTec);
+			}
+			if(topNum == 4){
+				this._saveSonTopic(topId+"1", request.getParameter("sTName6"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"2", request.getParameter("sTName7"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"3", request.getParameter("sTName8"), userId, 
+					topId, deptId, topTec);
+				this._saveSonTopic(topId+"4", request.getParameter("sTName9"), userId, 
+					topId, deptId, topTec);
+			}
+			request.setAttribute("message", "课题提交成功！");
+		}catch(Exception e){
+			System.out.println(e.toString());
+			request.setAttribute("message", "课题提交失败！");
+		}
+	}
+
+	/**
+	 * 
+	 * 添加相应子课题 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-8-14 上午10:00:09
+	 * @return void
+	 */
+	private void _saveSonTopic(String topId, String topName, String userId,
+		String parentId, String deptId, String topTec) {
+		Tbtopic topic = new Tbtopic();	
+		topic.setTopId(topId);
+		topic.setTopName(topName);
+		topic.setTopNumber(1);
+		topic.setTopTec(topTec);
+		topic.setTopCommitId(userId);
+		topic.setDeptId(deptId);
+		topic.setTopFlag("2");
+		topic.setTopStatus("0");
+		topic.setParentId(parentId);
+		try{
+			tbtopicService.save(topic);
+		}catch(Exception e){
+			System.out.println(e.toString());
+		}
+	}
+
+	/**
+	 * 
+	 * 判断课题是否已存在 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-24 上午11:44:19
+	 * @return boolean
+	 */
+	private boolean _isTopNameExist(String topName) {
+		System.out.println(topName+"------------");
+		List<Tbtopic> topic = new ArrayList<Tbtopic>();
+		topic = tbtopicService.getAll("from Tbtopic where topName = '" + topName + "'");
+		System.out.println(topic.size()+".............");
+		if (topic != null) {
+			System.out.println("is empty!");
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * 
+	 * 判断课题编号是否冲突 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2014-7-24 上午11:44:33
+	 * @return boolean
+	 */
+	private boolean _isTopIdExist(String topId) {
+		Tbtopic topic = new Tbtopic();
+		topic = tbtopicService.getByTopId(topId);
+		if(topic != null){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 查看课题选择情况
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-10 上午10:27:25
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="/selectcase.do")
+	public ModelAndView selectCase(HttpServletRequest request, ModelMap modelMap)
+	{
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("user/teacher/selectcase-list");
+		Department department = (Department) request.getSession().getAttribute("dept");
+		String userId = (String) request.getSession().getAttribute("user_id");		
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
+		{
+			pageNum = Integer.parseInt(request.getParameter("pageNum"));
+		}
+		int size = 10;
+		if(Verify.isEmpty(pagination)){
+			pagination = new Pagination(size);
+		}
+		pagination.setSize(size);
+		pagination.setCurrentPage(pageNum);
+		if(pagination.getCurrentPage() <= 0) {
+			pagination.setCurrentPage(1);
+		}
+		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
+			pagination.setCurrentPage(pagination.getTotalPage());
+		}
+		String where = "from Tbtopic where topCommitId='" + userId +"' AND topStatus = '1' AND deptId = '" + department.getDeptId() + "' order by topId asc";
+		topicList = tbtopicService.getAllRecordByPages(where, pagination);
+		//System.out.println("select first " + topicList.get(0).getSelectFirst().iterator().next());
+		if(Verify.isEmpty(topicList) || topicList.size() < 1) {
+			return mav;
+		}
+		if(this.topicList.size() == 0 && pagination.getCurrentPage() != 1) {
+			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+			topicList = (List<Tbtopic>) tbtopicService.getAllRecordByPages(where, pagination);
+		}
+		modelMap.put("list", topicList);
+		modelMap.put("pagination", pagination);
+		
+		return mav;
+	}
+	
+}

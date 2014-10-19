@@ -1,0 +1,7 @@
+package com.mvc.dao;
+
+import com.mvc.entity.Message;
+
+public class MessageDao extends BaseDao<Message>{
+
+}

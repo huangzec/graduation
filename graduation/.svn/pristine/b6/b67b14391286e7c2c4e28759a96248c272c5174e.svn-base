@@ -1,0 +1,148 @@
+package com.mvc.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.mvc.common.Pagination;
+import com.mvc.common.RequestSetAttribute;
+import com.mvc.entity.Department;
+import com.mvc.entity.Taskdoc;
+import com.mvc.entity.Teacher;
+import com.mvc.service.TaskdocService;
+
+/**
+ * 毕业设计任务书控制器类
+ * @author huangzec@foxmail.com
+ *
+ */
+@Controller
+@RequestMapping(value="/user/taskdoc")
+public class TaskdocController {
+
+	@Autowired
+	private TaskdocService taskdocService;
+	
+	private Integer pageNum = 1;
+
+	private int numPerPage = 10;//每页显示多少条
+	private Pagination pagination;
+	
+	public Pagination getPagination() {
+		return pagination;
+	}
+
+	public void setPagination(Pagination pagination) {
+		this.pagination = pagination;
+	}
+
+	private List<Taskdoc> list;
+
+	public Integer getPageNum() {
+		return pageNum;
+	}
+
+	public void setPageNum(Integer pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public int getNumPerPage() {
+		return numPerPage;
+	}
+
+	public void setNumPerPage(int numPerPage) {
+		this.numPerPage = numPerPage;
+	}
+
+	public List<Taskdoc> getList() {
+		return list;
+	}
+
+	public void setList(List<Taskdoc> list) {
+		this.list = list;
+	}
+	
+	/**
+	 * 发送任务书列表
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-8-13 上午11:12:37
+	 * @return ModelAndView
+	 */
+	@RequestMapping(value="/senddoclist.do")
+	public ModelAndView senddocList(HttpServletRequest request, ModelMap modelMap)
+	{
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("user/teacher/taskdoc");
+		Department department = (Department) request.getSession().getAttribute("dept");
+		/*if(!(request.getParameter("pageNum") == null))
+		{
+			pageNum = Integer.parseInt(request.getParameter("pageNum"));
+		}
+		if(!(request.getParameter("numPerPage") == null)) {
+			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
+		}
+		if(pagination == null){
+			pagination = new Pagination(numPerPage);
+		}
+		pagination.setSize(numPerPage);
+		pagination.setCurrentPage(pageNum);
+		if(pagination.getCurrentPage() <= 0) {
+			pagination.setCurrentPage(1);
+		}
+		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
+			pagination.setCurrentPage(pagination.getTotalPage());
+		}
+		String where = "from Selectfirst where 1 = 1";// AND deptId = '" + department.getDeptId() + "'";
+		
+		list = taskdocService.getAllRecordByPages(where, pagination);
+		if(list == null || list.size() < 1) {
+			return mav;
+		}
+		if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
+			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+			list = (List<Taskdoc>) taskdocService.getAllRecordByPages(where, pagination);
+		}
+		modelMap.put("list", list);
+		modelMap.put("pagination", pagination);
+		mav.addObject("department", department);*/
+		
+		return mav;
+	}
+	
+	@SuppressWarnings("serial")
+	@RequestMapping(value="/preview.do")
+	public ModelAndView preview(final HttpServletRequest request, ModelMap modelMap)
+	{
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("user/teacher/taskdoc-preview");
+		System.out.println(request.getParameter("workPlane"));
+		List<Map<String, String>> prev = new ArrayList<Map<String, String>>();
+		Map<String, String> taskpreviewMap = new HashMap<String, String>(){{
+			put("title", request.getParameter("title"));
+			put("stuid", request.getParameter("stuid"));
+			put("teaid", request.getParameter("teaid"));
+			put("source", request.getParameter("source"));
+			put("conRequest", request.getParameter("conRequest"));
+			put("refMaterial", request.getParameter("refMaterial"));
+			put("workPlane", request.getParameter("workPlane"));
+			put("receipttime", request.getParameter("receipttime"));
+			put("finishtime", request.getParameter("finishtime"));
+		}};
+		prev.add(taskpreviewMap);
+		mav.addObject("prev", prev);
+		
+		return mav;
+	}
+}

@@ -1,0 +1,93 @@
+HHJsLib.register({
+	init: function() {
+		this.bindBtnPassClick();
+		this.bindBtnRepassClick();
+		this.bindModalBtn();
+		this.bindToggleClick();
+		this.bindModalClick();
+		this.bindSubModalClick();
+		this.bindSwitchBtn();
+		this.bindSubTopicClick();
+		this.bindSelectcaseBtnClick();
+	},
+	bindBtnPassClick: function() {
+//		$("#judge-form").find(".pass").click(function() {
+//			$.getJSON(
+//					siteUrl + 'judge/pass.do',
+//					{data: ''},
+//					function(response) {
+//						
+//					}
+//			);
+//			HHJsLib.info("审核通过");
+//		});
+	},
+	bindBtnRepassClick: function() {
+		$("#judge-form").find(".repass").click(function() {
+			if(!confirm("确定不通过吗？")) {
+				return false;
+			}
+		});
+	},
+	bindModalBtn: function() {
+		$("#modalBtn").click(function() {
+			alert("ok");
+			$('#myModal').modal('toggle');
+		});
+	},
+	bindToggleClick: function(){
+		$("#judge-form").find(".name").click(function() {
+			var _root = $(this);
+			var tag = _root.attr("tag");
+			$(".sontopic" + tag).toggle();
+		});
+	},
+	bindModalClick: function() {
+		$("#judge-form").find(".content").click(function() {
+			var _root 	= $(this);
+			var tec 	= _root.attr("tec");
+			$("#" + tec).modal("show");
+		});
+	},
+	bindSwitchBtn: function() {
+		$(".switchbtn").change(function() {
+		    //var $el = $(data.el), value = data.value;
+		    //console.log(e, $el, value);
+			alert("jjjjjj");
+		});
+	},
+	bindSubModalClick: function() {
+		$("#judge-form").find(".know").click(function() {
+			var _root 	= $(this);
+			var subknow 	= _root.attr("subknow");
+			$("#" + subknow).modal("show");
+		});
+	},
+	bindSubTopicClick: function() {
+		$("#judge-form").find(".subsontopic").click(function() {
+			var _root 	= $(this);
+			var subson 	= _root.attr("subson");
+			$("." + subson).toggle();
+		});
+	},
+	bindSelectcaseBtnClick: function() {
+		$(".selectcase-btn").click(function() {
+			var _root 	= $(this);
+			var id 		= _root.parents("td").find("input[name='item']").val();
+			var topid 	= _root.parents("td").find("input[name='subtopid']").val();
+			if(confirm("确认为任务人？")){
+				$.getJSON(
+						siteUrl + 'user/topic/confirmworker.do',
+						{id: id, topid: topid},
+						function(response) {
+							alert(response.message);
+							if(response.rs === true) {
+								window.location.reload();
+							}
+						}
+				);
+			}
+			
+		});
+	}
+});

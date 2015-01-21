@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Tboffice entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "tboffice", catalog = "graduation")
+@Table(name = "tboffice")
 public class Tboffice implements java.io.Serializable {
 
 	// Fields
@@ -33,8 +33,7 @@ public class Tboffice implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Tboffice(String offId, String offName, String offSex, String offTel,
-			String offEmail) {
+	public Tboffice(String offId, String offName, String offSex, String offTel, String offEmail) {
 		this.offId = offId;
 		this.offName = offName;
 		this.offSex = offSex;

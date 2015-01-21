@@ -18,11 +18,12 @@ ul li{list-style-type: none;}
 .line-height{line-height: 30px;}
 .text-font{font-size: 14px; font-weight: normal;}
 .control-label{float: left;width: 240px;padding-top: 5px;text-align: right;}
-.controls{text-align: left; margin-left: 300px;}
+.controls{text-align: left; margin-left: 300px; padding-top: 5px;}
 .input-mlarge{width: 350px;}
 .height-60{height: 60px;}
 .height-100{height: 100px;}
 .left-100{margin-left: 100px;}
+.right-100{margin-right: 100px;}
 .openapply{display: none;}
 .openreport{display: none;}
 .hidden{display: none;}
@@ -53,3 +54,17 @@ tr .center-td{text-align: center; vertical-align:middle}
 .grade-title{font-size: 23px; font-weight: bold; margin-top: 20px;}
 .widget-content .type-profes{margin-top:10px; margin-bottom: 10px; font-size: 15px;}
 .score{line-height: 30px; margin-bottom: 0px; margin-right: 68px;}
+.progress-new{}
+.progress-new > ul{list-style:none;}
+.progress-new > ul.progress{height: 30px}
+.progress-new > ul.progress-desc{height: 30px}
+.progress-new > ul > li{float:left;}
+.progress-new > ul > li div{color : #999999; font-size : 0.8em}
+.progress-new > ul > li.dot-active{width:21px;height:21px;background : url(../images/progress-dot-active.png)}
+.progress-new > ul > li.dot-inactive{width:21px;height:21px;background : url(../images/progress-dot-inactive.png)}
+.progress-new > ul > li.line-active{width:165px;height:10px; background : url(../images/progress-line-active.png) no-repeat; margin-top: 10px}
+.progress-new > ul > li.line-inactive{width:205px;height:10px; background : url(../images/progress-line-inactive.png) no-repeat; margin-top: 10px}
+
+.model-edit{left: 40%; width: 900px; }
+.is-judged{background: #fff url(../images/loading.gif) center center no-repeat}
+.is-judged a{display: none; }

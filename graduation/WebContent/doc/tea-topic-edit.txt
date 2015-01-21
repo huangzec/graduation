@@ -1,0 +1,25 @@
+<!--<script type="text/javascript" src="=basePath %>js/z-select2.js"></script>
+    <input type="hidden" name="stname1" id="stname1" value="sontopic.getTopName() %>" />
+	}if(index == 2){ %>
+		<input type="hidden" name="stname2" id="stname2" value="=sontopic.getTopName() %>" />
+	}if(index == 3){ %>
+		<input type="hidden" name="stname3" id="stname3" value="=sontopic.getTopName() %>" />
+	}if(index == 4){ %>
+		<input type="hidden" name="stname4" id="stname4" value="=sontopic.getTopName() %>" />
+	} %><div class="hide header" id="head">
+		±à¼­¿ÎÌâ   %=(Verify.isEmpty(tbtopic.getTopName()) ? "" : tbtopic.getTopName())%>
+	</div>
+	<div class="hide body" id="body">
+		<input type="hidden" value="%=tbtopic.getTopId() %>" name="topid" id="topid" />
+		<input type="hidden" value="%=tbtopic.getTopType() %>" name="toptype" id="toptype" />
+		<input type="hidden" value="%=tbtopic.getTopSource() %>" name="topsource" id="topsource" />
+		<input type="hidden" value="%=tbtopic.getTopName() %>" name="topname" id="topname" />
+		<input type="hidden" value="%=tbtopic.getTopContent() %>" name="topcontent" id="topcontent" />
+		<input type="hidden" value="%=tbtopic.getTopNumber() %>" name="number" id="number" />
+		<input type="hidden" value="%=tbtopic.getTopKeywords() %>" name="keywords" id="keywords" />
+		<jsp:include page="edit-topic-body.jsp" flush="true" />
+	</div>
+	<button class="btn btn-info enter-tea-edit" type="button" title="±à¼­">
+		<i class="icon-edit"></i>
+	</button>
+	-->

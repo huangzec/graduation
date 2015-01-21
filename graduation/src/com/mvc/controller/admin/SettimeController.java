@@ -24,6 +24,7 @@ import com.mvc.entity.Profession;
 import com.mvc.entity.Settime;
 import com.mvc.entity.Tbgrade;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.SettimeService;
 import com.mvc.service.TbgradeService;
 
@@ -88,7 +89,7 @@ public class SettimeController {
 		put("1", "提交课题时间");
 		put("2", "审核课题时间");
 		put("3", "选择课题时间");
-		put("4", "查看课题时间");
+		//put("4", "查看课题时间");
 		put("5", "开题答辩申请时间");
 		put("6", "毕业答辩申请时间");
 		put("7", "转让课题时间");
@@ -130,10 +131,11 @@ public class SettimeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 下午09:11:11
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/setsubmit.do")
-	public ModelAndView setSubmit(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView setSubmit(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
@@ -153,9 +155,10 @@ public class SettimeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 下午09:12:59
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/setsub.do")
-	public ModelAndView setSub(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView setSub(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav 	= new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
@@ -174,7 +177,7 @@ public class SettimeController {
 		department.getDeptId() + "' AND graNumber = '" + granumber + "' AND mark = '" + 
 		mark + "'";
 		Settime settime = settimeService.getOneByWhere(where);
-		if(settime != null) {
+		if(!Verify.isEmpty(settime)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "已经设置过该课题时间了");
 			mav.setViewName("public/ajaxDone");
@@ -208,21 +211,32 @@ public class SettimeController {
 	 * @return boolean
 	 */
 	protected boolean _verifyData(HttpServletRequest request) {
+		String name 		= request.getParameter("name");
 		String granumber 	= request.getParameter("granumber");
 		String starttime 	= request.getParameter("start_time");
 		String endtime 		= request.getParameter("end_time");
-		if(granumber == null || granumber.trim().equals("")) {
+		if(Verify.isEmpty(name)) {
+			request.setAttribute("message", "标题不能为空");
+			
+			return false;
+		}
+		if(Verify.isEmpty(granumber)) {
 			request.setAttribute("message", "年级不能为空");
 			
 			return false;
 		}
-		if(starttime == null || starttime.trim().equals("")) {
+		if(Verify.isEmpty(starttime)) {
 			request.setAttribute("message", "开始时间不能为空");
 			
 			return false;
 		}
-		if(endtime == null || endtime.trim().equals("")) {
+		if(Verify.isEmpty(endtime)) {
 			request.setAttribute("message", "结束时间不能为空");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(name, 1, 64)) {
+			request.setAttribute("message", "标题不超过64个字符");
 			
 			return false;
 		}
@@ -272,21 +286,22 @@ public class SettimeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午06:12:44
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/editview.do")
-	public ModelAndView editView(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView editView(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		String id 			= request.getParameter("id");
-		if(id == null || id.trim().equals("")) {
+		if(Verify.isEmpty(id)) {
 			RequestSetAttribute.requestSetAttribute(request, 300, "", "记录不存在", "", "");
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
 		Settime settime = settimeService.getRecordById(Integer.parseInt(id));
-		if(settime == null) {
+		if(Verify.isEmpty(settime)) {
 			RequestSetAttribute.requestSetAttribute(request, 300, "", "记录不存在", "", "");
 			mav.setViewName("public/ajaxDone");
 			
@@ -324,7 +339,7 @@ public class SettimeController {
 			return mav;
 		}
 		Settime settime = settimeService.getRecordById(Integer.parseInt(id));
-		if(settime == null) {
+		if(Verify.isEmpty(settime)) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -354,20 +369,20 @@ public class SettimeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 上午10:21:50
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/timeorder.do")
-	public ModelAndView timeOrder(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView timeOrder(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -406,8 +421,9 @@ public class SettimeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午05:43:18
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignGradeListMap(List<?> data, HttpServletRequest request) {
+	private void _assignGradeListMap(List<?> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}

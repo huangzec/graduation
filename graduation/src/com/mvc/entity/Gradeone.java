@@ -1,10 +1,9 @@
 package com.mvc.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,7 +11,7 @@ import javax.persistence.Table;
  * Gradeone entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "gradeone", catalog = "graduation")
+@Table(name = "gradeone")
 public class Gradeone implements java.io.Serializable {
 
 	// Fields
@@ -24,10 +23,11 @@ public class Gradeone implements java.io.Serializable {
 	private Float goThree;
 	private Float goFour;
 	private Float goFive;
+	private Float goSix;
 	private Float goAll;
 	private String content;
-	private String createTime;
 	private String status;
+	private String createTime;
 
 	// Constructors
 
@@ -36,26 +36,26 @@ public class Gradeone implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Gradeone(Integer goId, String createTime, String status) {
-		this.goId = goId;
-		this.createTime = createTime;
+	public Gradeone(String status, String createTime) {
 		this.status = status;
+		this.createTime = createTime;
 	}
 
 	/** full constructor */
-	public Gradeone(Integer goId, String stuId, Float goOne, Float goTwo, Float goThree, Float goFour, Float goFive, Float goAll, String content,
-			String createTime, String status) {
-		this.goId = goId;
+	public Gradeone(String stuId, Float goOne, Float goTwo, Float goThree,
+			Float goFour, Float goFive, Float goSix, Float goAll,
+			String content, String status, String createTime) {
 		this.stuId = stuId;
 		this.goOne = goOne;
 		this.goTwo = goTwo;
 		this.goThree = goThree;
 		this.goFour = goFour;
 		this.goFive = goFive;
+		this.goSix = goSix;
 		this.goAll = goAll;
 		this.content = content;
-		this.createTime = createTime;
 		this.status = status;
+		this.createTime = createTime;
 	}
 
 	// Property accessors
@@ -124,6 +124,15 @@ public class Gradeone implements java.io.Serializable {
 		this.goFive = goFive;
 	}
 
+	@Column(name = "go_Six", precision = 12, scale = 0)
+	public Float getGoSix() {
+		return this.goSix;
+	}
+
+	public void setGoSix(Float goSix) {
+		this.goSix = goSix;
+	}
+
 	@Column(name = "go_All", precision = 12, scale = 0)
 	public Float getGoAll() {
 		return this.goAll;
@@ -142,15 +151,6 @@ public class Gradeone implements java.io.Serializable {
 		this.content = content;
 	}
 
-	@Column(name = "create_time", nullable = false)
-	public String getCreateTime() {
-		return this.createTime;
-	}
-
-	public void setCreateTime(String createTime) {
-		this.createTime = createTime;
-	}
-
 	@Column(name = "status", nullable = false)
 	public String getStatus() {
 		return this.status;
@@ -158,6 +158,15 @@ public class Gradeone implements java.io.Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	@Column(name = "create_time", nullable = false)
+	public String getCreateTime() {
+		return this.createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
 	}
 
 }

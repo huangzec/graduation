@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.LinkeddataApplyGraduateinfoDao;
 import com.mvc.entity.LinkeddataApplyGraduateinfo;
+import com.mvc.exception.VerifyException;
 
 /**
  * 答辩申请与毕业答辩信息表关联服务层
@@ -27,8 +28,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 16:19:51
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) {
+	public void addOne(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) throws VerifyException {
 		linkeddataApplyGraduateinfoDao.save(linkeddataApplyGraduateinfo);		
 	}
 
@@ -52,8 +54,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 16:19:51
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneLinkeddataApplyGraduateinfo(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) {
+	public void removeOneLinkeddataApplyGraduateinfo(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) throws VerifyException {
 		linkeddataApplyGraduateinfoDao.remove(linkeddataApplyGraduateinfo);		
 	}
 
@@ -64,8 +67,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 16:19:51
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneLinkeddataApplyGraduateinfo(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) {
+	public void editOneLinkeddataApplyGraduateinfo(LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo) throws VerifyException {
 		linkeddataApplyGraduateinfoDao.update(linkeddataApplyGraduateinfo);		
 	}
 
@@ -76,8 +80,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 16:19:51
 	 * @return List<LinkeddataApplyGraduateinfo>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyGraduateinfo> getAllRowsByWhere(String where) {
+	public List<LinkeddataApplyGraduateinfo> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return linkeddataApplyGraduateinfoDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 16:19:51
 	 * @return List<LinkeddataApplyGraduateinfo>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyGraduateinfo> getAllRecordByPages(String where, Pagination pagination) {
+	public List<LinkeddataApplyGraduateinfo> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return linkeddataApplyGraduateinfoDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -100,8 +106,9 @@ public class LinkeddataApplyGraduateinfoService {
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param where
 	 * @return
+	 * @throws VerifyException 
 	 */
-	public LinkeddataApplyGraduateinfo getRecordByWhere(String where) {
+	public LinkeddataApplyGraduateinfo getRecordByWhere(String where) throws VerifyException {
 		return linkeddataApplyGraduateinfoDao.getOne(where);
 	}
 	

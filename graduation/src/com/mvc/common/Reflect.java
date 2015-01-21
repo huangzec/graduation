@@ -35,6 +35,26 @@ public class Reflect {
 	/**
 	 * 得到代理对象
 	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param className
+	 * @param isCache
+	 * @param params
+	 * @return
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 * @throws InvocationTargetException 
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static Object getProxy(String className, Boolean isCache, Object... params) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+		return null != params && 0 < params.length ? newInstance(className, params) : newInstance(className);
+	}
+	
+	/**
+	 * 得到代理对象
+	 *  
 	 * @Description  
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-4 下午02:30:26

@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * StuTeaTopic entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "stu_tea_topic", catalog = "graduation")
+@Table(name = "stu_tea_topic")
 public class StuTeaTopic implements java.io.Serializable {
 
 	// Fields

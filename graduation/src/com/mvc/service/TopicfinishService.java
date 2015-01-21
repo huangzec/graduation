@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.TopicfinishDao;
 import com.mvc.entity.Topicfinish;
+import com.mvc.exception.VerifyException;
 
 /**
  * 毕业答辩相关材料服务层
@@ -27,8 +28,9 @@ public class TopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 20:06:01
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Topicfinish topicfinish) {
+	public void addOne(Topicfinish topicfinish) throws VerifyException {
 		topicfinishDao.save(topicfinish);		
 	}
 
@@ -52,8 +54,9 @@ public class TopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 20:06:01
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneTopicfinish(Topicfinish topicfinish) {
+	public void removeOneTopicfinish(Topicfinish topicfinish) throws VerifyException {
 		topicfinishDao.remove(topicfinish);		
 	}
 
@@ -64,8 +67,9 @@ public class TopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 20:06:01
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneTopicfinish(Topicfinish topicfinish) {
+	public void editOneTopicfinish(Topicfinish topicfinish) throws VerifyException {
 		topicfinishDao.update(topicfinish);		
 	}
 
@@ -76,8 +80,9 @@ public class TopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 20:06:01
 	 * @return Object
+	 * @throws VerifyException 
 	 */
-	public List<Topicfinish> getAllRowsByWhere(String where) {
+	public List<Topicfinish> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return topicfinishDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class TopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 20:06:01
 	 * @return List<Topicfinish>
+	 * @throws VerifyException 
 	 */
-	public List<Topicfinish> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Topicfinish> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return topicfinishDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -111,8 +117,9 @@ public class TopicfinishService {
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param where
 	 * @return
+	 * @throws VerifyException 
 	 */
-	public Topicfinish getRecordByWhere(String where) {
+	public Topicfinish getRecordByWhere(String where) throws VerifyException {
 		return topicfinishDao.getOne(where);
 	}
 	

@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Apply entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "apply", catalog = "graduation")
+@Table(name = "apply")
 public class Apply implements java.io.Serializable {
 
 	// Fields
@@ -31,8 +31,7 @@ public class Apply implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Apply(String userId, String departmentId, String type, String pass,
-			String status, String createTime) {
+	public Apply(String userId, String departmentId, String type, String pass, String status, String createTime) {
 		this.userId = userId;
 		this.departmentId = departmentId;
 		this.type = type;

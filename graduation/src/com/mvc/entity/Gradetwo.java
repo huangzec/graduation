@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Gradetwo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "gradetwo", catalog = "graduation")
+@Table(name = "gradetwo")
 public class Gradetwo implements java.io.Serializable {
 
 	// Fields
@@ -23,6 +23,7 @@ public class Gradetwo implements java.io.Serializable {
 	private Float gtThree;
 	private Float gtFour;
 	private Float gtFive;
+	private Float gtSix;
 	private Float gtAll;
 	private String content;
 	private String status;
@@ -41,7 +42,7 @@ public class Gradetwo implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Gradetwo(String stuId, Float gtOne, Float gtTwo, Float gtThree, Float gtFour, Float gtFive, Float gtAll, String content, String status,
+	public Gradetwo(String stuId, Float gtOne, Float gtTwo, Float gtThree, Float gtFour, Float gtFive, Float gtSix, Float gtAll, String content, String status,
 			String createTime) {
 		this.stuId = stuId;
 		this.gtOne = gtOne;
@@ -49,6 +50,7 @@ public class Gradetwo implements java.io.Serializable {
 		this.gtThree = gtThree;
 		this.gtFour = gtFour;
 		this.gtFive = gtFive;
+		this.gtSix = gtSix;
 		this.gtAll = gtAll;
 		this.content = content;
 		this.status = status;
@@ -119,6 +121,15 @@ public class Gradetwo implements java.io.Serializable {
 
 	public void setGtFive(Float gtFive) {
 		this.gtFive = gtFive;
+	}
+	
+	@Column(name = "gt_Six", precision = 12, scale = 0)
+	public Float getGtSix() {
+		return this.gtSix;
+	}
+
+	public void setGtSix(Float gtSix) {
+		this.gtSix = gtSix;
 	}
 
 	@Column(name = "gt_All", precision = 12, scale = 0)

@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Graduateinfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "graduateinfo", catalog = "graduation")
+@Table(name = "graduateinfo")
 public class Graduateinfo implements java.io.Serializable {
 
 	// Fields
@@ -25,6 +25,7 @@ public class Graduateinfo implements java.io.Serializable {
 	private Integer gdiNumber;
 	private String judge;
 	private String headerman;
+	private String begroup;
 	private String content;
 	private String status;
 	private String createTime;
@@ -48,7 +49,8 @@ public class Graduateinfo implements java.io.Serializable {
 	/** full constructor */
 	public Graduateinfo(String name, String stuId, String departmentId,
 			String gdiDate, String gdiPlace, Integer gdiNumber, String judge,
-			String headerman, String content, String status, String createTime) {
+			String headerman, String begroup, String content, String status,
+			String createTime) {
 		this.name = name;
 		this.stuId = stuId;
 		this.departmentId = departmentId;
@@ -57,6 +59,7 @@ public class Graduateinfo implements java.io.Serializable {
 		this.gdiNumber = gdiNumber;
 		this.judge = judge;
 		this.headerman = headerman;
+		this.begroup = begroup;
 		this.content = content;
 		this.status = status;
 		this.createTime = createTime;
@@ -144,6 +147,15 @@ public class Graduateinfo implements java.io.Serializable {
 
 	public void setHeaderman(String headerman) {
 		this.headerman = headerman;
+	}
+
+	@Column(name = "begroup")
+	public String getBegroup() {
+		return this.begroup;
+	}
+
+	public void setBegroup(String begroup) {
+		this.begroup = begroup;
 	}
 
 	@Column(name = "content")

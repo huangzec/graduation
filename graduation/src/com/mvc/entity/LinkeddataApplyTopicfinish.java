@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * LinkeddataApplyTopicfinish entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "linkeddata_apply_topicfinish", catalog = "graduation")
+@Table(name = "linkeddata_apply_topicfinish")
 public class LinkeddataApplyTopicfinish implements java.io.Serializable {
 
 	// Fields

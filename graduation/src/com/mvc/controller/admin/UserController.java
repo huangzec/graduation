@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.MD5Util;
+import com.mvc.common.Verify;
 import com.mvc.entity.User;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.UserService;
 
 
@@ -44,9 +46,10 @@ public class UserController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-12 上午10:49:23
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="repwd.do")
-	public ModelAndView repwd(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView repwd(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav 	= new ModelAndView();
 		String oldpassword 	= request.getParameter("oldpassword");
@@ -60,7 +63,7 @@ public class UserController {
 		}
 		String userid 	= (String) request.getSession().getAttribute("user_id");
 		User user 	= userService.getOneUser("from User where username='" + userid + "'");
-		if(user == null) {
+		if(Verify.isEmpty(user)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -110,15 +113,15 @@ public class UserController {
 		String password 	= request.getParameter("password");
 		String repassword 	= request.getParameter("repassword");
 		String code 		= request.getParameter("code");
-		if(oldpassword.equals("")) {
+		if(Verify.isEmpty(oldpassword)) {
 			request.setAttribute("message", "原密码不能为空");
 			return false;
 		}
-		if(password.equals("")) {
+		if(Verify.isEmpty(password)) {
 			request.setAttribute("message", "新密码不能为空");
 			return false;
 		}
-		if(repassword.equals("")) {
+		if(Verify.isEmpty(repassword)) {
 			request.setAttribute("message", "确认密码不能为空");
 			return false;
 		}
@@ -130,7 +133,7 @@ public class UserController {
 			request.setAttribute("message", "验证码不正确");
 			return false;
 		}
-		if(password.length() > 32 || password.length() < 6) {
+		if(!Verify.isStrLen(password, 6, 32)) {
 			request.setAttribute("message", "新密码长度在6~32个字符之间");
 			return false;
 		}

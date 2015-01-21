@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Taskdoc entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "taskdoc", catalog = "graduation")
+@Table(name = "taskdoc")
 public class Taskdoc implements java.io.Serializable {
 
 	// Fields
@@ -41,10 +41,8 @@ public class Taskdoc implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Taskdoc(String title, String stuId, String teaId, String source,
-			String tdConRequest, String tdDevTools, String tdRefMaterial,
-			String tdWorkPlane, String receiptTime, String finishTime,
-			String createTime) {
+	public Taskdoc(String title, String stuId, String teaId, String source, String tdConRequest, String tdDevTools, String tdRefMaterial,
+			String tdWorkPlane, String receiptTime, String finishTime, String createTime) {
 		this.title = title;
 		this.stuId = stuId;
 		this.teaId = teaId;

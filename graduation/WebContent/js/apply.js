@@ -49,13 +49,40 @@ HHJsLib.register({
 	},
 	bindTypeNextClick: function() {
 		$(".typenext").click(function() {
+			var _root = $(this);
 			var applyType 	= $("#apply-form").find("input[name='type']:checked").val();
 			if(applyType == 1) {
-				$(".applytype").addClass("hidden");
-				$(".openly").removeClass("openapply").addClass("show");
+				/**
+				 * 开题答辩申请 检测时间和是否已经通过答辩 
+				 */
+				$.getJSON(
+						siteUrl + 'user/apply/checktime.do',
+						{mark: "5"},
+						function(response) {
+							if(response.rs === false) {
+								$("#message").text(response.message);
+								return;
+							}
+							$(".applytype").addClass("hidden");
+							$(".openly").removeClass("openapply").addClass("show");							
+						}
+				);
 			}else if(applyType == 2) {
-				$(".applytype").addClass("hidden");
-				$(".finish").removeClass("hidden").addClass("show");
+				/**
+				 * 毕业答辩申请
+				 */
+				$.getJSON(
+						siteUrl + 'user/apply/checktime.do',
+						{mark: "6"},
+						function(response) {
+							if(response.rs === false) {
+								$("#message").text(response.message);
+								return;
+							}
+							$(".applytype").addClass("hidden");
+							$(".finish").removeClass("hidden").addClass("show");						
+						}
+				);
 			}
 		});
 	},

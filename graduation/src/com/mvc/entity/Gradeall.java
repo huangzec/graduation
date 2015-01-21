@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Gradeall entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "gradeall", catalog = "graduation")
+@Table(name = "gradeall")
 public class Gradeall implements java.io.Serializable {
 
 	// Fields
@@ -37,8 +37,7 @@ public class Gradeall implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Gradeall(String stuId, String departmentId, Float gaGrade,
-			String status, String createTime) {
+	public Gradeall(String stuId, String departmentId, Float gaGrade, String status, String createTime) {
 		this.stuId = stuId;
 		this.departmentId = departmentId;
 		this.gaGrade = gaGrade;

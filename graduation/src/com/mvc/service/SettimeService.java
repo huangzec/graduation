@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.SettimeDao;
 import com.mvc.entity.Settime;
+import com.mvc.exception.VerifyException;
 
 /**
  * 设置时间服务层
@@ -27,8 +28,9 @@ public class SettimeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 下午09:36:48
 	 * @return Settime
+	 * @throws VerifyException 
 	 */
-	public Settime getOneByWhere(String where) {
+	public Settime getOneByWhere(String where) throws VerifyException {
 		
 		return settimeDao.getOne(where);
 	}
@@ -40,8 +42,9 @@ public class SettimeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 下午09:42:46
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneSettime(Settime settime) {
+	public void addOneSettime(Settime settime) throws VerifyException {
 		settimeDao.save(settime);		
 	}
 
@@ -52,8 +55,9 @@ public class SettimeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 上午10:32:34
 	 * @return List<Settime>
+	 * @throws VerifyException 
 	 */
-	public List<Settime> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Settime> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		
 		return settimeDao.getAllRecordByPages(where, pagination);
 	}
@@ -77,8 +81,9 @@ public class SettimeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午06:07:40
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOne(Settime settime) {
+	public void removeOne(Settime settime) throws VerifyException {
 		settimeDao.remove(settime);
 	}
 
@@ -89,8 +94,9 @@ public class SettimeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午08:00:43
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOne(Settime settime) {
+	public void editOne(Settime settime) throws VerifyException {
 		settimeDao.update(settime);
 	}
 		

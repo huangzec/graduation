@@ -8,10 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * LinkeddataApplyTopicfinish entity. @author MyEclipse Persistence Tools
+ * LinkeddataApplyGradethree entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "linkeddata_apply_gradethree", catalog = "graduation")
+@Table(name = "linkeddata_apply_gradethree")
 public class LinkeddataApplyGradethree implements java.io.Serializable {
 
 	// Fields

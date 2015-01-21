@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.MeetingDao;
 import com.mvc.entity.Meeting;
+import com.mvc.exception.VerifyException;
 
 /**
  * 会议|会议模块服务层
@@ -27,8 +28,9 @@ public class MeetingService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 15:53:16
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Meeting meeting) {
+	public void addOne(Meeting meeting) throws VerifyException {
 		meetingDao.save(meeting);		
 	}
 
@@ -52,8 +54,9 @@ public class MeetingService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 15:53:16
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneMeeting(Meeting meeting) {
+	public void removeOneMeeting(Meeting meeting) throws VerifyException {
 		meetingDao.remove(meeting);		
 	}
 
@@ -64,8 +67,9 @@ public class MeetingService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 15:53:16
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneMeeting(Meeting meeting) {
+	public void editOneMeeting(Meeting meeting) throws VerifyException {
 		meetingDao.update(meeting);		
 	}
 
@@ -76,8 +80,9 @@ public class MeetingService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 15:53:16
 	 * @return List<Meeting>
+	 * @throws VerifyException 
 	 */
-	public List<Meeting> getAllRowsByWhere(String where) {
+	public List<Meeting> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return meetingDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class MeetingService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 15:53:16
 	 * @return List<Meeting>
+	 * @throws VerifyException 
 	 */
-	public List<Meeting> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Meeting> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return meetingDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -115,6 +121,19 @@ public class MeetingService {
 	 */
 	public int addOneReturn(Meeting meeting) {
 		return meetingDao.saveReturn(meeting);
+	}
+
+	/**
+	 * 通过where条件获取一条记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param metWhere
+	 * @return
+	 * @throws VerifyException 
+	 */
+	public Meeting getRecordByWhere(String where) throws VerifyException {
+		
+		return meetingDao.getOne(where);
 	}
 	
 }

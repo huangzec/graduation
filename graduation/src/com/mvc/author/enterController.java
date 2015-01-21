@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.MD5Util;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Deptmanager;
 import com.mvc.entity.Profession;
@@ -23,6 +24,7 @@ import com.mvc.entity.Student;
 import com.mvc.entity.Tboffice;
 import com.mvc.entity.Teacher;
 import com.mvc.entity.User;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.DeptService;
 import com.mvc.service.DeptmanagerService;
 import com.mvc.service.ProfessionService;
@@ -68,19 +70,25 @@ public class enterController {
 	 */
 	public static boolean isLogined(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
-		String contextPath=request.getContextPath();
-        String  url=request.getServletPath().toString();
-        HttpSession session = request.getSession();
-        String userID = (String) request.getSession().getAttribute("user_id");
-        System.out.println("用户ID为 " + userID);
-        //这里可以根据session的用户来判断角色的权限，根据权限来重定向不同的页面，简单起见，这里只是做了一个重定向
-        if (userID == null || userID.equals("")) {
-            //被拦截，重定向到login界面
-        	response.sendRedirect(contextPath+"/user/signin.do?redirectURL=" + URLEncoder.encode(url));
-        	return false;
-        }
-        
-        return true;
+		try {
+			String contextPath=request.getContextPath();
+	        String  url=request.getServletPath().toString();
+	        HttpSession session = request.getSession();
+	        String userID = (String) request.getSession().getAttribute("user_id");
+	        System.out.println("用户ID为 " + userID);
+	        //这里可以根据session的用户来判断角色的权限，根据权限来重定向不同的页面，简单起见，这里只是做了一个重定向
+	        if (userID == null || userID.equals("")) {
+	            //被拦截，重定向到login界面
+	        	response.sendRedirect(contextPath+"/user/signin.do?redirectURL=" + URLEncoder.encode(url));
+	        	return false;
+	        }
+	        
+	        return true;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return false;
+		}
 	}
 	
 	/**
@@ -144,19 +152,25 @@ public class enterController {
 	}
 
 	public static boolean isAdminLogined(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String contextPath=request.getContextPath();
-		String  url=request.getServletPath().toString();
-        HttpSession session = request.getSession();
-        String userID = (String) request.getSession().getAttribute("user_id");
-        System.out.println("用户ID为 " + userID);
-        //这里可以根据session的用户来判断角色的权限，根据权限来重定向不同的页面，简单起见，这里只是做了一个重定向
-        if (userID == null || userID.equals("")) {
-            //被拦截，重定向到login界面
-            response.sendRedirect(contextPath+"/admin/timeout.do?redirectURL=" + URLEncoder.encode(url));
-            return false;
-        }
-        
-        return true;
+		try {
+			String contextPath=request.getContextPath();
+			String  url=request.getServletPath().toString();
+	        HttpSession session = request.getSession();
+	        String userID = (String) request.getSession().getAttribute("user_id");
+	        System.out.println("用户ID为 " + userID);
+	        //这里可以根据session的用户来判断角色的权限，根据权限来重定向不同的页面，简单起见，这里只是做了一个重定向
+	        if (userID == null || userID.equals("")) {
+	            //被拦截，重定向到login界面
+	            response.sendRedirect(contextPath+"/admin/timeout.do?redirectURL=" + URLEncoder.encode(url));
+	            return false;
+	        }
+	        
+	        return true;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return false;
+		}
 	}
 	
 	/**
@@ -201,91 +215,103 @@ public class enterController {
 		/**
 		 * 如果是教务处管理员
 		 */
-		if(status.equals("4")) {
-			user = this._getOneUser("from User where username = '" + username + "'");
-			tboffice = this._getOneTbOffice("from Tboffice where offId = '" + username + "'");
-			if(user == null) {//如果用户表为空，就去找教务处管理员表
-				if(tboffice == null) {
+		try {
+			if(status.equals("4")) {
+				user = this._getOneUser("from User where username = '" + username + "' AND permissions = " + Integer.parseInt(status));
+				tboffice = this._getOneTbOffice("from Tboffice where offId = '" + username + "'");
+				if(Verify.isEmpty(user)) {//如果用户表为空，就去找教务处管理员表
+					if(Verify.isEmpty(tboffice)) {
+						return new ModelAndView("admin/login", "message", "用户名或密码错误");
+					}
+					//将教务处管理员数据添加到用户表
+					if((!this._insertOfficeIntoUser(tboffice)) || (!tboffice.getOffId().equals(password))) {
+						return new ModelAndView("admin/login", "message", "用户名或密码错误");
+					}
+					//设置用户信息通过登录
+					request.getSession().setAttribute("user_id", tboffice.getOffId());
+					request.getSession().setAttribute("user_name", tboffice.getOffName());
+					request.getSession().setAttribute("user_status", 4);
+					
+					return new ModelAndView("redirect:/admin/index.do");
+				}
+				//如果用户不为空
+				if(!user.getPassword().equals(MD5Util.MD5(password))) {//密码不正确
 					return new ModelAndView("admin/login", "message", "用户名或密码错误");
 				}
-				//将教务处管理员数据添加到用户表
-				if((!this._insertOfficeIntoUser(tboffice)) || (!tboffice.getOffId().equals(password))) {
+				//设置用户信息
+				if(!Verify.isEmpty(user) && !Verify.isEmpty(tboffice)){
+					request.getSession().setAttribute("user_id", tboffice.getOffId());
+					request.getSession().setAttribute("user_name", tboffice.getOffName());
+					request.getSession().setAttribute("user_status", 4);
+					return new ModelAndView("redirect:/admin/index.do");
+				}else {
 					return new ModelAndView("admin/login", "message", "用户名或密码错误");
 				}
-				//设置用户信息通过登录
-				request.getSession().setAttribute("user_id", tboffice.getOffId());
-				request.getSession().setAttribute("user_name", tboffice.getOffName());
-				request.getSession().setAttribute("user_status", 4);
-				
-				return new ModelAndView("forward:/admin/index.do");
-			}
-			//如果用户不为空
-			if(!user.getPassword().equals(MD5Util.MD5(password))) {//密码不正确
-				return new ModelAndView("admin/login", "message", "用户名或密码错误");
-			}
-			//设置用户信息
-			if(user != null && tboffice != null){
-				request.getSession().setAttribute("user_id", tboffice.getOffId());
-				request.getSession().setAttribute("user_name", tboffice.getOffName());
-				request.getSession().setAttribute("user_status", 4);
-				return new ModelAndView("forward:/admin/index.do");
-			}
-		} else if(status.equals("3")){//如果选择的是系部管理员
-			user = this._getOneUser("from User where username = '" + username + "'");
-			deptmanager = this._getOneDeptManager("from Deptmanager where dmId = '" + username + "'");
-			if(user == null) {//如果用户表为空，就去找系部管理员表
-				if(deptmanager == null) {
-					return new ModelAndView("admin/login", "message", "用户名或密码错误");
+			} else if(status.equals("3")){//如果选择的是系部管理员
+				user = this._getOneUser("from User where username = '" + username + "' AND permissions = " + Integer.parseInt(status));
+				deptmanager = this._getOneDeptManager("from Deptmanager where dmId = '" + username + "'");
+				if(Verify.isEmpty(user)) {//如果用户表为空，就去找系部管理员表
+					if(Verify.isEmpty(deptmanager)) {
+						return new ModelAndView("admin/login", "message", "用户名或密码错误");
+					}
+					//将系部管理员数据添加到用户表
+					if((!this._insertDeptmanagerIntoUser(deptmanager)) || (!deptmanager.getDmId().equals(password))) 
+					{
+						return new ModelAndView("admin/login", "message", "用户名或密码错误");
+					}
+					/**
+					 * 获取系部管理员所属的系部
+					 */
+					Department department = departmentService.getOneDept(deptmanager.getDeptId());
+					if(Verify.isEmpty(department)) {//如果所属系部不存在
+						return new ModelAndView("admin/login", "message", "用户名或密码错误");
+					}
+					request.getSession().setAttribute("department", department);
+					//设置用户信息通过登录
+					request.getSession().setAttribute("user_id", deptmanager.getDmId().toString());
+					request.getSession().setAttribute("user_name", deptmanager.getDmName());
+					request.getSession().setAttribute("user_status", 3);
+					
+					return new ModelAndView("redirect:/admin/index.do");
 				}
-				//将系部管理员数据添加到用户表
-				if((!this._insertDeptmanagerIntoUser(deptmanager)) || (!deptmanager.getDmId().equals(password))) 
-				{
+				//如果用户不为空
+				if(!user.getPassword().equals(MD5Util.MD5(password))) {//密码不正确
+					System.out.println("pass " + password);
 					return new ModelAndView("admin/login", "message", "用户名或密码错误");
 				}
 				/**
 				 * 获取系部管理员所属的系部
 				 */
-				Department department = departmentService.getOneDept(deptmanager.getDeptId());
-				if(department == null) {//如果所属系部不存在
+				if(Verify.isEmpty(deptmanager)) {
 					return new ModelAndView("admin/login", "message", "用户名或密码错误");
 				}
-				request.getSession().setAttribute("department", department);
-				//设置用户信息通过登录
-				request.getSession().setAttribute("user_id", deptmanager.getDmId().toString());
-				request.getSession().setAttribute("user_name", deptmanager.getDmName());
-				request.getSession().setAttribute("user_status", 3);
-				
-				return new ModelAndView("forward:/admin/index.do");
-			}
-			//如果用户不为空
-			if(!user.getPassword().equals(MD5Util.MD5(password))) {//密码不正确
-				return new ModelAndView("admin/login", "message", "用户名或密码错误");
-			}
-			/**
-			 * 获取系部管理员所属的系部
-			 */
-			if(deptmanager == null) {
-				return new ModelAndView("admin/login", "message", "用户名或密码错误");
-			}
-			Department department = departmentService.getOneDept(deptmanager.getDeptId());
-			if(department == null) {//如果所属系部不存在
-				return new ModelAndView("admin/login", "message", "用户名或密码错误");
-			}
-			if(user != null && deptmanager != null){
-				request.getSession().setAttribute("department", department);
-				//ModelMap modelMap = new ModelMap();
-				//modelMap.put("department", department);
-				//设置用户信息
-				
-				request.getSession().setAttribute("user_id", deptmanager.getDmId().toString());
-				request.getSession().setAttribute("user_name", deptmanager.getDmName());
-				request.getSession().setAttribute("user_status", 3);
+				Department department = departmentService.getOneDept(deptmanager.getDeptId());
+				if(Verify.isEmpty(department)) {//如果所属系部不存在
+					return new ModelAndView("admin/login", "message", "用户名或密码错误");
+				}
+				if(!Verify.isEmpty(user) && !Verify.isEmpty(deptmanager)){
+					request.getSession().setAttribute("department", department);
+					//ModelMap modelMap = new ModelMap();
+					//modelMap.put("department", department);
+					//设置用户信息
+					
+					request.getSession().setAttribute("user_id", deptmanager.getDmId().toString());
+					request.getSession().setAttribute("user_name", deptmanager.getDmName());
+					request.getSession().setAttribute("user_status", 3);
 
-				return new ModelAndView("forward:/admin/index.do");
+					return new ModelAndView("redirect:/admin/index.do");
+				}else {
+					return new ModelAndView("admin/login", "message", "用户名或密码错误");
+				}
+			}else {
+				return new ModelAndView("admin/login", "message", "用户名或密码错误");
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return new ModelAndView("admin/login", "message", "服务器繁忙，请稍后再试");
 		}
 		
-		return new ModelAndView("admin/login", "message", "用户名或密码错误");
 	}
 	
 	/**
@@ -308,51 +334,58 @@ public class enterController {
 		if(!this._verifyLoginData(request, response)){
 			return new ModelAndView("user/login");
 		}
-		
-		user = this._getOneUser("from User where username = '" + username + "'");
-		teacher = this._getOneTea("from Teacher where teaId = '" + username + "'");
-		student = this._getOneStudent("from Student where stuId = '" + username + "'");
-		
-		if(user == null){
-			if(student != null){
-				int stuStatus = 1;
-				if((!this._insertStuIntoUser(student)) || (!student.getStuId().equals(password))
-						|| stuStatus != Integer.parseInt(status)){
-					return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
-				}
-				this._setUserInfo(username, student.getStuName(), stuStatus, request);
-				this._setStuDept(student.getClaId(), request);
-				return new ModelAndView("forward:/user/index.do");
-			}
-			else if(teacher != null){
-				int teaStatus = 2;
-				if(!this._insertTeacIntoUser(teacher) || (!teacher.getTeaId().equals(password))
-						|| teaStatus != Integer.parseInt(status)){
-					return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
-				}
-				this._setUserInfo(username, teacher.getTeaName(), teaStatus, request);
-				this._setTeaDept(request, teacher.getDeptId());
-				return new ModelAndView("forward:/user/index.do");
-			}else{
-				return new ModelAndView("user/login", "message", "用户不存在！");
-			}
-			
-		}else{
-			if(user.getPassword().equals(MD5Util.MD5(password)) && user.getPermissions() == Integer.parseInt(status)) {
-				request.getSession().setAttribute("user_id", username);
-				request.getSession().setAttribute("user_status", Integer.parseInt(status));
-				if (teacher != null) {
-					request.getSession().setAttribute("user_name", teacher.getTeaName());
-					this._setTeaDept(request, teacher.getDeptId());
-				}else if(student != null){
-					request.getSession().setAttribute("user_name", student.getStuName());
+		try {
+			user = this._getOneUser("from User where username = '" + username + "'");
+			teacher = this._getOneTea("from Teacher where teaId = '" + username + "'");
+			student = this._getOneStudent("from Student where stuId = '" + username + "'");
+			if(Verify.isEmpty(user)){//如果用户表为空
+				if(!Verify.isEmpty(student)){
+					int stuStatus = 1;
+					if((!this._insertStuIntoUser(student)) || (!student.getStuId().equals(password))
+							|| stuStatus != Integer.parseInt(status)){
+						return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
+					}
+					this._setUserInfo(username, student.getStuName(), stuStatus, request);
 					this._setStuDept(student.getClaId(), request);
+					
+					return new ModelAndView("redirect:/user/index.do");
+				} else if(!Verify.isEmpty(teacher)){
+					int teaStatus = 2;
+					if(!this._insertTeacIntoUser(teacher) || (!teacher.getTeaId().equals(password))
+							|| teaStatus != Integer.parseInt(status)){
+						return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
+					}
+					this._setUserInfo(username, teacher.getTeaName(), teaStatus, request);
+					this._setTeaDept(request, teacher.getDeptId());
+					
+					return new ModelAndView("redirect:/user/index.do");
+				}else{
+					return new ModelAndView("user/login", "message", "用户不存在！");
 				}
-				return new ModelAndView("forward:/user/index.do");
-			}else{
-				System.out.println("it is a question..............");
-				return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
+				
+			}else{//用户表不为空
+				if(user.getPassword().equals(MD5Util.MD5(password)) && user.getPermissions() == Integer.parseInt(status)) {
+					request.getSession().setAttribute("user_id", username);
+					request.getSession().setAttribute("user_status", Integer.parseInt(status));
+					if (!Verify.isEmpty(teacher)) {
+						request.getSession().setAttribute("user_name", teacher.getTeaName());
+						this._setTeaDept(request, teacher.getDeptId());
+					}else if(!Verify.isEmpty(student)){
+						request.getSession().setAttribute("user_name", student.getStuName());
+						this._setStuDept(student.getClaId(), request);
+					}else {
+						return new ModelAndView("user/login", "message", "用户不存在！请与系部管理员联系");
+					}
+					
+					return new ModelAndView("redirect:/user/index.do");
+				}else{
+					return new ModelAndView("user/login", "message", "用户名/密码/角色选择错误");
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return new ModelAndView("user/login", "message", "服务器繁忙，请稍后再试");
 		}
 	}
 	
@@ -363,10 +396,12 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-8-7 上午09:04:00
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _setTeaDept(HttpServletRequest request, String deptId) {
+	private void _setTeaDept(HttpServletRequest request, String deptId) throws VerifyException {
 		String where = "from Department where deptId='" + deptId +"'";
-		Department dept = departmentService.getAll(where).get(0);
+		Department dept = departmentService.getRecordByWhere(where);
+		
 		request.getSession().setAttribute("dept", dept);
 	}
 
@@ -377,11 +412,13 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-8-7 上午09:00:18
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _setStuDept(Integer claId, HttpServletRequest request) {
+	private void _setStuDept(String claId, HttpServletRequest request) throws VerifyException {
 		String where = "from Department where deptId = (select deptId from Profession" +
 			" where proId = (select proId from Tbclass where claId='"+ claId + "'))";
-		Department dept = departmentService.getAll(where).get(0);
+		Department dept = departmentService.getRecordByWhere(where);
+		
 		request.getSession().setAttribute("dept", dept);
 	}
 
@@ -407,11 +444,11 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-21 下午8:09:13
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	private boolean _insertTeacIntoUser(Teacher teacher) {
-		User user 	= null;
-		user = userService.getOneUser("from User where username = '" + teacher.getTeaId() + "'");
-		if(user != null) {
+	private boolean _insertTeacIntoUser(Teacher teacher) throws VerifyException {
+		User user 	= userService.getOneUser("from User where username = '" + teacher.getTeaId() + "'");
+		if(!Verify.isEmpty(user)) {
 			return false;
 		}
 		try{
@@ -420,6 +457,7 @@ public class enterController {
 			user.setPassword(MD5Util.MD5(teacher.getTeaId()));
 			user.setPermissions(2);
 			userService.addOneUser(user);
+			
 			return true;
 		}catch (Exception e) {
 			return false;
@@ -433,8 +471,9 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-21 下午8:08:57
 	 * @return Teacher
+	 * @throws VerifyException 
 	 */
-	private Teacher _getOneTea(String where) {
+	private Teacher _getOneTea(String where) throws VerifyException {
 		return teaService.getOneByWhere(where);
 	}
 
@@ -445,11 +484,11 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-21 下午3:51:24
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	private boolean _insertStuIntoUser(Student student) {
-		User user 	= null;
-		user = userService.getOneUser("from User where username = '" + student.getStuId() + "'");
-		if(user != null) {
+	private boolean _insertStuIntoUser(Student student) throws VerifyException {
+		User user 	= userService.getOneUser("from User where username = '" + student.getStuId() + "'");
+		if(!Verify.isEmpty(user)) {
 			return false;
 		}
 		try{
@@ -458,8 +497,11 @@ public class enterController {
 			user.setPassword(MD5Util.MD5(student.getStuId()));
 			user.setPermissions(1);
 			userService.addOneUser(user);
+			
 			return true;
 		}catch (Exception e) {
+			e.printStackTrace();
+			
 			return false;
 		}
 	}
@@ -471,8 +513,9 @@ public class enterController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-21 下午3:50:49
 	 * @return Student
+	 * @throws VerifyException 
 	 */
-	private Student _getOneStudent(String where) {
+	private Student _getOneStudent(String where) throws VerifyException {
 		return stuService.getOneStu(where);
 	}
 
@@ -483,12 +526,13 @@ public class enterController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-11 上午11:36:24
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	protected boolean _insertDeptmanagerIntoUser(Deptmanager deptmanager)
+	protected boolean _insertDeptmanagerIntoUser(Deptmanager deptmanager) throws VerifyException
 	{
-		User user 	= null;
-		user 		= userService.getOneUser("from User where username = '" + deptmanager.getDmId() + "'");
-		if(user != null) {
+		String where = "from User where username = '" + deptmanager.getDmId() + "' AND permissions = 3 ";
+		User user 	= userService.getOneUser(where);
+		if(!Verify.isEmpty(user)) {
 			return false;
 		}
 		try{
@@ -510,8 +554,9 @@ public class enterController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-11 上午11:18:16
 	 * @return Deptmanager
+	 * @throws VerifyException 
 	 */
-	protected Deptmanager _getOneDeptManager(String where) 
+	protected Deptmanager _getOneDeptManager(String where) throws VerifyException 
 	{
 		return deptmanagerService.getOneDeptManager(where);
 	}
@@ -523,11 +568,11 @@ public class enterController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-10 下午09:22:47
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	protected boolean _insertOfficeIntoUser(Tboffice tboffice) {
-		User user 	= null;
-		user 		= userService.getOneUser("from User where username = '" + tboffice.getOffId() + "'");
-		if(user != null) {
+	protected boolean _insertOfficeIntoUser(Tboffice tboffice) throws VerifyException {
+		User user 	= userService.getOneUser("from User where username = '" + tboffice.getOffId() + "'");
+		if(!Verify.isEmpty(user)) {
 			return false;
 		}
 		try{
@@ -558,22 +603,22 @@ public class enterController {
 		String status 		= request.getParameter("status");
 		String code 		= request.getParameter("code");
 		String vcode 		= (String) request.getSession().getAttribute("rand");
-		if(username.equals("")) {
+		if(Verify.isEmpty(username)) {
 			request.setAttribute("message", "用户名不能为空");
 			
 			return false;
 		}
-		if(password.equals("")) {
+		if(Verify.isEmpty(password)) {
 			request.setAttribute("message", "密码不能为空");
 			
 			return false;
 		}
-		if(status.equals("")) {
+		if(Verify.isEmpty(status)) {
 			request.setAttribute("message", "身份不能为空");
 			
 			return false;
 		}
-		if(code.equals("")) {
+		if(Verify.isEmpty(code)) {
 			request.setAttribute("message", "验证码不能为空");
 			
 			return false;
@@ -594,8 +639,9 @@ public class enterController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-10 下午05:20:24
 	 * @return User
+	 * @throws VerifyException 
 	 */
-	protected User _getOneUser(String where)
+	protected User _getOneUser(String where) throws VerifyException
 	{
 		return userService.getOneUser(where);
 	}
@@ -607,8 +653,9 @@ public class enterController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-10 下午05:27:57
 	 * @return Tboffice
+	 * @throws VerifyException 
 	 */
-	protected Tboffice _getOneTbOffice(String where)
+	protected Tboffice _getOneTbOffice(String where) throws VerifyException
 	{
 		return tbofficeService.getOneTbOffice(where);
 	}

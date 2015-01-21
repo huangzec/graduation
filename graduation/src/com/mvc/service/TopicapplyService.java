@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.TopicapplyDao;
 import com.mvc.entity.Topicapply;
+import com.mvc.exception.VerifyException;
 
 /**
  * 开题答辩申请书服务层
@@ -27,8 +28,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 11:33:35
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Topicapply topicapply) {
+	public void addOne(Topicapply topicapply) throws VerifyException {
 		topicapplyDao.save(topicapply);		
 	}
 
@@ -52,8 +54,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 11:33:35
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneTopicapply(Topicapply topicapply) {
+	public void removeOneTopicapply(Topicapply topicapply) throws VerifyException {
 		topicapplyDao.remove(topicapply);		
 	}
 
@@ -64,8 +67,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 11:33:35
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneTopicapply(Topicapply topicapply) {
+	public void editOneTopicapply(Topicapply topicapply) throws VerifyException {
 		topicapplyDao.update(topicapply);		
 	}
 
@@ -76,8 +80,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 11:33:35
 	 * @return Object
+	 * @throws VerifyException 
 	 */
-	public Object getAllRowsByWhere(String where) {
+	public Object getAllRowsByWhere(String where) throws VerifyException {
 		
 		return topicapplyDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-14 11:33:35
 	 * @return List<Topicapply>
+	 * @throws VerifyException 
 	 */
-	public List<Topicapply> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Topicapply> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return topicapplyDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class TopicapplyService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-8 下午08:16:34
 	 * @return Topicapply
+	 * @throws VerifyException 
 	 */
-	public Topicapply getRecordByWhere(String where) {
+	public Topicapply getRecordByWhere(String where) throws VerifyException {
 		return topicapplyDao.getOne(where);
 	}
 

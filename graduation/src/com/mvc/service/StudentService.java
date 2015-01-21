@@ -12,6 +12,7 @@ import com.mvc.dao.EntityDao;
 import com.mvc.dao.StudentDao;
 import com.mvc.entity.Profession;
 import com.mvc.entity.Student;
+import com.mvc.exception.VerifyException;
 
 @Service
 public class StudentService {
@@ -57,8 +58,9 @@ public class StudentService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 下午03:18:19
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneStudent(Student student) {
+	public void addOneStudent(Student student) throws VerifyException {
 		studentDao.save(student);		
 	}
 
@@ -69,9 +71,10 @@ public class StudentService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 下午03:21:52
 	 * @return List<Student>
+	 * @throws VerifyException 
 	 */
 	public List<Student> getAllRecordByPages(String where,
-			Pagination pagination) {
+			Pagination pagination) throws VerifyException {
 		
 		return studentDao.getAllRecordByPages(where, pagination);
 	}
@@ -83,8 +86,9 @@ public class StudentService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 下午05:53:31
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneStudent(Student student) {
+	public void removeOneStudent(Student student) throws VerifyException {
 		studentDao.remove(student);		
 	}
 
@@ -95,8 +99,9 @@ public class StudentService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-17 下午08:25:04
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneStudent(Student student) {
+	public void editOneStudent(Student student) throws VerifyException {
 		studentDao.update(student);		
 	}
 
@@ -107,8 +112,9 @@ public class StudentService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-21 下午3:49:20
 	 * @return Student
+	 * @throws VerifyException 
 	 */
-	public Student getOneStu(String where) {
+	public Student getOneStu(String where) throws VerifyException {
 		return studentDao.getOne(where);
 	}
 
@@ -119,8 +125,9 @@ public class StudentService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-29 下午05:44:41
 	 * @return List<Student>
+	 * @throws VerifyException 
 	 */
-	public List<Student> getAllRows(String where) {
+	public List<Student> getAllRows(String where) throws VerifyException {
 		return studentDao.getAll(where);
 	}
 

@@ -9,12 +9,12 @@ import javax.persistence.Table;
  * Tbclass entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "tbclass", catalog = "graduation")
+@Table(name = "tbclass")
 public class Tbclass implements java.io.Serializable {
 
 	// Fields
 
-	private Integer claId;
+	private String claId;
 	private String claName;
 	private String proId;
 
@@ -25,12 +25,12 @@ public class Tbclass implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Tbclass(Integer claId) {
+	public Tbclass(String claId) {
 		this.claId = claId;
 	}
 
 	/** full constructor */
-	public Tbclass(Integer claId, String claName, String proId) {
+	public Tbclass(String claId, String claName, String proId) {
 		this.claId = claId;
 		this.claName = claName;
 		this.proId = proId;
@@ -39,11 +39,11 @@ public class Tbclass implements java.io.Serializable {
 	// Property accessors
 	@Id
 	@Column(name = "cla_ID", unique = true, nullable = false)
-	public Integer getClaId() {
+	public String getClaId() {
 		return this.claId;
 	}
 
-	public void setClaId(Integer claId) {
+	public void setClaId(String claId) {
 		this.claId = claId;
 	}
 

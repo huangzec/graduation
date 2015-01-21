@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.GradethreeDao;
 import com.mvc.entity.Gradethree;
+import com.mvc.exception.VerifyException;
 
 /**
  * 毕业答辩成绩模块服务层
@@ -27,8 +28,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-03 21:49:28
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Gradethree gradethree) {
+	public void addOne(Gradethree gradethree) throws VerifyException {
 		gradethreeDao.save(gradethree);		
 	}
 
@@ -52,8 +54,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-03 21:49:28
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneGradethree(Gradethree gradethree) {
+	public void removeOneGradethree(Gradethree gradethree) throws VerifyException {
 		gradethreeDao.remove(gradethree);		
 	}
 
@@ -64,8 +67,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-03 21:49:28
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneGradethree(Gradethree gradethree) {
+	public void editOneGradethree(Gradethree gradethree) throws VerifyException {
 		gradethreeDao.update(gradethree);		
 	}
 
@@ -76,8 +80,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-03 21:49:28
 	 * @return List<Gradethree>
+	 * @throws VerifyException 
 	 */
-	public List<Gradethree> getAllRowsByWhere(String where) {
+	public List<Gradethree> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return gradethreeDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-03 21:49:28
 	 * @return List<Gradethree>
+	 * @throws VerifyException 
 	 */
-	public List<Gradethree> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Gradethree> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return gradethreeDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class GradethreeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-4 上午11:17:44
 	 * @return Gradethree
+	 * @throws VerifyException 
 	 */
-	public Gradethree getRecordByWhere(String where) {
+	public Gradethree getRecordByWhere(String where) throws VerifyException {
 		return gradethreeDao.getOne(where);
 	}
 

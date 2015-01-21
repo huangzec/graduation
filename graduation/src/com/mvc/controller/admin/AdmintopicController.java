@@ -2,6 +2,7 @@ package com.mvc.controller.admin;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.mvc.common.MapUtil;
 import com.mvc.common.RequestSetAttribute;
 import com.mvc.entity.Department;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.TeacherService;
 
 /**
@@ -39,6 +42,80 @@ public class AdmintopicController {
 	public void setList(List<Teacher> list) {
 		this.list = list;
 	}
+	
+	/**
+	 * 注册课题状态Map
+	 */
+	@SuppressWarnings("serial")
+	private static LinkedHashMap<String, String> _statusMap = new LinkedHashMap<String, String>(){{
+		put("0", "未审核");
+		put("1", "通过");
+		put("2", "未通过");
+	}};
+	
+	/**
+	 * 注册课题提交人类型Map
+	 */
+	private static LinkedHashMap<String, String> _typeMap = new LinkedHashMap<String, String>(){{
+		put("1", "学生");
+		put("2", "老师");
+	}};
+	
+	/**
+	 * 加载课题状态Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignStatusMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"status_map",
+				MapUtil.makeLinkedMapMap(_statusMap)
+				);
+	}
+	
+	/**
+	 * 加载课题状态列表Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignStatusListMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"status_list", 
+				MapUtil.makeLinkedListMap(_statusMap)
+				);
+	}
+	
+	/**
+	 * 加载课题提交人类型Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignTypeMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"type_map",
+				MapUtil.makeLinkedMapMap(_typeMap)
+				);
+	}
+	
+	/**
+	 * 加载课题提交人类型列表Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignTypeListMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"type_list", 
+				MapUtil.makeLinkedListMap(_typeMap)
+				);
+	}
 
 	/**
 	 * 课题评审安排
@@ -47,9 +124,10 @@ public class AdmintopicController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-30 上午09:42:07
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/topicorderview.do")
-	public ModelAndView topicOrderView(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView topicOrderView(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
@@ -69,9 +147,10 @@ public class AdmintopicController {
 	 * @date 2014-7-30 下午03:24:40
 	 * @return void
 	 * @throws IOException 
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/judgeorder.do")
-	public void judgeOrder(@RequestParam(value="ids[]") String[] ids, HttpServletRequest request, HttpServletResponse response) throws IOException
+	public void judgeOrder(@RequestParam(value="ids[]") String[] ids, HttpServletRequest request, HttpServletResponse response) throws IOException, VerifyException
 	{
 		String id = "";
 		for(int i = 0; i < ids.length; i++) {
@@ -102,9 +181,10 @@ public class AdmintopicController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-8 上午10:06:14
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/judge.do")
-	public ModelAndView judge(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView judge(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department 	= (Department) request.getSession().getAttribute("department");

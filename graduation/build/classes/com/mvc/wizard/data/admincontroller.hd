@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.{entityName};
 import com.mvc.service.{entityName}Service;
@@ -35,7 +36,7 @@ public class {entityName}Controller {
 	private List<{entityName}> list = new ArrayList<{entityName}>();
 	
 	private int pageNum = 1;//页数
-	private int numPerPage = 10;//每页显示多少条
+	private int numPerPage = 20;//每页显示多少条
 	
 	public Pagination getPagination() {
 		return pagination;
@@ -108,7 +109,7 @@ public class {entityName}Controller {
 			return mav;
 		}
 		{entityName} {entityNameFirstLow} = {entityNameFirstLow}Service.getOneRecordById(Integer.parseInt(id));
-		if({entityNameFirstLow} != null) {
+		if(!Verify.isEmpty({entityNameFirstLow})) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "{entityZhName}编号已存在");
 			mav.setViewName("public/ajaxDone");
@@ -138,12 +139,12 @@ public class {entityName}Controller {
 	protected boolean _verifyData(HttpServletRequest request) {
 		String id 		= request.getParameter("id");
 		String name 	= request.getParameter("name");
-		if(id.trim().equals("")) {
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("message", "{entityZhName}编号不能为空");
 			
 			return false;
 		}
-		if(name.trim().equals("")) {
+		if(Verify.isEmpty(name)) {
 			request.setAttribute("message", "{entityZhName}名称不能为空");
 			
 			return false;
@@ -165,14 +166,13 @@ public class {entityName}Controller {
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -214,7 +214,7 @@ public class {entityName}Controller {
 	{
 		ModelAndView mav = new ModelAndView();
 		String id 	= request.getParameter("id");
-		if(id == null || id.trim().equals("")) {
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "ID不能为空");
 			mav.setViewName("public/ajaxDone");
@@ -222,7 +222,7 @@ public class {entityName}Controller {
 			return mav;
 		}
 		{entityName} {entityNameFirstLow} = {entityNameFirstLow}Service.getOneRecordById(Integer.parseInt(id));
-		if({entityNameFirstLow} == null) {
+		if(Verify.isEmpty({entityNameFirstLow})) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -255,7 +255,7 @@ public class {entityName}Controller {
 		Department department = (Department) request.getSession().getAttribute("department");
 		String id 	= request.getParameter("id");
 		{entityName} {entityNameFirstLow} = {entityNameFirstLow}Service.getOneRecordById(Integer.parseInt(id));
-		if({entityNameFirstLow} == null) {
+		if(Verify.isEmpty({entityNameFirstLow})) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -289,7 +289,7 @@ public class {entityName}Controller {
 			return mav;
 		}
 		{entityName} {entityNameFirstLow} = {entityNameFirstLow}Service.getOneRecordById(Integer.parseInt(id));
-		if({entityNameFirstLow} == null) {
+		if(Verify.isEmpty({entityNameFirstLow})) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");

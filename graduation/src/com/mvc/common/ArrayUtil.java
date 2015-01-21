@@ -7,8 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mvc.entity.Student;
-
 /**
  * 数组工具类
  * @author huangzec@foxmail.com
@@ -110,6 +108,58 @@ public class ArrayUtil {
 		}
 		
 		return map;
+	}
+	
+	/**
+	 * 把列表转换为json
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param data
+	 * @return
+	 */
+	public static String listToJson(List<?> data)
+	{
+		return listToJson("id", "name", data);
+	}
+	
+	/**
+	 * 把列表转换为json
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param id 要转换的字段
+	 * @param name 要转换的字段
+	 * @param data 要转换的数据
+	 * @return
+	 */
+	public static String listToJson(String id, String name, List<?> data)
+	{
+		StringBuilder json 	= new StringBuilder();
+		for(int i = 0; null != data && i < data.size(); i++) {
+			if(null == data.get(i)) {
+				continue;
+			}
+			try {
+				Object obj 		= data.get(i);
+				Class cls 		= obj.getClass();
+				Field idfield 	= cls.getDeclaredField(id);
+				Field namefield = cls.getDeclaredField(name);
+				idfield.setAccessible(true);
+				namefield.setAccessible(true);
+				Method idmethod 	= cls.getDeclaredMethod("get" + StringUtil.ufirst(id), null);
+				Method namemethod 	= cls.getDeclaredMethod("get" + StringUtil.ufirst(name), null);
+				String idresult 	= idmethod.invoke(obj, null).toString();
+				String nameresult 	= namemethod.invoke(obj, null).toString();
+				
+				json.append("{\"id\": \"" + idresult + "\", \"name\": \"" + nameresult +  "\"},");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if(1 > json.length()) {
+			return "[]";
+		}
+		
+		return "[" + json.toString().substring(0, json.length() - 1) + "]";
 	}
 	
 	/**

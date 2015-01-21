@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.RevieworderDao;
 import com.mvc.entity.Revieworder;
+import com.mvc.exception.VerifyException;
 
 /**
  * 毕业评阅安排服务层
@@ -27,8 +28,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-26 11:30:22
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Revieworder revieworder) {
+	public void addOne(Revieworder revieworder) throws VerifyException {
 		revieworderDao.save(revieworder);		
 	}
 
@@ -52,8 +54,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-26 11:30:22
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneRevieworder(Revieworder revieworder) {
+	public void removeOneRevieworder(Revieworder revieworder) throws VerifyException {
 		revieworderDao.remove(revieworder);		
 	}
 
@@ -64,8 +67,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-26 11:30:22
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneRevieworder(Revieworder revieworder) {
+	public void editOneRevieworder(Revieworder revieworder) throws VerifyException {
 		revieworderDao.update(revieworder);		
 	}
 
@@ -76,8 +80,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-26 11:30:22
 	 * @return List<Revieworder>
+	 * @throws VerifyException 
 	 */
-	public List<Revieworder> getAllRowsByWhere(String where) {
+	public List<Revieworder> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return revieworderDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-26 11:30:22
 	 * @return List<Revieworder>
+	 * @throws VerifyException 
 	 */
-	public List<Revieworder> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Revieworder> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return revieworderDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class RevieworderService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-27 上午09:49:18
 	 * @return Revieworder
+	 * @throws VerifyException 
 	 */
-	public Revieworder getRecordByWhere(String where) {
+	public Revieworder getRecordByWhere(String where) throws VerifyException {
 		return revieworderDao.getOne(where);
 	}
 	

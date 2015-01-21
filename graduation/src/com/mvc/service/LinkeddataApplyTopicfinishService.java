@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.LinkeddataApplyTopicfinishDao;
 import com.mvc.entity.LinkeddataApplyTopicfinish;
+import com.mvc.exception.VerifyException;
 
 /**
  * 毕业答辩相关材料关联服务层
@@ -27,8 +28,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-10 10:26:31
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) {
+	public void addOne(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) throws VerifyException {
 		linkeddataApplyTopicfinishDao.save(linkeddataApplyTopicfinish);		
 	}
 
@@ -52,8 +54,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-10 10:26:31
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneLinkeddataApplyTopicfinish(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) {
+	public void removeOneLinkeddataApplyTopicfinish(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) throws VerifyException {
 		linkeddataApplyTopicfinishDao.remove(linkeddataApplyTopicfinish);		
 	}
 
@@ -64,8 +67,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-10 10:26:31
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneLinkeddataApplyTopicfinish(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) {
+	public void editOneLinkeddataApplyTopicfinish(LinkeddataApplyTopicfinish linkeddataApplyTopicfinish) throws VerifyException {
 		linkeddataApplyTopicfinishDao.update(linkeddataApplyTopicfinish);		
 	}
 
@@ -76,8 +80,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-10 10:26:31
 	 * @return List<LinkeddataApplyTopicfinish>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyTopicfinish> getAllRowsByWhere(String where) {
+	public List<LinkeddataApplyTopicfinish> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return linkeddataApplyTopicfinishDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-10 10:26:31
 	 * @return List<LinkeddataApplyTopicfinish>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyTopicfinish> getAllRecordByPages(String where, Pagination pagination) {
+	public List<LinkeddataApplyTopicfinish> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return linkeddataApplyTopicfinishDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -111,8 +117,9 @@ public class LinkeddataApplyTopicfinishService {
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param linkWhere
 	 * @return
+	 * @throws VerifyException 
 	 */
-	public LinkeddataApplyTopicfinish getRecordByWhere(String where) {
+	public LinkeddataApplyTopicfinish getRecordByWhere(String where) throws VerifyException {
 		return linkeddataApplyTopicfinishDao.getOne(where);
 	}
 	

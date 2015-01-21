@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.GradeallDao;
 import com.mvc.entity.Gradeall;
+import com.mvc.exception.VerifyException;
 
 /**
  * 服务层
@@ -27,8 +28,9 @@ public class GradeallService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 17:41:47
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Gradeall gradeall) {
+	public void addOne(Gradeall gradeall) throws VerifyException {
 		gradeallDao.save(gradeall);		
 	}
 
@@ -52,8 +54,9 @@ public class GradeallService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 17:41:47
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneGradeall(Gradeall gradeall) {
+	public void removeOneGradeall(Gradeall gradeall) throws VerifyException {
 		gradeallDao.remove(gradeall);		
 	}
 
@@ -64,8 +67,9 @@ public class GradeallService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 17:41:47
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneGradeall(Gradeall gradeall) {
+	public void editOneGradeall(Gradeall gradeall) throws VerifyException {
 		gradeallDao.update(gradeall);		
 	}
 
@@ -76,8 +80,9 @@ public class GradeallService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 17:41:47
 	 * @return List<Gradeall>
+	 * @throws VerifyException 
 	 */
-	public List<Gradeall> getAllRowsByWhere(String where) {
+	public List<Gradeall> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return gradeallDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class GradeallService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-02 17:41:47
 	 * @return List<Gradeall>
+	 * @throws VerifyException 
 	 */
-	public List<Gradeall> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Gradeall> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return gradeallDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class GradeallService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-10-2 下午05:45:33
 	 * @return Gradeall
+	 * @throws VerifyException 
 	 */
-	public Gradeall getRecordByWhere(String where) {
+	public Gradeall getRecordByWhere(String where) throws VerifyException {
 		return gradeallDao.getOne(where);
 	}
 

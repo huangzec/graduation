@@ -3,6 +3,7 @@ package com.mvc.controller.admin;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,10 +28,14 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.ExcelIO;
+import com.mvc.common.HResponse;
+import com.mvc.common.MapUtil;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Deptmanager;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.DeptService;
 
 /**
@@ -81,6 +86,44 @@ public class DeptController {
 	public void setDeptList(List<Department> deptList) {
 		this.deptList = deptList;
 	}
+	
+	/**
+	 * 注册系部专业类型Map
+	 */
+	@SuppressWarnings("serial")
+	private static LinkedHashMap<String, String> _majorTypeMap = new LinkedHashMap<String, String>(){{
+		put("1", "理工医农学类");
+		put("2", "人文社科类");
+		put("3", "其他");
+	}};
+	
+	/**
+	 * 注册系部专业类型Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignMajorTypeMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"majortype_map",
+				MapUtil.makeLinkedMapMap(_majorTypeMap)
+				);
+	}
+	
+	/**
+	 * 注册系部专业类型列表Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignMajorTypeListMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"majortype_list",
+				MapUtil.makeLinkedListMap(_majorTypeMap)
+				);
+	}
 
 	/**
 	 * 
@@ -91,7 +134,9 @@ public class DeptController {
 	 * @return ModelAndView
 	 */
 	@RequestMapping(value="/intoAddOneDept.do")
-	public ModelAndView intoAddOneDept(){
+	public ModelAndView intoAddOneDept(HttpServletRequest request){
+		assignMajorTypeListMap(request);
+		
 		return new ModelAndView("admin/dept/addOneDept");
 	}
 	
@@ -102,11 +147,17 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 上午10:53:57
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addOneDept.do")
-	public String addOneDept(HttpServletRequest request){
+	public String addOneDept(HttpServletRequest request) throws VerifyException{
 		String deptId = request.getParameter("deptId");
 		String deptName = request.getParameter("deptName");
+		String majorType = request.getParameter("major-type");
+		
+		if(!this._verifyData(request)) {
+			return "public/ajaxDone";
+		}
 		
 		if(!this.isExist(deptId, request)){
 			return "public/ajaxDone";
@@ -117,6 +168,7 @@ public class DeptController {
 		Department dept = new Department();
 		dept.setDeptId(deptId);
 		dept.setDeptName(deptName);
+		dept.setMajorType(majorType);
 		try{
 			deptService.save(dept);
 			RequestSetAttribute.requestSetAttribute(
@@ -129,14 +181,49 @@ public class DeptController {
 	}
 	
 	/**
+	 * 数据验证
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @return
+	 */
+	private boolean _verifyData(HttpServletRequest request) 
+	{
+		String deptId = request.getParameter("deptId");
+		String deptName = request.getParameter("deptName");
+		String majorType = request.getParameter("major-type");
+		if (Verify.isEmpty(deptId)) {
+			request.setAttribute("message", "系部编号不能为空");
+			request.setAttribute("statusCode", 300);
+			
+			return false;
+		}
+		if (Verify.isEmpty(deptName)) {
+			request.setAttribute("message", "系部名称不能为空");
+			request.setAttribute("statusCode", 300);
+			
+			return false;
+		}
+		if (Verify.isEmpty(majorType)) {
+			request.setAttribute("message", "系部专业类型不能为空");
+			request.setAttribute("statusCode", 300);
+			
+			return false;
+		}
+		
+		return true;
+	}
+
+	/**
 	 * 
 	 * 判断是否存在 
 	 * @Description  
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-19 下午4:33:40
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	protected boolean isExist(String deptId, HttpServletRequest request){
+	protected boolean isExist(String deptId, HttpServletRequest request) throws VerifyException{
 		Department dept = new Department();
 		dept = deptService.getOneDept(deptId);
 		if (dept != null && !dept.getDeptId().equals("")) {
@@ -154,16 +241,18 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-19 下午4:39:40
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	protected boolean isNameOk(HttpServletRequest request,String deptName){
-		deptList = deptService.getAll("from Department");
-		for (int j = 0; j < deptList.size(); j++) {
-			if(deptName.equals(deptList.get(j).getDeptName())){
-				request.setAttribute("message", "系部名称--" + deptName + "--冲突");
-				request.setAttribute("statusCode", 300);
-				return false;
-			}
+	protected boolean isNameOk(HttpServletRequest request,String deptName) throws VerifyException{
+		String where = "from Department where deptName = '" + deptName + "' ";
+		Department department = deptService.getRecordByWhere(where);
+		if(!Verify.isEmpty(department)) {
+			request.setAttribute("message", "系部名称--" + deptName + "--冲突");
+			request.setAttribute("statusCode", 300);
+			
+			return false;
 		}
+		
 		return true;
 	}
 	
@@ -187,9 +276,10 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-14 上午10:54:51
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addLotDept.do")
-	public String addLotDept(HttpServletRequest request, ModelMap modelMap){
+	public String addLotDept(HttpServletRequest request, ModelMap modelMap) throws VerifyException{
 		MultipartHttpServletRequest mulRequest = (MultipartHttpServletRequest) request;
 		MultipartFile excelFile = mulRequest.getFile("file");
 		/**
@@ -210,6 +300,9 @@ public class DeptController {
 				}
 				if(j == 1){
 					dept.setDeptName(result[i][j]);
+				}
+				if(j == 2) {
+					dept.setMajorType(result[i][j]);
 				}
 			}
 			if (!this.isExist(dept.getDeptId(), request)) {
@@ -237,11 +330,13 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-18 下午5:46:19
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/excelExport.do")
-	public String excelExport(HttpServletRequest request, HttpServletResponse response){
+	public void excelExport(HttpServletRequest request, HttpServletResponse response) throws VerifyException{
 		deptList = deptService.getAll("from Department");
 		OutputStream outStream = null;
+		assignMajorTypeMap(request);
 		try{
 			HSSFWorkbook wb = new HSSFWorkbook();
 			HSSFSheet sheet = wb.createSheet("系部一览表");
@@ -268,6 +363,11 @@ public class DeptController {
 			cell_2.setCellStyle(style);
 			cell_2.setCellStyle(ExcelIO.stylecreateTitle(wb, 2));
 			
+			cell_2 = row_2.createCell((short) 2);
+			cell_2.setCellValue("系部专业类型");
+			cell_2.setCellStyle(style);
+			cell_2.setCellStyle(ExcelIO.stylecreateTitle(wb, 2));
+			
 			int i = 0;
 			for(Department deptlist : deptList){
 				row = sheet.createRow((int) i+2);
@@ -283,13 +383,19 @@ public class DeptController {
 				cell.setCellStyle(style);
 				cell.setCellStyle(ExcelIO.stylecreateTitle(wb, 3));
 				
+				sheet.setColumnWidth(1, 5000);
+				cell = row.createCell((short) 2);
+				cell.setCellValue(HResponse.formatValue("majortype", deptlist.getMajorType(), request));
+				cell.setCellStyle(style);
+				cell.setCellStyle(ExcelIO.stylecreateTitle(wb, 3));
+				
 				/*row.createCell((short) 0).setCellValue(deptlist.getDeptId());
 				row.createCell((short) 1).setCellValue(deptlist.getDeptName());*/
 				i++;
 			}
 			Region region = new Region();
 			region.setColumnFrom((short) 0);
-			region.setColumnTo((short) 1);
+			region.setColumnTo((short) 2);
 			region.setRowFrom(0);
 			region.setRowTo(0);
 			sheet.addMergedRegion(region);
@@ -310,7 +416,7 @@ public class DeptController {
 				System.out.println(e.toString());
 			}
 		}
-		return "";
+		return;
 	}
 	
 	/**
@@ -320,9 +426,10 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午5:44:10
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/deleteOneDept.do")
-	public String deleteOneDept(HttpServletRequest request){
+	public String deleteOneDept(HttpServletRequest request) throws VerifyException{
 		String deptId = request.getParameter("deptId");
 		if(deptId.equals("") || deptId == null){
 			request.setAttribute("statusCoed", 300);
@@ -353,16 +460,20 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午6:16:14
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/intoEditOneDept.do")
-	public ModelAndView intoEditOneDept(HttpServletRequest request, ModelMap modelMap){
+	public ModelAndView intoEditOneDept(HttpServletRequest request, ModelMap modelMap) throws VerifyException{
 		String deptId = request.getParameter("deptId");
 		Department dept = deptService.getOneDept(deptId);
 		request.setAttribute("deptId", dept.getDeptId());
 		request.setAttribute("deptName", dept.getDeptName());
+		request.setAttribute("department", dept);
+		assignMajorTypeListMap(request);
+		
 		return new ModelAndView("admin/dept/editOneDept");
 	}
-	
+
 	/**
 	 * 
 	 * 更新提交方法 
@@ -370,22 +481,36 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午7:34:02
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/editOneDept.do")
-	public String editOneDept(HttpServletRequest request){
-		Department dept = new Department();
+	public String editOneDept(HttpServletRequest request) throws VerifyException{
+		String deptId 	= request.getParameter("deptId");
+		String majorType = request.getParameter("major-type");
+		if(Verify.isEmpty(deptId)) {
+			RequestSetAttribute.requestSetAttribute(request, 300, "", "系部编号不能为空", "", "");
+			
+			return "public/ajaxDone";
+		}
 		String deptName = request.getParameter("deptName");
-		deptList = deptService.getAll("from Department");
-		for (int i = 0; i < deptList.size(); i++) {
-			if(deptName.equals(deptList.get(i).getDeptName())){
-				RequestSetAttribute.requestSetAttribute(request, 300, "", "系部名称冲突", "", "");
-				return "public/ajaxDone";
-			}
+		String where 	= "from Department where deptName = '" + deptName + "' AND deptId != '" + deptId + "' ";
+		Department dept = deptService.getRecordByWhere(where);
+		if(!Verify.isEmpty(dept)) {
+			RequestSetAttribute.requestSetAttribute(request, 300, "", "系部名称冲突", "", "");
+			
+			return "public/ajaxDone";
+		}
+		Department department 	= deptService.getRecordByWhere("from Department where deptId = '" + deptId + "' ");
+		if(Verify.isEmpty(department)) {
+			RequestSetAttribute.requestSetAttribute(request, 300, "", "系部不存在", "", "");
+			
+			return "public/ajaxDone";
 		}
 		try{
-			dept.setDeptId(request.getParameter("deptId"));
-			dept.setDeptName(deptName);
-			deptService.editOneDept(dept);
+			department.setDeptId(deptId);
+			department.setDeptName(deptName);
+			department.setMajorType(majorType);
+			deptService.editOneDept(department);
 			RequestSetAttribute.requestSetAttribute(
 					request, 200, "closeCurrent", "系部信息修改成功", "deptList", "/deptList.do");
 		}catch(Exception e){
@@ -402,14 +527,14 @@ public class DeptController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-11 下午9:08:50
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/deptList.do")
-	public ModelAndView deptList(HttpServletRequest request, ModelMap modelMap){
-		if(!(request.getParameter("pageNum") == null))
+	public ModelAndView deptList(HttpServletRequest request, ModelMap modelMap) throws VerifyException{
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		System.out.println("pageNum =  " + pageNum);
 		int size = 20;
 		if(pagination == null){
 			pagination = new Pagination(size);
@@ -441,6 +566,7 @@ public class DeptController {
 		}
 		RequestSetAttribute.setPageAttribute(keyword, pagination, deptList, modelMap);
 		modelMap.put("deptList", deptList);	
+		assignMajorTypeMap(request);
 		
 		return new ModelAndView("admin/dept/deptList");
 	}

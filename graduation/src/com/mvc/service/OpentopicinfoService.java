@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.OpentopicinfoDao;
 import com.mvc.entity.Opentopicinfo;
+import com.mvc.exception.VerifyException;
 
 /**
  * 开题答辩服务层
@@ -27,8 +28,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Opentopicinfo opentopicinfo) {
+	public void addOne(Opentopicinfo opentopicinfo) throws VerifyException {
 		opentopicinfoDao.save(opentopicinfo);		
 	}
 
@@ -52,8 +54,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneOpentopicinfo(Opentopicinfo opentopicinfo) {
+	public void removeOneOpentopicinfo(Opentopicinfo opentopicinfo) throws VerifyException {
 		opentopicinfoDao.remove(opentopicinfo);		
 	}
 
@@ -64,8 +67,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneOpentopicinfo(Opentopicinfo opentopicinfo) {
+	public void editOneOpentopicinfo(Opentopicinfo opentopicinfo) throws VerifyException {
 		opentopicinfoDao.update(opentopicinfo);		
 	}
 
@@ -76,8 +80,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return Object
+	 * @throws VerifyException 
 	 */
-	public List<Opentopicinfo> getAllRowsByWhere(String where) {
+	public List<Opentopicinfo> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return opentopicinfoDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return List<Opentopicinfo>
+	 * @throws VerifyException 
 	 */
-	public List<Opentopicinfo> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Opentopicinfo> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return opentopicinfoDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class OpentopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-17 下午08:24:03
 	 * @return Opentopicinfo
+	 * @throws VerifyException 
 	 */
-	public Opentopicinfo getRecordByWhere(String where) {
+	public Opentopicinfo getRecordByWhere(String where) throws VerifyException {
 		return opentopicinfoDao.getOne(where);
 	}
 

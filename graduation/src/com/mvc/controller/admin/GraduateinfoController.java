@@ -34,11 +34,13 @@ import com.mvc.entity.Department;
 import com.mvc.entity.Gradeall;
 import com.mvc.entity.Graduateinfo;
 import com.mvc.entity.LinkeddataApplyGraduateinfo;
+import com.mvc.entity.Opentopicinfo;
 import com.mvc.entity.Room;
 import com.mvc.entity.Student;
 import com.mvc.entity.Tbclass;
 import com.mvc.entity.Tbgrade;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.ApplyService;
 import com.mvc.service.GradeallService;
 import com.mvc.service.GraduateinfoService;
@@ -162,9 +164,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addview.do")
-	public ModelAndView addView(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView addView(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("admin/graduateinfo/add");
@@ -180,8 +183,9 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-23 下午03:36:32
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignRoom(HttpServletRequest request, ModelMap modelMap)
+	private void _assignRoom(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		Department department = (Department) request.getSession().getAttribute("department");
 		if(!Verify.isEmpty(request.getParameter("pageNum")))
@@ -240,6 +244,7 @@ public class GraduateinfoController {
 		}
 		mav.setViewName("admin/graduateinfo/orderroom");
 		mav.addObject("room", room);
+		OpentopicinfoController._assignBeGroupListMap(request);
 		
 		return mav;
 	}
@@ -258,38 +263,16 @@ public class GraduateinfoController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("admin/graduateinfo/lookup");
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!Verify.isEmpty(request.getParameter("pageNum")))
-		{
-			pageNum = Integer.parseInt(request.getParameter("pageNum"));
-		}
-		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
-			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
-		}
-		if(pagination == null){
-			pagination = new Pagination(numPerPage);
-		}
-		pagination.setSize(numPerPage);
-		pagination.setCurrentPage(pageNum);
-		if(pagination.getCurrentPage() <= 0) {
-			pagination.setCurrentPage(1);
-		}
-		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
-			pagination.setCurrentPage(pagination.getTotalPage());
-		}
-		String where = "from Apply where departmentId = '" + department.getDeptId() + 
-				"' and type = '2' and pass = '2' and status = '1')";
-		applyList = applyService.getAllRecordByPages(where, pagination);
-		if(applyList == null || applyList.size() < 1) {
+		try {
+			String where = "from Apply where departmentId = '" + department.getDeptId() + 
+					"' and type = '2' and pass = '2' and status = '1' ";
+			where += " AND userId IN (select stuId from Gradetwo)";
+			applyList = applyService.getAllRows(where);
 			RequestSetAttribute.setPageAttribute("", pagination, applyList, modelMap);
-			
-			return mav;
+			_assignStudentListMap(applyList, "stuId", "userId", request);			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if(this.applyList.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			applyList = (List<Apply>) applyService.getAllRecordByPages(where, pagination);
-		}
-		RequestSetAttribute.setPageAttribute("", pagination, applyList, modelMap);
-		_assignStudentListMap(applyList, "stuId", "userId", request);
 		
 		return mav;
 	}
@@ -302,8 +285,9 @@ public class GraduateinfoController {
 	 * @param filed
 	 * @param exFiled
 	 * @param request
+	 * @throws VerifyException 
 	 */
-	private void _assignStudentListMap(List<?> data, String filed, String exFiled, HttpServletRequest request)
+	private void _assignStudentListMap(List<?> data, String filed, String exFiled, HttpServletRequest request) throws VerifyException
 	{
 		if(Verify.isEmpty(data)) {
 			return;
@@ -324,9 +308,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-17 下午02:38:53
 	 * @return void
+	 * @throws VerifyException 
 	 */
 	@SuppressWarnings("unused")
-	private void _assignTbclassListMap(List<Student> data, HttpServletRequest request)
+	private void _assignTbclassListMap(List<Student> data, HttpServletRequest request) throws VerifyException
 	{
 		if(Verify.isEmpty(data)) {
 			return;
@@ -354,59 +339,63 @@ public class GraduateinfoController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("admin/graduateinfo/lookuptea");
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!Verify.isEmpty(request.getParameter("pageNum")))
-		{
-			pageNum = Integer.parseInt(request.getParameter("pageNum"));
-		}
-		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
-			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
-		}
-		if(pagination == null){
-			pagination = new Pagination(numPerPage);
-		}
-		pagination.setSize(numPerPage);
-		pagination.setCurrentPage(pageNum);
-		if(pagination.getCurrentPage() <= 0) {
-			pagination.setCurrentPage(1);
-		}
-		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
-			pagination.setCurrentPage(pagination.getTotalPage());
-		}
-		String hql = "from Graduateinfo where departmentId = '" + 
-			department.getDeptId() + "' and status = '1')";
-		Graduateinfo grad = null;
-		StringBuffer whereIn = new StringBuffer("(");
-		List<Graduateinfo> tempList = graduateinfoService.getAllRowsByWhere(hql);
-		String where = null;
-		if(tempList == null || tempList.size() < 1) {
-			where = "from Teacher where 1 = 1";
-		}else {
-			for(int i = 0; i < tempList.size(); i ++) {
-				grad = tempList.get(i);
-				if(!Verify.isEmpty(grad) && !Verify.isEmpty(grad.getJudge())) {
-					String[] judges = grad.getJudge().split(",");
-					for(int j = 0; j < judges.length; j ++) {
-						whereIn.append("'" + judges[j] + "',");
-					}
-				}
-			}
-			whereIn.deleteCharAt(whereIn.length() - 1);
-			whereIn.append(")").toString();
-			 where = "from Teacher where teaId NOT IN " + whereIn;
-		}
-		teaList = teacherService.getAllRecordByPages(where, pagination);
-		if(teaList == null || teaList.size() < 1) {
-			RequestSetAttribute.setPageAttribute("", pagination, teaList, modelMap);
-			
+		String place 	= request.getParameter("place");
+		String pos 		= request.getParameter("pos");
+		String name 	= request.getParameter("name");
+		if(Verify.isEmpty(place)) {
 			return mav;
 		}
-		if(this.teaList.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			teaList = (List<Teacher>) teacherService.getAllRecordByPages(where, pagination);
+		try {
+			String hql = "from Graduateinfo where departmentId = '" + 
+					department.getDeptId() + "' and status = '1' AND gdiPlace != '" + place.trim() + "' ";
+			Graduateinfo grad = null;
+			StringBuffer whereIn = new StringBuffer("(");
+			List<Graduateinfo> tempList = graduateinfoService.getAllRowsByWhere(hql);
+			String where = null;
+			if(tempList == null || tempList.size() < 1) {
+				where = "from Teacher where deptId = '" + department.getDeptId() + "' AND status = '1' ";
+			}else {
+				for(int i = 0; i < tempList.size(); i ++) {
+					grad = tempList.get(i);
+					if(!Verify.isEmpty(grad) && !Verify.isEmpty(grad.getJudge())) {
+						String[] judges = grad.getJudge().split(",");
+						for(int j = 0; j < judges.length; j ++) {
+							whereIn.append("'" + judges[j] + "',");
+						}
+					}
+				}
+				whereIn.deleteCharAt(whereIn.length() - 1);
+				whereIn.append(")").toString();
+				 where = "from Teacher where deptId = '" + department.getDeptId() + "' AND teaId NOT IN " + whereIn;
+			}
+			if(!Verify.isEmpty(pos)) {
+				/**
+				 * 按职称查询
+				 */
+				if(pos.trim().equals("0")) {
+					where += " AND teaPos IN ('0', '1', '2', '3') ";
+				}else if(pos.trim().equals("1")) {
+					where += " AND teaPos IN ('1', '2', '3') ";
+				}else if(pos.trim().equals("2")) {
+					where += " AND teaPos IN ('2', '3') ";
+				}else if(pos.trim().equals("3")) {
+					where += " AND teaPos = '3' ";
+				}
+				mav.addObject("pos", pos);
+			}
+			if(!Verify.isEmpty(name)) {
+				where += " AND teaName LIKE '%" + name + "%' ";
+				mav.addObject("name", name);
+			}
+			where += " order by teaId asc ";
+			teaList = teacherService.getAllRows(where);
+			RequestSetAttribute.setPageAttribute("", pagination, teaList, modelMap);
+			StudentController._assignSexMap(request);
+			TeacherController.assignTeacherposMap(request);
+			mav.addObject("place", place);			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		RequestSetAttribute.setPageAttribute("", pagination, teaList, modelMap);
-		StudentController._assignSexMap(request);
-		TeacherController.assignTeacherposMap(request);
 		
 		return mav;
 	}
@@ -418,9 +407,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-17 下午04:49:47
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/order.do")
-	public ModelAndView order(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView order(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
@@ -430,6 +420,7 @@ public class GraduateinfoController {
 		String applyids	= request.getParameter("stu.applyid");
 		String judge 	= request.getParameter("tea.id");
 		String header 	= request.getParameter("headername");
+		String begroup 	= request.getParameter("begroup");
 		if(!_verifyOrderData(request)) {
 			mav.addObject("statusCode", 300);
 			mav.setViewName("public/ajaxDone");
@@ -456,6 +447,7 @@ public class GraduateinfoController {
 				graduateinfo.setGdiNumber(++number);
 				graduateinfo.setJudge(judge);
 				graduateinfo.setHeaderman(header);
+				graduateinfo.setBegroup(begroup);
 				graduateinfo.setContent("");
 				graduateinfo.setStatus("1");
 				graduateinfo.setCreateTime(HResponse.formatDateTime(new Date()));
@@ -483,8 +475,9 @@ public class GraduateinfoController {
 	 *  
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param request
+	 * @throws VerifyException 
 	 */
-	private void _assignLinkeddataApplyInfo(HttpServletRequest request)
+	private void _assignLinkeddataApplyInfo(HttpServletRequest request) throws VerifyException
 	{
 		LinkeddataApplyGraduateinfo linkeddataApplyGraduateinfo = new LinkeddataApplyGraduateinfo();
 		linkeddataApplyGraduateinfo.setItemId(request.getAttribute("applyid").toString());
@@ -501,8 +494,9 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-17 下午09:11:51
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignUpdateApplyStatus(String applyId, String status)
+	private void _assignUpdateApplyStatus(String applyId, String status) throws VerifyException
 	{
 		Apply apply = applyService.getOneRecordById(Integer.parseInt(applyId));
 		if(Verify.isEmpty(apply)) {
@@ -621,17 +615,22 @@ public class GraduateinfoController {
 	public ModelAndView list(HttpServletRequest request, ModelMap modelMap )
 	{
 		ModelAndView mav = new ModelAndView();
+		mav.setViewName("admin/graduateinfo/list");
 		Department department = (Department) request.getSession().getAttribute("department");
 		String date 	= request.getParameter("date");
 		String place 	= request.getParameter("place");
-		if(!(request.getParameter("pageNum") == null))
+		String begroup 	= request.getParameter("begroup");
+		String status 	= request.getParameter("status");
+		String ingrade 	= request.getParameter("ingrade");
+		String profess 	= request.getParameter("profess");
+		String inclass 	= request.getParameter("inclass");
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -644,7 +643,11 @@ public class GraduateinfoController {
 			pagination.setCurrentPage(pagination.getTotalPage());
 		}
 		String where = "from Graduateinfo where departmentId = '" + 
-			department.getDeptId() + "' and status = '1' ";
+			department.getDeptId() + "' ";
+		if(!Verify.isEmpty(status)) {
+			where += " AND status = '" + status.trim() + "' ";
+			request.setAttribute("status", status);
+		}
 		if(!Verify.isEmpty(date)) {
 			where += " AND gdiDate LIKE '%" + date + "%' ";
 			request.setAttribute("date", date);
@@ -653,24 +656,72 @@ public class GraduateinfoController {
 			where += " AND gdiPlace LIKE '%" + place + "%' ";
 			request.setAttribute("place", place);
 		}
-		where += " order by gdiPlace asc";
-		list = graduateinfoService.getAllRecordByPages(where, pagination);
-		if(list == null || list.size() < 1) {
-			mav.setViewName("admin/graduateinfo/list");
-			
-			return mav;
+		if(!Verify.isEmpty(begroup)) {
+			where += " AND begroup = '" + begroup.trim() + "' ";
+			mav.addObject("begroup", begroup);
 		}
-		if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			list = (List<Graduateinfo>) graduateinfoService.getAllRecordByPages(where, pagination);
+		if(!Verify.isEmpty(ingrade) && !Verify.isEmpty(profess) && !Verify.isEmpty(inclass)) {
+			where += " AND stuId IN (select s.stuId from Student s where s.claId = '" + inclass.trim() + "' )";
+			request.setAttribute("ingrade", ingrade);
+			request.setAttribute("profess", profess);
+			request.setAttribute("inclass", inclass);
+		}else if(!Verify.isEmpty(ingrade) && !Verify.isEmpty(profess)) {
+			where += " AND stuId IN (select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId = '" + profess.trim() + "' ))";
+			request.setAttribute("ingrade", ingrade);
+			request.setAttribute("profess", profess);
+		}else if(!Verify.isEmpty(ingrade)) {
+			where += " AND stuId IN (select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (" +
+					"select p.proId from Profession p where p.deptId = '" + department.getDeptId() + 
+					"' AND p.graId = " + Integer.parseInt(ingrade) + " ) ))";
+			request.setAttribute("ingrade", ingrade);
 		}
-		RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
-		mav.setViewName("admin/graduateinfo/list");
-		_assignStudentListMap(list, request);
-		_assignHeadermanListMap(list, request);
-		_assignJudgeListMap(list, request);
+		where += " order by gdiPlace asc, gdiNumber asc, status asc, createTime desc ";
+		try {
+			OpentopicinfoController._assignBeGroupListMap(request);
+			OpentopicinfoController._assignBeGroupMap(request);
+			OpentopicinfoController._assignStatusListMap(request);
+			OpentopicinfoController._assignStatusMap(request);
+			_assignTbgradeList(request);
+			list = graduateinfoService.getAllRecordByPages(where, pagination);
+			String begroupWhere = "select begroup from Graduateinfo where departmentId = '" + 
+					department.getDeptId() + "' group by begroup ";
+			List<Graduateinfo> begroupList = graduateinfoService.getAllRowsByWhere(begroupWhere);
+			mav.addObject("begroupList", begroupList);
+			if(list == null || list.size() < 1) {
+				
+				return mav;
+			}
+			if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
+				pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+				list = (List<Graduateinfo>) graduateinfoService.getAllRecordByPages(where, pagination);
+			}
+			RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
+			_assignStudentListMap(list, request);
+			_assignHeadermanListMap(list, request);
+			_assignJudgeListMap(list, request);			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
+	}
+	
+	/**
+	 * 加载年级列表
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private void _assignTbgradeList(HttpServletRequest request) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String where 	= "from Tbgrade where deptId = '" + department.getDeptId() + 
+				"' order by graNumber desc ";
+		
+		request.setAttribute("gradeList", tbgradeService.getAllRowsByWhere(where));
 	}
 	
 	/**
@@ -680,13 +731,36 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-22 下午03:34:46
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignStudentListMap(List<?> data, HttpServletRequest request) {
+	private void _assignStudentListMap(List<?> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}
 		String whereIn 	= SqlUtil.whereIn("stuId", "stuId", data);
 		List<Student> tempList 	= studentService.getAllRows("from Student where " + whereIn);
+		if(Verify.isEmpty(tempList)) {
+			return;
+		}
+		
+		request.setAttribute("stuId_map", ArrayUtil.turnListToMap("stuId", "stuName", tempList));
+	}
+	
+	/**
+	 * 加载学生MapMap
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-9-22 下午03:34:46
+	 * @return void
+	 * @throws VerifyException 
+	 */
+	private void _assignStudentMapMap(Graduateinfo graduateinfo, HttpServletRequest request) throws VerifyException {
+		if(Verify.isEmpty(graduateinfo)) {
+			return;
+		}
+		String where 	= "from Student where stuId = '" + graduateinfo.getStuId() + "' ";
+		List<Student> tempList 	= studentService.getAllRows(where);
 		if(Verify.isEmpty(tempList)) {
 			return;
 		}
@@ -701,8 +775,9 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-22 下午03:55:13
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignHeadermanListMap(List<Graduateinfo> data, HttpServletRequest request)
+	private void _assignHeadermanListMap(List<Graduateinfo> data, HttpServletRequest request) throws VerifyException
 	{
 		if(null == data || 1 > data.size()) {
 			return;
@@ -717,14 +792,38 @@ public class GraduateinfoController {
 	}
 	
 	/**
+	 * 加载组长MapMap
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-9-22 下午03:55:13
+	 * @return void
+	 * @throws VerifyException 
+	 */
+	private void _assignHeadermanMapMap(Graduateinfo graduateinfo, HttpServletRequest request) throws VerifyException
+	{
+		if(null == graduateinfo) {
+			return;
+		}
+		String where 	= "from Teacher where teaId = '" + graduateinfo.getHeaderman() + "' ";
+		List<Teacher> tempList 	= teacherService.getAllRows(where);
+		if(null == tempList || 1 > tempList.size()) {
+			return;
+		}
+		
+		request.setAttribute("headerman_map", ArrayUtil.turnListToMap("teaId", "teaName", tempList));
+	}
+	
+	/**
 	 * 加载评审教师列表Map
 	 *  
 	 * @Description  
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-22 下午04:45:05
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignJudgeListMap(List<Graduateinfo> data, HttpServletRequest request)
+	private void _assignJudgeListMap(List<Graduateinfo> data, HttpServletRequest request) throws VerifyException
 	{
 		if(null == data || 1 > data.size()) {
 			return;
@@ -735,6 +834,57 @@ public class GraduateinfoController {
 			tempString += data.get(i).getJudge() + ",";
 		}
 		ids 	= tempString.split(",");
+		StringBuffer id 	= new StringBuffer("(");
+		for(int i = 0; i < ids.length; i ++) {
+			id.append("'" + ids[i] + "',");
+		}
+		id.deleteCharAt(id.length() - 1);
+		id.append(")").toString();
+		List<Teacher> tempList 	= teacherService.getAllRows("from Teacher where teaId IN " + id);
+		if(null == tempList || 1 > tempList.size()) {
+			return;
+		}
+		
+		request.setAttribute("judge_map", ArrayUtil.turnListToMap("teaId", "teaName", tempList));
+	}
+	
+	/**
+	 * 加载评审教师MapMap
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-9-22 下午04:45:05
+	 * @return void
+	 * @throws VerifyException 
+	 */
+	private void _assignJudgeMapMap(Graduateinfo graduateinfo, HttpServletRequest request) throws VerifyException
+	{
+		if(null == graduateinfo) {
+			return;
+		}
+		String where = "from Teacher where teaId = '" + graduateinfo.getJudge() + "' ";
+		List<Teacher> tempList 	= teacherService.getAllRows(where);
+		if(null == tempList || 1 > tempList.size()) {
+			return;
+		}
+		
+		request.setAttribute("judge_map", ArrayUtil.turnListToMap("teaId", "teaName", tempList));
+	}
+	
+	/**
+	 * 加载评审教师Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private void _assignJudgeMap(Graduateinfo graduateinfo, HttpServletRequest request) throws VerifyException 
+	{
+		if(Verify.isEmpty(graduateinfo) || Verify.isEmpty(graduateinfo.getJudge())) {
+			return;
+		}
+		String[] ids = null;
+		ids 	= graduateinfo.getJudge().split(",");
 		StringBuffer id 	= new StringBuffer("(");
 		for(int i = 0; i < ids.length; i ++) {
 			id.append("'" + ids[i] + "',");
@@ -863,9 +1013,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-4 下午03:41:02
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/totalscore.do")
-	public ModelAndView totalScore(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView totalScore(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("admin/graduateinfo/grade-total");
@@ -894,22 +1045,47 @@ public class GraduateinfoController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("admin/graduateinfo/grade-total-list");
 		Department department = (Department) request.getSession().getAttribute("department");
-		String grade 	= request.getParameter("grade");
-		if(Verify.isEmpty(grade)) {
-			return mav;
+		String grade 			= request.getParameter("gradeid");
+		String profession 		= request.getParameter("professid");
+		String tbclass 			= request.getParameter("claid");
+		String where 			= "from Gradeall where departmentId = '" + department.getDeptId() + 
+				"' AND status = '1' ";
+		if(!Verify.isEmpty(grade) && !Verify.isEmpty(profession) && !Verify.isEmpty(tbclass)) {
+			where += " AND stuId IN (" +
+					"select s.stuId from Student s where s.claId = (" +
+					"select c.claId from Tbclass c where c.claId = '" + tbclass.trim() + "' AND c.proId = (" +
+					"select p.proId from Profession p where p.proId = '" + profession.trim() + "' AND p.deptId = '" + 
+					department.getDeptId() + "' AND p.graId = " + Integer.parseInt(grade.trim()) + ") ) ) ";
+		}else if(!Verify.isEmpty(grade) && !Verify.isEmpty(profession)) {
+			where += " AND stuId IN (" +
+					"select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (" +
+					"select p.proId from Profession p where p.proId = '" + profession.trim() + "' AND p.deptId = '" + 
+					department.getDeptId() + "' AND p.graId = " + Integer.parseInt(grade.trim()) + ") ) ) ";
+		}else if(!Verify.isEmpty(grade)) {
+			where += " AND stuId IN (" +
+					"select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (" +
+					"select p.proId from Profession p where p.deptId = '" + 
+					department.getDeptId() + "' AND p.graId = " + Integer.parseInt(grade.trim()) + ") ) ) ";
 		}
-		String proWhere 	= "from Profession where graId = '" + grade + "'";
-		String tbcWhere 	= "from Tbclass where " + SqlUtil.whereIn("proId", "proId", professionService.getAllRowsByWhere(proWhere));
-		String stuWhere 	= "from Student where " + SqlUtil.whereIn("claId", "claId", tbclassService.getAllRows(tbcWhere));
-		String whereIn 		= SqlUtil.whereIn("stuId", "stuId", studentService.getAllRows(stuWhere));
-		String where 		= "from Gradeall where departmentId = '" + department.getDeptId() + 
-			"' AND status = '1' AND " + whereIn + " order by createTime desc";
-		mav.addObject("gradeall-list", gradeallService.getAllRowsByWhere(where));
-		_assignStudentListMap(gradeallService.getAllRowsByWhere(where), request);
-		String gwhere = "from Tbgrade where deptId = '" + department.getDeptId() + "' order by graNumber desc";
-		request.setAttribute("tbgradeList",tbgradeService.getAllRowsByWhere(gwhere));
-		request.setAttribute("grade", grade);
-		_assignTbgradeListMap(tbgradeService.getAllRowsByWhere(gwhere), request);
+		where += " order by createTime desc";
+		try {
+			/*String proWhere 	= "from Profession where graId = '" + grade + "'";
+			String tbcWhere 	= "from Tbclass where " + SqlUtil.whereIn("proId", "proId", professionService.getAllRowsByWhere(proWhere));
+			String stuWhere 	= "from Student where " + SqlUtil.whereIn("claId", "claId", tbclassService.getAllRows(tbcWhere));
+			String whereIn 		= SqlUtil.whereIn("stuId", "stuId", studentService.getAllRows(stuWhere));
+			*/
+			List<Gradeall> gradeallList 	= gradeallService.getAllRowsByWhere(where);
+			mav.addObject("gradeall-list", gradeallList);
+			_assignStudentListMap(gradeallList, request);
+			String gwhere = "from Tbgrade where deptId = '" + department.getDeptId() + "' order by graNumber desc";
+			request.setAttribute("tbgradeList",tbgradeService.getAllRowsByWhere(gwhere));
+			request.setAttribute("grade", grade);
+			_assignTbgradeListMap(tbgradeService.getAllRowsByWhere(gwhere), request);			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
 	}
@@ -921,9 +1097,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午05:01:23
 	 * @return void
+	 * @throws VerifyException 
 	 */
 	@SuppressWarnings("unchecked")
-	private void _assignTbgradeListMap(List<?> data, HttpServletRequest request) {
+	private void _assignTbgradeListMap(List<?> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}
@@ -944,9 +1121,10 @@ public class GraduateinfoController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-7 下午03:31:48
 	 * @return void
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/export.do")
-	public void export(HttpServletRequest request, HttpServletResponse response)
+	public void export(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		Department department = (Department) request.getSession().getAttribute("department");
 		String where = "from Graduateinfo where departmentId = '" + 
@@ -1065,5 +1243,148 @@ public class GraduateinfoController {
 				System.out.println(e.toString());
 			}
 		}
+	}
+	
+	/**
+	 * 判断该组是否已经被安排了
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/abegroup.do")
+	public void abegroup(HttpServletRequest request, HttpServletResponse response)
+	{
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String place 	= request.getParameter("place");
+		String begroup 	= request.getParameter("begroup");
+		if(Verify.isEmpty(place)) {
+			HResponse.errorJSON("答辩教室不能为空", response);
+			
+			return;
+		}
+		if(Verify.isEmpty(begroup)) {
+			HResponse.errorJSON("组别不能为空", response);
+			
+			return;
+		}
+		try {
+			String where = "from Graduateinfo where departmentId = '" + department.getDeptId() + 
+					"' AND gdiPlace = '" + place.trim() + "' AND begroup = '" + 
+					begroup + "' AND status = '1' ";
+			Graduateinfo graduateinfo = graduateinfoService.getRecordByWhere(where);
+			if(!Verify.isEmpty(graduateinfo)) {
+				HResponse.errorJSON("该组已被安排，请安排其他组", response);
+				
+				return;
+			}
+			HResponse.okJSON(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			HResponse.errorJSON("服务器繁忙，请稍后再试", response);
+		}
+	}
+	
+	/**
+	 * 毕业答辩概况
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value="/gderesult.do")
+	public ModelAndView gdeResult(HttpServletRequest request, HttpServletResponse response)
+	{
+		ModelAndView mav 	= new ModelAndView();
+		mav.setViewName("admin/graduateinfo/gde-result-search");
+		try {
+			_assignTbgradeList(request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return mav;
+	}
+	
+	/**
+	 * 毕业答辩概况
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param modelMap
+	 * @return
+	 * @throws VerifyException
+	 */
+	@RequestMapping(value="/totalresult.do")
+	public ModelAndView totalResult(HttpServletRequest request, ModelMap modelMap) throws VerifyException
+	{
+		ModelAndView mav 	= new ModelAndView();
+		mav.setViewName("admin/graduateinfo/gde-result-search-list");
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String gradeid 			= request.getParameter("gradeid");
+		String professid 		= request.getParameter("professid");
+		String claid 			= request.getParameter("claid");
+		if(Verify.isEmpty(claid)) {
+			///如果班级编号为空
+			return mav;
+		}
+		//查询该班级的学生
+		String stuWhere = "from Student where claId = '" + claid + "' order by stuId asc ";
+		//该班级的答辩信息
+		String gdeinfo 	= "from Graduateinfo where departmentId = '" + department.getDeptId() + "' ";
+		try {
+			//查找学生
+			List<Student> stuList 	= studentService.getAllRows(stuWhere);
+			if(!Verify.isEmpty(stuList)) {
+				gdeinfo += " AND " + SqlUtil.whereIn("stuId", "stuId", stuList) + " order by createTime desc ";
+			}
+			//查找信息
+			List<Graduateinfo> gdeinfoList = graduateinfoService.getAllRowsByWhere(gdeinfo);
+			if(!Verify.isEmpty(gdeinfoList)) {
+				//查找答辩分数
+				String scoreWhere = "from Gradeall where " + SqlUtil.whereIn("stuId", "stuId", gdeinfoList);
+				request.setAttribute("gdescoreList", gradeallService.getAllRowsByWhere(scoreWhere));
+			}
+			request.setAttribute("stuList", stuList);
+			request.setAttribute("gdeinfoList", gdeinfoList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		_assignTbgradeList(request);
+		
+		return mav;
+	}
+	
+	/**
+	 * 详细安排信息
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value="orderdetail.do")
+	public ModelAndView orderDetail(HttpServletRequest request, HttpServletResponse response)
+	{
+		ModelAndView mav 	= new ModelAndView();
+		mav.setViewName("/admin/graduateinfo/order-detail");
+		String id 	= request.getParameter("id");
+		if(Verify.isEmpty(id)) {
+			return mav;
+		}
+		try {
+			Graduateinfo graduateinfo = graduateinfoService.getOneRecordById(Integer.parseInt(id.trim()));
+			mav.addObject("graduateinfo", graduateinfo);
+			_assignJudgeMap(graduateinfo, request);
+			_assignJudgeMapMap(graduateinfo, request);
+			_assignHeadermanMapMap(graduateinfo, request);
+			OpentopicinfoController._assignBeGroupMap(request);
+			_assignStudentMapMap(graduateinfo, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return mav;
 	}
 }

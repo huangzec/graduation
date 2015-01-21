@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.OpentopicscoreDao;
 import com.mvc.entity.Opentopicscore;
+import com.mvc.exception.VerifyException;
 
 /**
  * 开题答辩分数服务层
@@ -27,8 +28,9 @@ public class OpentopicscoreService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-30 16:28:59
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Opentopicscore opentopicscore) {
+	public void addOne(Opentopicscore opentopicscore) throws VerifyException {
 		opentopicscoreDao.save(opentopicscore);		
 	}
 
@@ -52,8 +54,9 @@ public class OpentopicscoreService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-30 16:28:59
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneOpentopicscore(Opentopicscore opentopicscore) {
+	public void removeOneOpentopicscore(Opentopicscore opentopicscore) throws VerifyException {
 		opentopicscoreDao.remove(opentopicscore);		
 	}
 
@@ -64,8 +67,9 @@ public class OpentopicscoreService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-30 16:28:59
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneOpentopicscore(Opentopicscore opentopicscore) {
+	public void editOneOpentopicscore(Opentopicscore opentopicscore) throws VerifyException {
 		opentopicscoreDao.update(opentopicscore);		
 	}
 
@@ -76,8 +80,9 @@ public class OpentopicscoreService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-30 16:28:59
 	 * @return List<Opentopicscore>
+	 * @throws VerifyException 
 	 */
-	public List<Opentopicscore> getAllRowsByWhere(String where) {
+	public List<Opentopicscore> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return opentopicscoreDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class OpentopicscoreService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-30 16:28:59
 	 * @return List<Opentopicscore>
+	 * @throws VerifyException 
 	 */
-	public List<Opentopicscore> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Opentopicscore> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return opentopicscoreDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class OpentopicscoreService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-10-2 下午04:20:48
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public Opentopicscore getRecordByWhere(String where) {
+	public Opentopicscore getRecordByWhere(String where) throws VerifyException {
 		return opentopicscoreDao.getOne(where);
 	}
 

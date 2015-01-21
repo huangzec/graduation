@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.GraduateinfoDao;
 import com.mvc.entity.Graduateinfo;
+import com.mvc.exception.VerifyException;
 
 /**
  * 毕业答辩服务层
@@ -27,8 +28,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(Graduateinfo graduateinfo) {
+	public void addOne(Graduateinfo graduateinfo) throws VerifyException {
 		graduateinfoDao.save(graduateinfo);		
 	}
 
@@ -52,8 +54,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneGraduateinfo(Graduateinfo graduateinfo) {
+	public void removeOneGraduateinfo(Graduateinfo graduateinfo) throws VerifyException {
 		graduateinfoDao.remove(graduateinfo);		
 	}
 
@@ -64,8 +67,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneGraduateinfo(Graduateinfo graduateinfo) {
+	public void editOneGraduateinfo(Graduateinfo graduateinfo) throws VerifyException {
 		graduateinfoDao.update(graduateinfo);		
 	}
 
@@ -76,8 +80,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return List<Graduateinfo>
+	 * @throws VerifyException 
 	 */
-	public List<Graduateinfo> getAllRowsByWhere(String where) {
+	public List<Graduateinfo> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return graduateinfoDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-22 20:29:42
 	 * @return List<Graduateinfo>
+	 * @throws VerifyException 
 	 */
-	public List<Graduateinfo> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Graduateinfo> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return graduateinfoDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -101,8 +107,9 @@ public class GraduateinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-23 下午04:18:46
 	 * @return Graduateinfo
+	 * @throws VerifyException 
 	 */
-	public Graduateinfo getRecordByWhere(String where) {
+	public Graduateinfo getRecordByWhere(String where) throws VerifyException {
 		
 		return graduateinfoDao.getOne(where);
 	}

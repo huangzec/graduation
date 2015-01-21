@@ -49,4 +49,19 @@ public class Path {
 	{
 		return request.getServerName() + request.getServerPort();
 	}
+	
+	/**
+	 * 得到网站路径 如 http://localhost:8080/xxxxx/
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @return
+	 */
+	public static String getBasePath(HttpServletRequest request)
+	{
+		String path = request.getContextPath();
+		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+		
+		return basePath;
+	}
 }

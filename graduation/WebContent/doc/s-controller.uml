@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_qb8akM37EdqwVrslYOdUDA" name="s-controller">
+  <packagedElement xmi:type="uml:Class" xmi:id="_cPhNgJ7zEeSpf5jcaWyJ3w" name="TopicController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_kF4FwJ7zEeSpf5jcaWyJ3w" name="TaskdocController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_nAbyaJ7zEeSpf5jcaWyJ3w" name="MessageController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_vf__sJ7zEeSpf5jcaWyJ3w" name="StudentController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_wwIK2J7zEeSpf5jcaWyJ3w" name="TeacherController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_zHlxcJ7zEeSpf5jcaWyJ3w" name="UserController"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_2bo8KJ7zEeSpf5jcaWyJ3w" name="GraduateinfoController"/>
+</uml:Model>

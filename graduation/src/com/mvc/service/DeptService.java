@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.DeptDao;
 import com.mvc.entity.Department;
+import com.mvc.exception.VerifyException;
 
 @Service
 public class DeptService {
@@ -22,8 +23,9 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 上午11:34:17
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void save(Department dept) {
+	public void save(Department dept) throws VerifyException {
 		deptDao.save(dept);
 	}
 
@@ -34,8 +36,9 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午5:50:37
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void remove(Department dept) {
+	public void remove(Department dept) throws VerifyException {
 		deptDao.remove(dept);
 	}
 
@@ -46,8 +49,9 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午5:51:00
 	 * @return Department
+	 * @throws VerifyException 
 	 */
-	public Department getOneDept(String deptId) {
+	public Department getOneDept(String deptId) throws VerifyException {
 		return deptDao.getOne("from Department where deptId='" + deptId + "'");
 	}
 
@@ -58,8 +62,9 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午7:33:42
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneDept(Department dept) {
+	public void editOneDept(Department dept) throws VerifyException {
 		deptDao.update(dept);
 	}
 
@@ -70,9 +75,10 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-13 下午7:10:44
 	 * @return List<Department>
+	 * @throws VerifyException 
 	 */
 	public List<Department> getAllRecordByPages(String where,
-			Pagination pagination) {
+			Pagination pagination) throws VerifyException {
 		return deptDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -83,9 +89,22 @@ public class DeptService {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-13 下午7:25:42
 	 * @return List<Department>
+	 * @throws VerifyException 
 	 */
-	public List<Department> getAll(String sql) {
+	public List<Department> getAll(String sql) throws VerifyException {
 		return deptDao.getAll(sql);
+	}
+
+	/**
+	 * 通过where条件获取记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param where
+	 * @return
+	 * @throws VerifyException 
+	 */
+	public Department getRecordByWhere(String where) throws VerifyException {
+		return deptDao.getOne(where);
 	}
 
 }

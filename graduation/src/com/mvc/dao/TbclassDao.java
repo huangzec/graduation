@@ -25,7 +25,7 @@ public class TbclassDao extends BaseDao<Tbclass>{
 				ResultSet rs = ps.executeQuery();
 				while(rs.next()){
 					Tbclass tbclass = new Tbclass();
-					tbclass.setClaId(Integer.parseInt(rs.getString("cla_ID")));
+					tbclass.setClaId(rs.getString("cla_ID"));
 					tbclass.setClaName(rs.getString("cla_Name"));
 					tbclass.setProId(rs.getString("pro_ID"));
 					classlist.add(tbclass);

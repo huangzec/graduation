@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * User entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "user", catalog = "graduation")
+@Table(name = "user")
 public class User implements java.io.Serializable {
 
 	// Fields
@@ -51,7 +51,7 @@ public class User implements java.io.Serializable {
 		this.userid = userid;
 	}
 
-	@Column(name = "username", nullable = false, length = 255)
+	@Column(name = "username", nullable = false)
 	public String getUsername() {
 		return this.username;
 	}
@@ -60,7 +60,7 @@ public class User implements java.io.Serializable {
 		this.username = username;
 	}
 
-	@Column(name = "password", length = 255)
+	@Column(name = "password")
 	public String getPassword() {
 		return this.password;
 	}

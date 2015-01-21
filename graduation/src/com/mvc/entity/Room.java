@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Room entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "room", catalog = "graduation")
+@Table(name = "room")
 public class Room implements java.io.Serializable {
 
 	// Fields
@@ -38,8 +38,7 @@ public class Room implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Room(String number, String name, String parentId, String usable,
-			String createTime) {
+	public Room(String number, String name, String parentId, String usable, String createTime) {
 		this.number = number;
 		this.name = name;
 		this.parentId = parentId;

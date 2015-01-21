@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Opentopicinfo entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "opentopicinfo", catalog = "graduation")
+@Table(name = "opentopicinfo")
 public class Opentopicinfo implements java.io.Serializable {
 
 	// Fields
@@ -25,6 +25,7 @@ public class Opentopicinfo implements java.io.Serializable {
 	private String opiNumber;
 	private String judge;
 	private String headerman;
+	private String begroup;
 	private String content;
 	private String status;
 	private String createTime;
@@ -48,7 +49,8 @@ public class Opentopicinfo implements java.io.Serializable {
 	/** full constructor */
 	public Opentopicinfo(String name, String stuId, String departmentId,
 			String opiDate, String opiPlace, String opiNumber, String judge,
-			String headerman, String content, String status, String createTime) {
+			String headerman, String begroup, String content, String status,
+			String createTime) {
 		this.name = name;
 		this.stuId = stuId;
 		this.departmentId = departmentId;
@@ -57,6 +59,7 @@ public class Opentopicinfo implements java.io.Serializable {
 		this.opiNumber = opiNumber;
 		this.judge = judge;
 		this.headerman = headerman;
+		this.begroup = begroup;
 		this.content = content;
 		this.status = status;
 		this.createTime = createTime;
@@ -144,6 +147,15 @@ public class Opentopicinfo implements java.io.Serializable {
 
 	public void setHeaderman(String headerman) {
 		this.headerman = headerman;
+	}
+
+	@Column(name = "begroup")
+	public String getBegroup() {
+		return this.begroup;
+	}
+
+	public void setBegroup(String begroup) {
+		this.begroup = begroup;
 	}
 
 	@Column(name = "content", length = 65535)

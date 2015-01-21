@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Tbgrade entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "tbgrade", catalog = "graduation")
+@Table(name = "tbgrade")
 public class Tbgrade implements java.io.Serializable {
 
 	// Fields

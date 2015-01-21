@@ -9,24 +9,22 @@ import javax.persistence.Table;
  * Teacher entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "teacher", catalog = "graduation")
+@Table(name = "teacher")
 public class Teacher implements java.io.Serializable {
 
 	// Fields
 
 	private String teaId;
-	private Integer opiId;
-	private Integer sttId;
-	private Integer stuSttId;
 	private String deptId;
-	private Integer gdiId;
 	private String teaName;
 	private String teaSex;
 	private String teaPos;
+	private String status;
 	private Boolean teaJudge;
 	private Boolean teaGroup;
 	private String teaTel;
 	private String teaEmail;
+	private String imagePath;
 
 	// Constructors
 
@@ -35,29 +33,27 @@ public class Teacher implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Teacher(String teaId, String teaEmail) {
+	public Teacher(String teaId, String status, String teaEmail) {
 		this.teaId = teaId;
+		this.status = status;
 		this.teaEmail = teaEmail;
 	}
 
 	/** full constructor */
-	public Teacher(String teaId, Integer opiId, Integer sttId,
-			Integer stuSttId, String deptId, Integer gdiId, String teaName,
-			String teaSex, String teaPos, Boolean teaJudge, Boolean teaGroup,
-			String teaTel, String teaEmail) {
+	public Teacher(String teaId, String deptId, String teaName, String teaSex,
+			String teaPos, String status, Boolean teaJudge, Boolean teaGroup,
+			String teaTel, String teaEmail, String imagePath) {
 		this.teaId = teaId;
-		this.opiId = opiId;
-		this.sttId = sttId;
-		this.stuSttId = stuSttId;
 		this.deptId = deptId;
-		this.gdiId = gdiId;
 		this.teaName = teaName;
 		this.teaSex = teaSex;
 		this.teaPos = teaPos;
+		this.status = status;
 		this.teaJudge = teaJudge;
 		this.teaGroup = teaGroup;
 		this.teaTel = teaTel;
 		this.teaEmail = teaEmail;
+		this.imagePath = imagePath;
 	}
 
 	// Property accessors
@@ -71,33 +67,6 @@ public class Teacher implements java.io.Serializable {
 		this.teaId = teaId;
 	}
 
-	@Column(name = "opi_ID")
-	public Integer getOpiId() {
-		return this.opiId;
-	}
-
-	public void setOpiId(Integer opiId) {
-		this.opiId = opiId;
-	}
-
-	@Column(name = "stt_ID")
-	public Integer getSttId() {
-		return this.sttId;
-	}
-
-	public void setSttId(Integer sttId) {
-		this.sttId = sttId;
-	}
-
-	@Column(name = "stu_stt_ID")
-	public Integer getStuSttId() {
-		return this.stuSttId;
-	}
-
-	public void setStuSttId(Integer stuSttId) {
-		this.stuSttId = stuSttId;
-	}
-
 	@Column(name = "dept_ID", length = 10)
 	public String getDeptId() {
 		return this.deptId;
@@ -105,15 +74,6 @@ public class Teacher implements java.io.Serializable {
 
 	public void setDeptId(String deptId) {
 		this.deptId = deptId;
-	}
-
-	@Column(name = "gdi_ID")
-	public Integer getGdiId() {
-		return this.gdiId;
-	}
-
-	public void setGdiId(Integer gdiId) {
-		this.gdiId = gdiId;
 	}
 
 	@Column(name = "tea_Name", length = 16)
@@ -141,6 +101,15 @@ public class Teacher implements java.io.Serializable {
 
 	public void setTeaPos(String teaPos) {
 		this.teaPos = teaPos;
+	}
+
+	@Column(name = "status", nullable = false)
+	public String getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	@Column(name = "tea_Judge")
@@ -177,6 +146,15 @@ public class Teacher implements java.io.Serializable {
 
 	public void setTeaEmail(String teaEmail) {
 		this.teaEmail = teaEmail;
+	}
+
+	@Column(name = "image_path")
+	public String getImagePath() {
+		return this.imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
 	}
 
 }

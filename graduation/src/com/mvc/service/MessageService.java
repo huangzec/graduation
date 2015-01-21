@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.MessageDao;
 import com.mvc.entity.Message;
+import com.mvc.exception.VerifyException;
 
 /**
  * 消息服务层
@@ -28,8 +29,9 @@ public class MessageService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-3 上午09:33:45
 	 * @return List<Message>
+	 * @throws VerifyException 
 	 */
-	public List<Message> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Message> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		
 		return messageDao.getAllRecordByPages(where, pagination);
 	}
@@ -67,8 +69,9 @@ public class MessageService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-4 上午11:51:19
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneRecord(Message message) {
+	public void editOneRecord(Message message) throws VerifyException {
 		messageDao.update(message);		
 	}
 
@@ -79,9 +82,33 @@ public class MessageService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-28 上午11:13:19
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void saveMessage(Message message) {
+	public void saveMessage(Message message) throws VerifyException {
 		messageDao.save(message);
+	}
+
+	/**
+	 * 通过where条件获取所有记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param where
+	 * @return
+	 * @throws VerifyException 
+	 */
+	public List<Message> getAllRows(String where) throws VerifyException {
+		return messageDao.getAll(where);
+	}
+
+	/**
+	 * 删除一条记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param message
+	 */
+	public void removeOneRecord(Message message) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -22,6 +22,7 @@ import com.mvc.common.RequestSetAttribute;
 import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Room;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.RoomService;
 
 /**
@@ -124,9 +125,10 @@ public class RoomController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-16 15:56:58
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/add.do")
-	public ModelAndView add(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView add(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
@@ -175,10 +177,22 @@ public class RoomController {
 	protected boolean _verifyData(HttpServletRequest request) {
 		String number	= request.getParameter("number");
 		String name 	= request.getParameter("name");
-		if(number.trim().equals("")) {
+		if(Verify.isEmpty(number)) {
 			request.setAttribute("message", "教室编号不能为空");
 			
 			return false;
+		}
+		if(!Verify.isStrLen(number, 1, 64)) {
+			request.setAttribute("message", "教室编号不超过64个字符");
+			
+			return false;
+		}
+		if(!Verify.isEmpty(name)) {
+			if(!Verify.isStrLen(number, 1, 64)) {
+				request.setAttribute("message", "教室名称不超过64个字符");
+				
+				return false;
+			}
 		}
 		
 		return true;
@@ -196,12 +210,13 @@ public class RoomController {
 	public ModelAndView list(HttpServletRequest request, ModelMap modelMap )
 	{
 		ModelAndView mav = new ModelAndView();
+		mav.setViewName("admin/room/list");
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
 		if(pagination == null){
@@ -216,19 +231,21 @@ public class RoomController {
 			pagination.setCurrentPage(pagination.getTotalPage());
 		}
 		String where = "from Room where parentId = '" + department.getDeptId() + "'";
-		list = roomService.getAllRecordByPages(where, pagination);
-		if(list == null || list.size() < 1) {
-			mav.setViewName("admin/room/list");
-			
-			return mav;
+		try {
+			list = roomService.getAllRecordByPages(where, pagination);
+			if(list == null || list.size() < 1) {
+				
+				return mav;
+			}
+			if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
+				pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+				list = (List<Room>) roomService.getAllRecordByPages(where, pagination);
+			}
+			RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
+			_assignUsableMap(request);			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			list = (List<Room>) roomService.getAllRecordByPages(where, pagination);
-		}
-		RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
-		mav.setViewName("admin/room/list");
-		_assignUsableMap(request);
 		
 		return mav;
 	}
@@ -316,6 +333,13 @@ public class RoomController {
 		String number 	= request.getParameter("number");
 		String name 	= request.getParameter("name");
 		String usable 	= request.getParameter("usable");
+		if(Verify.isEmpty(id)) {
+			mav.addObject("statusCode", 300);
+			mav.addObject("message", "id不能为空");
+			mav.setViewName("public/ajaxDone");
+			
+			return mav;
+		}
 		if(!this._verifyData(request)) {
 			mav.addObject("statusCode", 300);
 			mav.setViewName("public/ajaxDone");

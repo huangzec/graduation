@@ -1,10 +1,6 @@
 package com.mvc.common;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.mvc.log.Logger;
 
 /**
  * 字符串处理工具类
@@ -146,6 +142,61 @@ public class StringUtil {
 	public static String[] splitString(String str){
 		String[] arrayStr = null;
 		return arrayStr = str.split(",");
+	}
+
+	/**
+	 * 原始字符串转换为目标编码字符串
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param property
+	 * @param encoding
+	 * @return
+	 */
+	public static String rawToEncode(String str, String toEncode)
+	{
+		return StringUtil.rawToEncode(str, "ISO8859_1", toEncode);
+	}
+
+	/**
+	 * 原始串转成目标编码字符串 
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param str
+	 * @param string
+	 * @param toEncode
+	 * @return
+	 */
+	public static String rawToEncode(String str, String fromEncode, String toEncode)
+	{
+		if(null == str || str.equals("")) {
+			return str;
+		}
+		try {
+			return new String(str.getBytes(fromEncode), toEncode);
+		} catch (Exception e) {
+			Logger.write(e.getMessage());
+			
+			return str;
+		}
+	}
+	
+	/**
+	 * 
+	 * 数字转换成对应的中文表达 
+	 * @Description  
+	 * @author Happy_Jqc@163.com
+	 * @date 2015-1-12 下午12:05:27
+	 * @return String
+	 */
+	public static String numToCH(int number){
+		if(number == 1){
+			return "一";
+		}else if(number == 2){
+			return "二";
+		}else if(number == 3){
+			return "三";
+		}else
+			return "四";
 	}
 	
 }

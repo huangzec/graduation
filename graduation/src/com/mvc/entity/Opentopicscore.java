@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Opentopicscore entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "opentopicscore", catalog = "graduation")
+@Table(name = "opentopicscore")
 public class Opentopicscore implements java.io.Serializable {
 
 	// Fields
@@ -29,8 +29,7 @@ public class Opentopicscore implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Opentopicscore(String studentId, String departmentId, Double score,
-			String createTime) {
+	public Opentopicscore(String studentId, String departmentId, Double score, String createTime) {
 		this.studentId = studentId;
 		this.departmentId = departmentId;
 		this.score = score;

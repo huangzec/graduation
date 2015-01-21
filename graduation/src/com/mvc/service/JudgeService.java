@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.mvc.dao.JudgeDao;
 import com.mvc.entity.Reviewresult;
+import com.mvc.exception.VerifyException;
 
 /**
  * 课题评审服务层
@@ -27,8 +28,9 @@ public class JudgeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-8 下午12:02:53
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneReviewResult(Reviewresult reviewResult) {
+	public void addOneReviewResult(Reviewresult reviewResult) throws VerifyException {
 		judgeDao.save(reviewResult);
 	}
 
@@ -39,8 +41,9 @@ public class JudgeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-8 下午12:08:16
 	 * @return Reviewresult
+	 * @throws VerifyException 
 	 */
-	public Reviewresult getRecordByWhere(String where) {
+	public Reviewresult getRecordByWhere(String where) throws VerifyException {
 		return judgeDao.getOne(where);
 	}
 
@@ -63,8 +66,9 @@ public class JudgeService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-8 下午08:46:20
 	 * @return List<Reviewresult>
+	 * @throws VerifyException 
 	 */
-	public List<Reviewresult> getSomeRows(String where) {
+	public List<Reviewresult> getSomeRows(String where) throws VerifyException {
 		return judgeDao.getAll(where);
 	}
 

@@ -6,14 +6,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.mvc.common.Pagination;
-import com.mvc.entity.Department;
-import com.mvc.entity.User;
+import com.mvc.exception.VerifyException;
+import com.mvc.log.Logger;
 
 /**
  * 基类-->所有daoImpl方法的父类，模板化操作类
@@ -59,9 +56,17 @@ public class BaseDao<T> extends HibernateDaoSupport{//提供DAO的泛型类
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-10 上午11:03:35
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void save(T entity){
-		this.getHibernateTemplate().save(entity);
+	public void save(T entity) throws VerifyException{
+		try {
+			this.getHibernateTemplate().save(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
+		}
 	}
 	
 	/**
@@ -71,9 +76,17 @@ public class BaseDao<T> extends HibernateDaoSupport{//提供DAO的泛型类
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-10 上午11:03:39
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void update(T entity){
-		this.getHibernateTemplate().update(entity);
+	public void update(T entity) throws VerifyException{
+		try {
+			this.getHibernateTemplate().update(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
+		}
 	}
 	
 	/**
@@ -83,9 +96,17 @@ public class BaseDao<T> extends HibernateDaoSupport{//提供DAO的泛型类
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-10 上午11:03:43
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void remove(T entity){
-		this.getHibernateTemplate().delete(entity);
+	public void remove(T entity) throws VerifyException{
+		try {
+			this.getHibernateTemplate().delete(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
+		}
 	}
 	
 	/**
@@ -95,14 +116,22 @@ public class BaseDao<T> extends HibernateDaoSupport{//提供DAO的泛型类
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-10 下午09:01:16
 	 * @return T
+	 * @throws VerifyException 
 	 */
-	public T getOne(String where){
-		List<T> list = this.getHibernateTemplate().find(where);
-		if(list == null || list.size() < 1) {
-			return null;
+	public T getOne(String where) throws VerifyException{
+		try {
+			List<T> list = this.getHibernateTemplate().find(where);
+			if(list == null || list.size() < 1) {
+				return null;
+			}
+			
+			return (T) list.get(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
 		}
-		
-		return (T) list.get(0);
 	}
 
 	/**
@@ -112,37 +141,61 @@ public class BaseDao<T> extends HibernateDaoSupport{//提供DAO的泛型类
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-13 下午04:05:06
 	 * @return List<T>
+	 * @throws VerifyException 
 	 */
-	public List<T> getAllRecordByPages(String where, Pagination pagination)
+	public List<T> getAllRecordByPages(String where, Pagination pagination) throws VerifyException
 	{
-		List<T> list = getHibernateTemplate().find(where);
-		if(list == null || list.size() < 1) {
-			return null;
+		try {
+			List<T> list = getHibernateTemplate().find(where);
+			if(list == null || list.size() < 1) {
+				return null;
+			}
+			int size 	= pagination.getSize();
+			int pagenum = pagination.getCurrentPage();
+			List<T> listReturn = new ArrayList<T>();
+			listReturn.clear();
+			int currentPageStart 	= (pagenum - 1) * size;
+			int currentPageEnd 		= pagenum * size - 1;
+			while(currentPageStart <= currentPageEnd && currentPageStart < list.size())
+			{
+				T entity = (T) list.get(currentPageStart);
+				listReturn.add(entity);
+				currentPageStart++;
+			}
+			pagination.setTotalRecord(list.size());
+			int totalPage = list.size()/size;
+			if(totalPage * size < list.size()) {
+				totalPage++;
+			}
+			pagination.setTotalPage(totalPage);
+			
+			return listReturn;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
 		}
-		int size 	= pagination.getSize();
-		int pagenum = pagination.getCurrentPage();
-		List<T> listReturn = new ArrayList<T>();
-		listReturn.clear();
-		int currentPageStart 	= (pagenum - 1) * size;
-		int currentPageEnd 		= pagenum * size - 1;
-		while(currentPageStart <= currentPageEnd && currentPageStart < list.size())
-		{
-			T entity = (T) list.get(currentPageStart);
-			listReturn.add(entity);
-			currentPageStart++;
-		}
-		pagination.setTotalRecord(list.size());
-		int totalPage = list.size()/size;
-		if(totalPage * size < list.size()) {
-			totalPage++;
-		}
-		pagination.setTotalPage(totalPage);
-		
-		return listReturn;
 	}
 	
-	public List<T> getAll(String sql) {
-		return this.getHibernateTemplate().find(sql);
+	/**
+	 * 得到所有记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param sql
+	 * @return
+	 * @throws VerifyException 
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> getAll(String sql) throws VerifyException {
+		try {
+			return this.getHibernateTemplate().find(sql);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Logger.write(e.getMessage(), Logger.L_ERROR);
+			
+			throw new VerifyException("服务器繁忙，请稍后再试");
+		}		
 	}
 
 }

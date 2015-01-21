@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Gradethree entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "gradethree", catalog = "graduation")
+@Table(name = "gradethree")
 public class Gradethree implements java.io.Serializable {
 
 	// Fields
@@ -23,6 +23,7 @@ public class Gradethree implements java.io.Serializable {
 	private Float gtrThree;
 	private Float gtrFour;
 	private Float gtrFive;
+	private Float gtrSix;
 	private Float gtrAll;
 	private String content;
 	private String status;
@@ -41,14 +42,16 @@ public class Gradethree implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Gradethree(String stuId, Float gtrOne, Float gtrTwo, Float gtrThree, Float gtrFour, Float gtrFive, Float gtrAll, String content,
-			String status, String createTime) {
+	public Gradethree(String stuId, Float gtrOne, Float gtrTwo, Float gtrThree,
+			Float gtrFour, Float gtrFive, Float gtrSix, Float gtrAll,
+			String content, String status, String createTime) {
 		this.stuId = stuId;
 		this.gtrOne = gtrOne;
 		this.gtrTwo = gtrTwo;
 		this.gtrThree = gtrThree;
 		this.gtrFour = gtrFour;
 		this.gtrFive = gtrFive;
+		this.gtrSix = gtrSix;
 		this.gtrAll = gtrAll;
 		this.content = content;
 		this.status = status;
@@ -119,6 +122,15 @@ public class Gradethree implements java.io.Serializable {
 
 	public void setGtrFive(Float gtrFive) {
 		this.gtrFive = gtrFive;
+	}
+
+	@Column(name = "gtr_Six", precision = 12, scale = 0)
+	public Float getGtrSix() {
+		return this.gtrSix;
+	}
+
+	public void setGtrSix(Float gtrSix) {
+		this.gtrSix = gtrSix;
 	}
 
 	@Column(name = "gtr_All", precision = 12, scale = 0)

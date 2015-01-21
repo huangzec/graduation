@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.TeacherDao;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 
 @Service
 public class TeacherService {
@@ -23,8 +24,9 @@ public class TeacherService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-13 下午01:56:18
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneTeacher(Teacher teacher) {
+	public void addOneTeacher(Teacher teacher) throws VerifyException {
 		teacherDao.save(teacher);
 	}
 
@@ -49,8 +51,9 @@ public class TeacherService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-13 下午03:59:40
 	 * @return List<Teacher>
+	 * @throws VerifyException 
 	 */
-	public List<Teacher> getAllRecordByPages(String where, Pagination pagination) {
+	public List<Teacher> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		
 		return teacherDao.getAllRecordByPages(where, pagination);
 	}
@@ -62,8 +65,9 @@ public class TeacherService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-13 下午08:37:05
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneTeacher(Teacher teacher) {
+	public void removeOneTeacher(Teacher teacher) throws VerifyException {
 		teacherDao.remove(teacher);
 	}
 
@@ -75,13 +79,14 @@ public class TeacherService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-14 下午10:27:39
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneTeacher(Teacher teacher) {
+	public void editOneTeacher(Teacher teacher) throws VerifyException {
 		teacherDao.update(teacher);
 	}
 
 
-	public Teacher getOneByWhere(String where) {
+	public Teacher getOneByWhere(String where) throws VerifyException {
 		return teacherDao.getOne(where);
 	}
 
@@ -93,8 +98,9 @@ public class TeacherService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-28 下午09:39:48
 	 * @return List<Teacher>
+	 * @throws VerifyException 
 	 */
-	public List<Teacher> getAllRows(String where) {
+	public List<Teacher> getAllRows(String where) throws VerifyException {
 		return teacherDao.getAll(where);
 	}
 

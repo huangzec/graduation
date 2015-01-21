@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import javax.jws.WebParam.Mode;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,11 +29,12 @@ import com.mvc.common.HResponse;
 import com.mvc.common.MapUtil;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.DeptService;
 import com.mvc.service.TeacherService;
-import com.sun.java.swing.plaf.motif.resources.motif;
 
 /**
  * 教师控制器类
@@ -57,7 +57,7 @@ public class TeacherController {
 	private List<Teacher> list = new ArrayList<Teacher>();
 	
 	private int pageNum = 1;//页数
-	private int numPerPage = 10;//每页显示多少条
+	private int numPerPage = 20;//每页显示多少条
 	
 	
 	public int getNumPerPage() {
@@ -103,7 +103,6 @@ public class TeacherController {
 	/**
 	 * 注册教师职称Map
 	 */
-	@SuppressWarnings("serial")
 	private static LinkedHashMap<String, String> _teacherposMap = new LinkedHashMap<String, String>(){{
 		put("0", "助教");
 		put("1", "讲师");
@@ -117,6 +116,15 @@ public class TeacherController {
 	private static LinkedHashMap<String, String> _sexMap = new LinkedHashMap<String, String>(){{
 		put("1", "男");
 		put("2", "女");
+	}};
+	
+	/**
+	 * 注册教师状态Map
+	 */
+	private static LinkedHashMap<String, String> _statusMap = new LinkedHashMap<String, String>(){{
+		put("1", "激活");
+		put("2", "未激活");
+		put("3", "不能使用");
 	}};
 	
 	/**
@@ -168,6 +176,34 @@ public class TeacherController {
 	}
 	
 	/**
+	 * 加载教师状态Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignStatusMap(HttpServletRequest request) 
+	{
+		request.setAttribute(
+				"status_map", 
+				MapUtil.makeLinkedMapMap(_statusMap)
+				);
+	}
+	
+	/**
+	 * 加载教师状态列表Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void assignStatusListMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"status_list",
+				MapUtil.makeLinkedListMap(_statusMap)
+				);
+	}
+	
+	/**
 	 * 添加视图
 	 *  
 	 * @Description  
@@ -183,6 +219,7 @@ public class TeacherController {
 		mav.addObject("department", department);
 		mav.setViewName("admin/teacher/add");
 		assignTeacherposListMap(request);
+		assignStatusListMap(request);
 		
 		return mav;
 	}
@@ -201,6 +238,7 @@ public class TeacherController {
 		ModelAndView mav 	= new ModelAndView();
 		String id 			= request.getParameter("id");
 		String email 		= request.getParameter("email");
+		String status 		= request.getParameter("status");
 		if(!this._verifyData(request)) {
 			mav.addObject("statusCode", 300);
 			mav.setViewName("public/ajaxDone");
@@ -222,6 +260,7 @@ public class TeacherController {
 		teacher.setDeptId(request.getParameter("parent_id"));
 		teacher.setTeaSex(request.getParameter("sex"));
 		teacher.setTeaPos(request.getParameter("pos"));
+		teacher.setStatus((Verify.isEmpty(status) ? "1" : status));
 		teacher.setTeaTel(request.getParameter("phone"));
 		teacher.setTeaEmail(email);
 		try{
@@ -247,18 +286,43 @@ public class TeacherController {
 		String id 		= request.getParameter("id");
 		String name 	= request.getParameter("name");
 		String email 	= request.getParameter("email");
-		if(id.equals("")) {
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("message", "教师工号不能为空");
 			
 			return false;
 		}
-		if(name.equals("")) {
+		if(Verify.isEmpty(name)) {
 			request.setAttribute("message", "教师姓名不能为空");
 			
 			return false;
 		}
-		if(email.equals("")) {
+		if(Verify.isEmpty(email)) {
 			request.setAttribute("message", "邮箱不能为空");
+			
+			return false;
+		}
+		if(!Verify.isNumber(id)) {
+			request.setAttribute("message", "教师工号不是一个数字");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(id, 1, 12)) {
+			request.setAttribute("message", "教师工号不超过12个字符");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(name, 1, 12)) {
+			request.setAttribute("message", "教师姓名不超过16个字符");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(email, 1, 30)) {
+			request.setAttribute("message", "邮箱不超过30个字符");
+			
+			return false;
+		}
+		if(!Verify.isEmail(email)) {
+			request.setAttribute("message", "邮箱格式不正确");
 			
 			return false;
 		}
@@ -329,9 +393,12 @@ public class TeacherController {
 					teacher.setTeaPos(result[i][j]);
 				}
 				if(j == 5){
-					teacher.setTeaTel(result[i][j]);
+					teacher.setStatus(result[i][j]);
 				}
 				if(j == 6){
+					teacher.setTeaTel(result[i][j]);
+				}
+				if(j == 7){
 					teacher.setTeaEmail(result[i][j]);
 				}
 			}
@@ -359,6 +426,7 @@ public class TeacherController {
 				}
 			}
 			try{
+				teacher.setStatus("1");
 				teacherService.addOneTeacher(teacher);
 				RequestSetAttribute.requestSetAttribute(
 					request, 200, "closeCurrent", "添加成功", "teacherlist", "admin/teacher/teachlist.do");
@@ -452,11 +520,12 @@ public class TeacherController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-29 下午05:25:24
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
+	@SuppressWarnings("deprecation")
 	@RequestMapping(value="/export.do")
-	public void export(HttpServletRequest request, HttpServletResponse response)
+	public void export(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
-		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
 		assignTeacherposMap(request);
 		assignSexMapMap(request);
@@ -589,21 +658,21 @@ public class TeacherController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-28 下午05:22:53
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/teachlist.do")
-	public ModelAndView teacherList(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView teacherList(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
+		mav.setViewName("admin/teacher/list");
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		}
-		System.out.println("numPerPage = " + numPerPage);
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -619,31 +688,36 @@ public class TeacherController {
 		String keywordid 	= request.getParameter("keywordid");
 		String keywordname 	= request.getParameter("keywordname");
 		String where = "from Teacher where 1 = 1 AND deptId = '" + department.getDeptId() + "'";
-		if(keywordid != null && (!keywordid.trim().equals(""))) {
+		if(!Verify.isEmpty(keywordid)) {
 			where += " AND teaId LIKE '%" + keywordid + "%' ";
 		}
-		if(keywordname != null && (!keywordname.trim().equals(""))) {
+		if(!Verify.isEmpty(keywordname)) {
 			where += " AND teaName LIKE '%" + keywordname + "%' ";
 		}
-		if(keyword != null && (!keyword.trim().equals("")))
+		if(!Verify.isEmpty(keyword))
 		{
 			where += " ";
 			list = teacherService.getAllRecordByPages(where, pagination);
 		}
-		list = teacherService.getAllRecordByPages(where, pagination);
-		if(list == null || list.size() < 1) {
-			mav.setViewName("admin/teacher/list");
-			return mav;
+		where += " order by teaId asc ";
+		try {
+			list = teacherService.getAllRecordByPages(where, pagination);
+			if(list == null || list.size() < 1) {
+				return mav;
+			}
+			if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
+				pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+				list = (List<Teacher>) teacherService.getAllRecordByPages(where, pagination);
+			}
+			RequestSetAttribute.setPageAttribute(keyword, pagination, list, modelMap);
+			mav.addObject("department", department);
+			assignTeacherposMap(request);
+			assignSexMapMap(request);
+			assignStatusMap(request);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			list = (List<Teacher>) teacherService.getAllRecordByPages(where, pagination);
-		}
-		RequestSetAttribute.setPageAttribute(keyword, pagination, list, modelMap);
-		mav.setViewName("admin/teacher/list");
-		mav.addObject("department", department);
-		assignTeacherposMap(request);
-		assignSexMapMap(request);
 		
 		return mav;
 	}
@@ -691,9 +765,10 @@ public class TeacherController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-13 下午09:23:22
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/lookup.do")
-	public ModelAndView lookup(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView lookup(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav 			= new ModelAndView();
 		List<Department> deptList 	= new ArrayList<Department>();
@@ -755,14 +830,14 @@ public class TeacherController {
 	{
 		ModelAndView mav	= new ModelAndView();
 		String id 			= request.getParameter("id");
-		if(id == null || id.equals("")) {
+		if(Verify.isEmpty(id)) {
 			RequestSetAttribute.requestSetAttribute(request, 300, "closeCurrent", "记录不存在", "teacherlist", "/admin/teacher/teachlist.do");
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
 		Teacher teacher = teacherService.getOneTeacherById(id);
-		if(teacher == null) {
+		if(Verify.isEmpty(teacher)) {
 			RequestSetAttribute.requestSetAttribute(request, 300, "closeCurrent", "记录不存在", "teacherlist", "/admin/teacher/teachlist.do");
 			mav.setViewName("public/ajaxDone");
 			
@@ -772,6 +847,7 @@ public class TeacherController {
 		mav.addObject("department", (Department) request.getSession().getAttribute("department"));
 		mav.setViewName("admin/teacher/edit");
 		assignTeacherposListMap(request);
+		assignStatusListMap(request);
 		
 		return mav;
 	}
@@ -795,7 +871,7 @@ public class TeacherController {
 			return "public/ajaxDone";
 		}
 		Teacher teacher = teacherService.getOneTeacherById(id);
-		if(teacher == null) {
+		if(Verify.isEmpty(teacher)) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "记录不存在");
 			
@@ -806,6 +882,7 @@ public class TeacherController {
 		teacher.setDeptId(request.getParameter("parent_id"));
 		teacher.setTeaSex(request.getParameter("sex"));
 		teacher.setTeaPos(request.getParameter("pos"));
+		teacher.setStatus(request.getParameter("status"));
 		teacher.setTeaTel(request.getParameter("phone"));
 		teacher.setTeaEmail(email);
 		try{

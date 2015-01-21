@@ -13,7 +13,7 @@ import javax.persistence.Table;
  * Selectfirst entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "selectfirst", catalog = "graduation")
+@Table(name = "selectfirst")
 public class Selectfirst implements java.io.Serializable {
 
 	// Fields

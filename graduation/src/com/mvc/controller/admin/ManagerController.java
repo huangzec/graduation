@@ -26,14 +26,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.ArrayUtil;
 import com.mvc.common.ExcelIO;
+import com.mvc.common.HResponse;
 import com.mvc.common.MD5Util;
 import com.mvc.common.MapUtil;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
 import com.mvc.common.SqlUtil;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Deptmanager;
 import com.mvc.entity.User;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.DeptService;
 import com.mvc.service.DeptmanagerService;
 import com.mvc.service.UserService;
@@ -110,8 +113,9 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-10-12 下午09:00:48
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignDeptMap(List<Deptmanager> list, HttpServletRequest request){
+	private void _assignDeptMap(List<Deptmanager> list, HttpServletRequest request) throws VerifyException{
 		if(list == null || list.size() < 0){
 			return;
 		}
@@ -131,14 +135,15 @@ public class ManagerController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-11 下午09:49:33
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/perfile.do")
-	public ModelAndView perfile(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView perfile(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav 	= new ModelAndView();
 		String userID 	= (String) request.getSession().getAttribute("user_id");;
 		User user = userService.getOneUser("from User where username='" + userID + "'");
-		if(user == null) {
+		if(Verify.isEmpty(user)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -163,9 +168,10 @@ public class ManagerController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-12 下午04:06:10
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/file.do")
-	public String file(HttpServletRequest request, HttpServletResponse response)
+	public String file(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		String sex 		= request.getParameter("sex");
 		String phone 	= request.getParameter("phone");
@@ -201,7 +207,23 @@ public class ManagerController {
 	 * @return boolean
 	 */
 	protected boolean _verifyFileData(HttpServletRequest request) {
-		// TODO Auto-generated method stub
+		String email 	= request.getParameter("email");
+		if(Verify.isEmpty(email)) {
+			request.setAttribute("message", "邮箱不能为空");
+			
+			return false;
+		}
+		if(!Verify.isEmail(email)) {
+			request.setAttribute("message", "邮箱格式不正确");
+			
+			return false;
+		}
+		if(Verify.isStrLen(email, 1, 30)) {
+			request.setAttribute("message", "长度不超过30个字符");
+			
+			return false;
+		}
+		
 		return true;
 	}
 
@@ -216,9 +238,10 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-11 下午9:11:37
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/intoAddOneDeptMgr.do")
-	public ModelAndView intoAddOneDeptMgr(ModelMap modelMap){
+	public ModelAndView intoAddOneDeptMgr(ModelMap modelMap) throws VerifyException{
 		List<Department> deptList = deptService.getAll("from Department");
 		modelMap.put("deptList", deptList);	
 		return new ModelAndView("admin/deptmanager/addOneDeptMgr");
@@ -231,9 +254,10 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-12 下午5:03:16
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addOneDeptMgr.do")
-	public String addOneDeptMgr(HttpServletRequest request, ModelMap modelMap){
+	public String addOneDeptMgr(HttpServletRequest request, ModelMap modelMap) throws VerifyException{
 		List<Department> deptList = deptService.getAll("from Department");
 		modelMap.put("deptList", deptList);	
 		String dmId = request.getParameter("dmId");
@@ -297,8 +321,9 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-19 下午3:35:46
 	 * @return boolean
+	 * @throws VerifyException 
 	 */
-	protected boolean isExist(String dmId,HttpServletRequest request){
+	protected boolean isExist(String dmId,HttpServletRequest request) throws VerifyException{
 		Deptmanager deptMgr = new Deptmanager();
 		deptMgr = deptmanagerService.getOne(dmId);
 		if (deptMgr != null && !dmId.equals("")) {
@@ -316,9 +341,10 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-14 下午3:37:07
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/lookup.do")
-	public ModelAndView lookup(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView lookup(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav 			= new ModelAndView();
 		List<Department> deptList 	= new ArrayList<Department>();
@@ -385,9 +411,10 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-14 下午4:35:18
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addLotDeptMgr.do")
-	public String addLotDeptMgr(HttpServletRequest request){
+	public String addLotDeptMgr(HttpServletRequest request) throws VerifyException{
 		MultipartHttpServletRequest mulRequest = (MultipartHttpServletRequest) request;
 		MultipartFile excelFile = mulRequest.getFile("file");
 		/**
@@ -403,8 +430,8 @@ public class ManagerController {
 		for (int i = 0; i < rowLength; i++) {
 			Deptmanager deptMgr = new Deptmanager();
 			for (int j = 0; j < result[i].length; j++) {
-				if (j == 0) {deptMgr.setDmId(result[i][j]);}
-				if (j == 1) {deptMgr.setDeptId(result[i][j]);}
+				if (j == 0) {deptMgr.setDeptId(result[i][j]);}
+				if (j == 1) {deptMgr.setDmId(result[i][j]);}
 				if (j == 2) {deptMgr.setDmName(result[i][j]);}
 				if (j == 3) {deptMgr.setDmSex(result[i][j]);}
 				if (j == 4) {deptMgr.setDmTel(result[i][j]);}
@@ -417,7 +444,7 @@ public class ManagerController {
 				try{
 					deptmanagerService.save(deptMgr);
 					RequestSetAttribute.requestSetAttribute(
-							request, 200, "closeCurrent", "删除成功", "deptMgrList", "admin/manager/DeptMgrList.do");
+							request, 200, "closeCurrent", "批量添加成功", "deptMgrList", "admin/manager/DeptMgrList.do");
 				}catch(Exception e){
 					RequestSetAttribute.requestSetAttribute(
 							request, 300, "", "批量添加失败", "", "");
@@ -441,7 +468,7 @@ public class ManagerController {
 			List<Department> deptList = deptService.getAll("from Department");
 			modelMap.put("deptList", deptList);
 			
-			if(!(request.getParameter("pageNum") == null))
+			if(!Verify.isEmpty(request.getParameter("pageNum")))
 			{
 				pageNum = Integer.parseInt(request.getParameter("pageNum"));
 			}
@@ -500,9 +527,10 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-13 上午11:51:04
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="deleteOneDeptMgr.do")
-	public String deleteOneDeptMgr(HttpServletRequest request){
+	public String deleteOneDeptMgr(HttpServletRequest request) throws VerifyException{
 		String dmId = request.getParameter("dmId");
 		if(dmId.equals("") || dmId == null){
 			request.setAttribute("statusCode", 300);
@@ -534,15 +562,17 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-13 上午11:57:02
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/intoEditOneDeptMgr.do")
-	public ModelAndView intoEditOneDeptMgr(HttpServletRequest request){
+	public ModelAndView intoEditOneDeptMgr(HttpServletRequest request) throws VerifyException{
 
 		List<Department> deptList = deptService.getAll("from Department");
 		request.setAttribute("deptList", deptList);
 		
 		Deptmanager deptMgr = deptmanagerService.getOne(request.getParameter("dmId"));
 		request.setAttribute("deptMgr", deptMgr);
+		_assignDeptMap(deptMgrList, request);
 		
 		return new ModelAndView("admin/deptmanager/editOneDeptMgr");
 	}
@@ -586,15 +616,18 @@ public class ManagerController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-18 上午9:27:16
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/exportExcel.do")
-	public String exportExcel(HttpServletRequest request, HttpServletResponse response , ModelMap modelMap){
+	public void exportExcel(HttpServletRequest request, HttpServletResponse response , ModelMap modelMap) throws VerifyException{
 		deptMgrList = deptmanagerService.getAll("from Deptmanager order by deptId asc");
 		OutputStream outStream = null;
+		TeacherController.assignSexMapMap(request);
+		_assignDeptMap(deptMgrList, request);
 		try{
 			HSSFWorkbook wb = new HSSFWorkbook();
 			HSSFSheet sheet = wb.createSheet("各系部管理员一览表");
-			sheet.setDefaultColumnWidth((short) 15);
+			sheet.setDefaultColumnWidth((short) 18);
 			sheet.setDefaultRowHeightInPoints(15);
 			HSSFCellStyle style = wb.createCellStyle();
 			style.setAlignment(HSSFCellStyle.BORDER_HAIR);
@@ -609,7 +642,7 @@ public class ManagerController {
 			row_2.setHeightInPoints(18);
 			
 			HSSFCell cell_2 = row_2.createCell((short) 0);
-			cell_2.setCellValue("系部ID");
+			cell_2.setCellValue("系部");
 			cell_2.setCellStyle(style);
 			cell_2.setCellStyle(ExcelIO.stylecreateTitle(wb, 2));
 			
@@ -644,7 +677,7 @@ public class ManagerController {
 				row.setHeightInPoints(20);
 				
 				cell = row.createCell((short) 0);
-				cell.setCellValue(mgrList.getDeptId());
+				cell.setCellValue(mgrList.getDeptId() + "【" + HResponse.formatValue("dept", mgrList.getDeptId(), request) + "】");
 				cell.setCellStyle(style);
 				cell.setCellStyle(ExcelIO.stylecreateTitle(wb, 3));
 				
@@ -659,7 +692,7 @@ public class ManagerController {
 				cell.setCellStyle(ExcelIO.stylecreateTitle(wb, 3));
 				
 				cell = row.createCell((short) 3);
-				cell.setCellValue(mgrList.getDmSex());
+				cell.setCellValue(HResponse.formatValue("sex", mgrList.getDmSex(), request));
 				cell.setCellStyle(style);
 				cell.setCellStyle(ExcelIO.stylecreateTitle(wb, 3));
 				
@@ -706,6 +739,6 @@ public class ManagerController {
 				System.out.println(e.toString());
 			}
 		}
-		return "";
+		return;
 	}
 }

@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Settime entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "settime", catalog = "graduation")
+@Table(name = "settime")
 public class Settime implements java.io.Serializable {
 
 	// Fields
@@ -31,8 +31,7 @@ public class Settime implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Settime(String name, String deptId, String graNumber,
-			String startTime, String endTime, String mark) {
+	public Settime(String name, String deptId, String graNumber, String startTime, String endTime, String mark) {
 		this.name = name;
 		this.deptId = deptId;
 		this.graNumber = graNumber;

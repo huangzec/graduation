@@ -1,11 +1,11 @@
-#Thu Oct 16 09:20:34 CST 2014
-connectionInfoProperty=graduate
+#Thu Jan 15 16:28:54 CST 2015
+connectionInfoProperty=fm
 detect.m2m=false
 detect.o2o=false
 eclipse.preferences.version=1
 enableAnalysisProperty=true
 generate.version=false
-newSchemaProperty=graduation
+newCatalogProperty=graduation
 re.settings=/graduation/jpa.reveng.xml
 re.strategy=
 schemaProperty=graduation

@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Deptmanager entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "deptmanager", catalog = "graduation")
+@Table(name = "deptmanager")
 public class Deptmanager implements java.io.Serializable {
 
 	// Fields
@@ -34,8 +34,7 @@ public class Deptmanager implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Deptmanager(String dmId, String deptId, String dmName, String dmSex,
-			String dmTel, String dmEmail) {
+	public Deptmanager(String dmId, String deptId, String dmName, String dmSex, String dmTel, String dmEmail) {
 		this.dmId = dmId;
 		this.deptId = deptId;
 		this.dmName = dmName;

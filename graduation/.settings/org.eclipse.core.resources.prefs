@@ -1,4 +1,7 @@
+#Wed Jan 07 21:44:47 CST 2015
 eclipse.preferences.version=1
 encoding//WebContent/WEB-INF/view/admin/dept/addLotDept.jsp=UTF-8
 encoding//WebContent/WEB-INF/view/admin/login.jsp=UTF-8
+encoding//WebContent/cscon/style.css=UTF-8
+encoding//src/config/Config.properties=UTF-8
 encoding/<project>=UTF-8

@@ -1,20 +1,15 @@
 package com.mvc.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
  * Tbtopic entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "tbtopic", catalog = "graduation")
+@Table(name = "tbtopic")
 public class Tbtopic implements java.io.Serializable {
 
 	// Fields
@@ -24,12 +19,15 @@ public class Tbtopic implements java.io.Serializable {
 	private String topName;
 	private Integer topNumber;
 	private String topStatus;
-	private String topTec;
+	private String topContent;
 	private String topFlag;
+	private String topType;
+	private String topSource;
+	private String topKeywords;
+	private String topYear;
 	private String deptId;
 	private String parentId;
 	private String completerId;
-	private Set<Selectfirst> selectfirsts = new HashSet<Selectfirst>(0);
 
 	// Constructors
 
@@ -38,27 +36,30 @@ public class Tbtopic implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Tbtopic(String topId, String topName) {
+	public Tbtopic(String topId, String topName, String topType, String parentId) {
 		this.topId = topId;
 		this.topName = topName;
+		this.topType = topType;
+		this.parentId = parentId;
 	}
 
 	/** full constructor */
-	public Tbtopic(String topId, String topCommitId, String topName,
-			Integer topNumber, String topStatus, String topTec, String topFlag,
-			String deptId, String parentId, String completerId,
-			Set<Selectfirst> selectfirsts) {
+	public Tbtopic(String topId, String topCommitId, String topName, Integer topNumber, String topStatus, String topContent, String topFlag,
+			String topType, String topSource, String topKeywords, String topYear, String deptId, String parentId, String completerId) {
 		this.topId = topId;
 		this.topCommitId = topCommitId;
 		this.topName = topName;
 		this.topNumber = topNumber;
 		this.topStatus = topStatus;
-		this.topTec = topTec;
+		this.topContent = topContent;
 		this.topFlag = topFlag;
+		this.topType = topType;
+		this.topSource = topSource;
+		this.topKeywords = topKeywords;
+		this.topYear = topYear;
 		this.deptId = deptId;
 		this.parentId = parentId;
 		this.completerId = completerId;
-		this.selectfirsts = selectfirsts;
 	}
 
 	// Property accessors
@@ -108,13 +109,13 @@ public class Tbtopic implements java.io.Serializable {
 		this.topStatus = topStatus;
 	}
 
-	@Column(name = "top_Tec", length = 65535)
-	public String getTopTec() {
-		return this.topTec;
+	@Column(name = "top_Content", length = 65535)
+	public String getTopContent() {
+		return this.topContent;
 	}
 
-	public void setTopTec(String topTec) {
-		this.topTec = topTec;
+	public void setTopContent(String topContent) {
+		this.topContent = topContent;
 	}
 
 	@Column(name = "top_Flag", length = 10)
@@ -126,6 +127,42 @@ public class Tbtopic implements java.io.Serializable {
 		this.topFlag = topFlag;
 	}
 
+	@Column(name = "top_Type", nullable = false, length = 10)
+	public String getTopType() {
+		return this.topType;
+	}
+
+	public void setTopType(String topType) {
+		this.topType = topType;
+	}
+
+	@Column(name = "top_Source")
+	public String getTopSource() {
+		return this.topSource;
+	}
+
+	public void setTopSource(String topSource) {
+		this.topSource = topSource;
+	}
+
+	@Column(name = "top_Keywords")
+	public String getTopKeywords() {
+		return this.topKeywords;
+	}
+
+	public void setTopKeywords(String topKeywords) {
+		this.topKeywords = topKeywords;
+	}
+
+	@Column(name = "top_Year")
+	public String getTopYear() {
+		return this.topYear;
+	}
+
+	public void setTopYear(String topYear) {
+		this.topYear = topYear;
+	}
+
 	@Column(name = "dept_ID")
 	public String getDeptId() {
 		return this.deptId;
@@ -135,7 +172,7 @@ public class Tbtopic implements java.io.Serializable {
 		this.deptId = deptId;
 	}
 
-	@Column(name = "parent_ID")
+	@Column(name = "parent_ID", nullable = false)
 	public String getParentId() {
 		return this.parentId;
 	}
@@ -151,15 +188,6 @@ public class Tbtopic implements java.io.Serializable {
 
 	public void setCompleterId(String completerId) {
 		this.completerId = completerId;
-	}
-
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "tbtopic")
-	public Set<Selectfirst> getSelectfirsts() {
-		return this.selectfirsts;
-	}
-
-	public void setSelectfirsts(Set<Selectfirst> selectfirsts) {
-		this.selectfirsts = selectfirsts;
 	}
 
 }

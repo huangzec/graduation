@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmi:id="_qb8akM37EdqwVrslYOdUDA" name="s-dao">
+  <packagedElement xmi:type="uml:Package" xmi:id="_Fu8AsZ7sEeSpf5jcaWyJ3w" name="com">
+    <packagedElement xmi:type="uml:Package" xmi:id="_FvCHUJ7sEeSpf5jcaWyJ3w" name="mvc">
+      <packagedElement xmi:type="uml:Package" xmi:id="_FvCHUZ7sEeSpf5jcaWyJ3w" name="dao">
+        <packagedElement xmi:type="uml:Class" xmi:id="_FwjxUJ7sEeSpf5jcaWyJ3w" name="UserDao">
+          <generalization xmi:id="_FyLiBp7sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_Z4g-EJ7sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+          <ownedOperation xmi:id="_FyLiCJ7sEeSpf5jcaWyJ3w" name="getOneUser" visibility="public">
+            <ownedComment xmi:id="_FyLiC57sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 得到一个用户
+ * @Description  
+ * @author huangzec@foxmail.com
+ * @date 2014-7-10 下午08:08:08
+ * @return User
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_FyLiCZ7sEeSpf5jcaWyJ3w" name="userName">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_FyLiCp7sEeSpf5jcaWyJ3w" name="return" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_HB8gsp7sEeSpf5jcaWyJ3w" name="TbtopicDao">
+          <ownedComment xmi:id="_HB8gs57sEeSpf5jcaWyJ3w">
+            <body>/** 
+ * 课题实现层
+ * @author Happy_Jqc@163.com
+ */
+</body>
+          </ownedComment>
+          <generalization xmi:id="_HCzca57sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_ZVKZYJ7sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_IQfXdJ7sEeSpf5jcaWyJ3w" name="BaseDao">
+          <ownedComment xmi:id="_IQfXeJ7sEeSpf5jcaWyJ3w">
+            <body>/** 
+ * 基类-->所有daoImpl方法的父类，模板化操作类
+ * @author Happy_Jqc@163.com
+ */
+</body>
+          </ownedComment>
+          <ownedTemplateSignature xmi:type="uml:RedefinableTemplateSignature" xmi:id="_IQfXdZ7sEeSpf5jcaWyJ3w" parameter="_IQfXdp7sEeSpf5jcaWyJ3w">
+            <ownedParameter xmi:type="uml:ClassifierTemplateParameter" xmi:id="_IQfXdp7sEeSpf5jcaWyJ3w" parameteredElement="_IQfXd57sEeSpf5jcaWyJ3w">
+              <ownedParameteredElement xmi:type="uml:Class" xmi:id="_IQfXd57sEeSpf5jcaWyJ3w" name="T" templateParameter="_IQfXdp7sEeSpf5jcaWyJ3w"/>
+            </ownedParameter>
+          </ownedTemplateSignature>
+          <generalization xmi:id="_IRQMnJ7sEeSpf5jcaWyJ3w"/>
+          <ownedAttribute xmi:id="_IRWTEJ7sEeSpf5jcaWyJ3w" name="entityClass" visibility="private"/>
+          <ownedOperation xmi:id="_IRWTEp7sEeSpf5jcaWyJ3w" name="getById" visibility="public">
+            <ownedComment xmi:id="_IRWTFZ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 通过ID查询一条记录
+ * @Description  
+ * @author Happy_Jqc@163.com
+ * @date 2014-7-10 上午11:03:22
+ * @return T
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRWTE57sEeSpf5jcaWyJ3w" name="id"/>
+            <ownedParameter xmi:id="_IRWTFJ7sEeSpf5jcaWyJ3w" name="return" type="_IQfXd57sEeSpf5jcaWyJ3w" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRWTFp7sEeSpf5jcaWyJ3w" name="save" visibility="public">
+            <ownedComment xmi:id="_IRWTGJ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 保存一条数据
+ * @Description  
+ * @author Happy_Jqc@163.com
+ * @date 2014-7-10 上午11:03:35
+ * @return void
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRWTF57sEeSpf5jcaWyJ3w" name="entity" type="_IQfXd57sEeSpf5jcaWyJ3w"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRWTGZ7sEeSpf5jcaWyJ3w" name="update" visibility="public">
+            <ownedComment xmi:id="_IRcZsJ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 更新一条记录
+ * @Description  
+ * @author Happy_Jqc@163.com
+ * @date 2014-7-10 上午11:03:39
+ * @return void
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRWTGp7sEeSpf5jcaWyJ3w" name="entity" type="_IQfXd57sEeSpf5jcaWyJ3w"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRcZsZ7sEeSpf5jcaWyJ3w" name="remove" visibility="public">
+            <ownedComment xmi:id="_IRcZs57sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 删除一条记录
+ * @Description  
+ * @author Happy_Jqc@163.com
+ * @date 2014-7-10 上午11:03:43
+ * @return void
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRcZsp7sEeSpf5jcaWyJ3w" name="entity" type="_IQfXd57sEeSpf5jcaWyJ3w"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRcZtJ7sEeSpf5jcaWyJ3w" name="getOne" visibility="public">
+            <ownedComment xmi:id="_IRcZt57sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 通过where条件获取一条记录
+ * @Description  
+ * @author huangzec@foxmail.com
+ * @date 2014-7-10 下午09:01:16
+ * @return T
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRcZtZ7sEeSpf5jcaWyJ3w" name="where">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_IRcZtp7sEeSpf5jcaWyJ3w" name="return" type="_IQfXd57sEeSpf5jcaWyJ3w" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRcZuZ7sEeSpf5jcaWyJ3w" name="getAllRecordByPages" visibility="public">
+            <ownedComment xmi:id="_IRcZvZ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 分页查询
+ * @Description  
+ * @author huangzec@foxmail.com
+ * @date 2014-7-13 下午04:05:06
+ * @return List&lt;T>
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRcZup7sEeSpf5jcaWyJ3w" name="where">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_IRcZu57sEeSpf5jcaWyJ3w" name="pagination"/>
+            <ownedParameter xmi:id="_IRcZvJ7sEeSpf5jcaWyJ3w" name="return" direction="return"/>
+          </ownedOperation>
+          <ownedOperation xmi:id="_IRcZvp7sEeSpf5jcaWyJ3w" name="getAll" visibility="public">
+            <ownedComment xmi:id="_IRigUJ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 得到所有记录
+ * @author huangzec &lt;huangzec@foxmail.com>
+ * @param sql
+ * @return
+ * @throws VerifyException 
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_IRcZv57sEeSpf5jcaWyJ3w" name="sql">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_IRcZwJ7sEeSpf5jcaWyJ3w" name="return" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_NkVPoZ7sEeSpf5jcaWyJ3w" name="SelectfirstDao">
+          <ownedComment xmi:id="_NkbWQJ7sEeSpf5jcaWyJ3w">
+            <body>/** 
+ * 课题选择记录
+ * @author huangzec@foxmail.com
+ */
+</body>
+          </ownedComment>
+          <generalization xmi:id="_NlSR857sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_XsB4Y57sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_ORiT557sEeSpf5jcaWyJ3w" name="MessageDao">
+          <ownedComment xmi:id="_ORiT6J7sEeSpf5jcaWyJ3w">
+            <body>/** 
+ * 消息模块DAO
+ * @author huangzec@foxmail.com
+ */
+</body>
+          </ownedComment>
+          <generalization xmi:id="_OSf9TZ7sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_a7pPAJ7sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+          <ownedOperation xmi:id="_OSf9Tp7sEeSpf5jcaWyJ3w" name="getAllRecords" visibility="public">
+            <ownedComment xmi:id="_OSf9UZ7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 得到Map类型的所有记录
+ * @Description  
+ * @author huangzec@foxmail.com
+ * @date 2014-8-4 上午10:19:44
+ * @return List&lt;Map&lt;String,String>>
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_OSf9T57sEeSpf5jcaWyJ3w" name="where">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_OSf9UJ7sEeSpf5jcaWyJ3w" name="return" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_PW29MZ7sEeSpf5jcaWyJ3w" name="GradeoneDao">
+          <generalization xmi:id="_PYMaAZ7sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_YYHiU57sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_P6rb_p7sEeSpf5jcaWyJ3w" name="ApplyDao">
+          <generalization xmi:id="_P8NF-J7sEeSpf5jcaWyJ3w" general="_P8NF957sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_Y2p4dJ7sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+          <ownedOperation xmi:id="_P8NF-p7sEeSpf5jcaWyJ3w" name="saveReturn" visibility="public">
+            <ownedComment xmi:id="_P8NF_Z7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 添加一条记录，返回id
+ * @param apply
+ * @return
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_P8NF-57sEeSpf5jcaWyJ3w" name="apply" type="_P8NF-Z7sEeSpf5jcaWyJ3w"/>
+            <ownedParameter xmi:id="_P8NF_J7sEeSpf5jcaWyJ3w" name="return" direction="return">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/JavaPrimitiveTypes.library.uml#int"/>
+            </ownedParameter>
+          </ownedOperation>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Class" xmi:id="_Jc-YsJ7sEeSpf5jcaWyJ3w" name="StudentDao">
+          <generalization xmi:id="_JeBhkp7sEeSpf5jcaWyJ3w"/>
+          <generalization xmi:id="_abcsAJ7sEeSpf5jcaWyJ3w" general="_IQfXdJ7sEeSpf5jcaWyJ3w"/>
+          <ownedOperation xmi:id="_JeBhk57sEeSpf5jcaWyJ3w" name="getStudentInfo" visibility="public">
+            <ownedComment xmi:id="_JeBhlp7sEeSpf5jcaWyJ3w">
+              <body>/** 
+ * 获取学生相关的信息
+ * @Description  
+ * @author huangzec@foxmail.com
+ * @date 2014-8-16 下午07:52:23
+ * @return Student
+ */
+</body>
+            </ownedComment>
+            <ownedParameter xmi:id="_JeBhlJ7sEeSpf5jcaWyJ3w" name="where">
+              <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+            </ownedParameter>
+            <ownedParameter xmi:id="_JeBhlZ7sEeSpf5jcaWyJ3w" name="return" direction="return"/>
+          </ownedOperation>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKUJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Topicorderreview>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKUp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyTopicscore>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKVJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Profession>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKV57sEeSpf5jcaWyJ3w" name="Map"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKXJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Student>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKYp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tbgrade>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKZJ7sEeSpf5jcaWyJ3w" name="List"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKaJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Room>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKap7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyGradethree>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKbJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Message>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKcp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyGraduateinfo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7WKdJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Reviewresult>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ8Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Selectfirst>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ857sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataMeetingGraduateinfo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ9Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyTopicinfo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ957sEeSpf5jcaWyJ3w" name="LinkeddataApplyTopicinfo"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ_Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Settime>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cQ_57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Department>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cRAp7sEeSpf5jcaWyJ3w" name="HibernateDaoSupport"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cRBJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyGradeall>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cRBp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;User>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cRCJ7sEeSpf5jcaWyJ3w" name="User"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cRDZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tbtopic>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7cREJ7sEeSpf5jcaWyJ3w" name="Class&lt;T>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7iXkJ7sEeSpf5jcaWyJ3w" name="Serializable"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7oeNZ7sEeSpf5jcaWyJ3w" name="Pagination"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7oeP57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Topicreport>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk0Z7sEeSpf5jcaWyJ3w" name="Topicreport"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk1p7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyTopicfinish>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk2J7sEeSpf5jcaWyJ3w" name="LinkeddataApplyTopicfinish"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk3Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Gradetwo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk357sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tballdoc>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P7uk4Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tbclass>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P70reJ7sEeSpf5jcaWyJ3w" name="Object"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8A4u57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Topicfinish>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8A4vZ7sEeSpf5jcaWyJ3w" name="Topicfinish"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_UZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Gradeone>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_U57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Gradethree>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_VZ7sEeSpf5jcaWyJ3w" name="Gradethree"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_Wp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyTopicreport>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_XJ7sEeSpf5jcaWyJ3w" name="LinkeddataApplyTopicreport"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_YZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tboffice>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_Y57sEeSpf5jcaWyJ3w" name="Tboffice"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_aJ7sEeSpf5jcaWyJ3w" name="JdbcTemplate"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8G_a57sEeSpf5jcaWyJ3w" name="HibernateTemplate"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NF8Z7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Teacher>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NF957sEeSpf5jcaWyJ3w" name="BaseDao&lt;Apply>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NF-Z7sEeSpf5jcaWyJ3w" name="Apply"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NF_p7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Meeting>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NGAJ7sEeSpf5jcaWyJ3w" name="Meeting"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NGCZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Taskdoc>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NGC57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Graduateinfo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8NGDZ7sEeSpf5jcaWyJ3w" name="Graduateinfo"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMkJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Topicapply>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMkp7sEeSpf5jcaWyJ3w" name="Topicapply"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMl57sEeSpf5jcaWyJ3w" name="BaseDao&lt;LinkeddataApplyTopicapply>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMmZ7sEeSpf5jcaWyJ3w" name="LinkeddataApplyTopicapply"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMv57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Revieworder>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMwZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Opentopicinfo>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8TMw57sEeSpf5jcaWyJ3w" name="Opentopicinfo"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTMJ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Gradeall>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTMp7sEeSpf5jcaWyJ3w" name="Gradeall"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTN57sEeSpf5jcaWyJ3w" name="BaseDao&lt;Tbdocnum>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTOp7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Opentopicscore>"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTPJ7sEeSpf5jcaWyJ3w" name="Opentopicscore"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_P8ZTQZ7sEeSpf5jcaWyJ3w" name="BaseDao&lt;Deptmanager>"/>
+</uml:Model>

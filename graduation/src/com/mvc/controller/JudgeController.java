@@ -21,6 +21,7 @@ import com.mvc.entity.Profession;
 import com.mvc.entity.Reviewresult;
 import com.mvc.entity.Settime;
 import com.mvc.entity.Tbtopic;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.JudgeService;
 import com.mvc.service.SettimeService;
 import com.mvc.service.TbtopicService;
@@ -87,9 +88,10 @@ public class JudgeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-4 下午08:58:22
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/judgeview.do")
-	public ModelAndView judgeView(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView judgeView(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/teacher/judge-list");
@@ -98,9 +100,8 @@ public class JudgeController {
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
-		if(!Verify.isEmpty(request.getParameter("page"))) {
-			System.out.println("page " + request.getParameter("page"));
-			pageNum = Integer.parseInt(request.getParameter("page"));
+		if(!Verify.isEmpty(request.getParameter("pageNum"))) {
+			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
 		pagination.setSize(numPerPage);
 		pagination.setCurrentPage(pageNum);
@@ -137,10 +138,12 @@ public class JudgeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-8-5 下午05:54:32
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignJudgeSetTime(HttpServletRequest request) {
+	private void _assignJudgeSetTime(HttpServletRequest request) throws VerifyException {
 		Department department = (Department) request.getSession().getAttribute("dept");
-		String where = "from Settime where deptId = '" + department.getDeptId() + "' AND mark = '2' AND ('" + HResponse.formatDateTime(new Date()) + "' between startTime and endTime )";
+		String where = "from Settime where deptId = '" + department.getDeptId() + 
+			"' AND mark = '2' AND ('" + HResponse.formatDateTime(new Date()) + "' between startTime and endTime )";
 		Settime judgeTime 	= settimeService.getOneByWhere(where);
 		request.setAttribute("judge-time", judgeTime);
 	}
@@ -206,8 +209,9 @@ public class JudgeController {
 	 * @param request 
 	 * @date 2014-8-8 上午11:11:16
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignJudgeResult(HttpServletRequest request, String topicId, String judgeId, String status) {
+	private void _assignJudgeResult(HttpServletRequest request, String topicId, String judgeId, String status) throws VerifyException {
 		Reviewresult reviewResult = null;
 		String where = "from Reviewresult where topId = '" + topicId + "' AND judgeId = '" + judgeId + "'";
 		reviewResult = judgeService.getRecordByWhere(where);
@@ -273,6 +277,48 @@ public class JudgeController {
 		}else if(!Verify.isEmpty(tempList) && tempList.size() > 6) {
 			request.setAttribute("message", "该课题已经达到评审人数限制");
 			return;
+		}
+	}
+	
+	/**
+	 * ajax获取评审过的记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/agetlist.do")
+	public void ajaxGetJudgedList(HttpServletRequest request, HttpServletResponse response)
+	{
+		String userid 	= (String) request.getSession().getAttribute("user_id");
+		String[] ids 	= request.getParameterValues("ids[]");
+		try {
+			if(ids.length < 0) {
+				HResponse.errorJSON(response);
+				return;
+			}
+			String id = "";
+			for(int i = 0; i < ids.length; i ++) {
+				id += ids[i] + ",";
+			}
+			id = id.substring(0, id.lastIndexOf(","));
+			String where = "from Reviewresult where judgeId = '" + userid + "' AND topId IN (" + id + ") ";
+			List<Reviewresult> relist = judgeService.getSomeRows(where);
+			String turnid = "";
+			if(!Verify.isEmpty(relist)) {
+				for(int j = 0; j < relist.size(); j ++) {
+					Reviewresult reviewresult = relist.get(j);
+					turnid += "{\"id\": " + "\"" + reviewresult.getTopId() + "\"},";
+				}
+				turnid = turnid.substring(0, turnid.lastIndexOf(","));
+				turnid = "[" + turnid + "]";
+			}
+			
+			HResponse.okJSON("成功", turnid, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			HResponse.errorJSON(response);
 		}
 	}
 

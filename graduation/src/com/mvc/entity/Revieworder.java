@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Revieworder entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "revieworder", catalog = "graduation")
+@Table(name = "revieworder")
 public class Revieworder implements java.io.Serializable {
 
 	// Fields
@@ -31,8 +31,7 @@ public class Revieworder implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Revieworder(String studentId, String teacherId, String departmentId,
-			String tbgradeId, String status, String createTime) {
+	public Revieworder(String studentId, String teacherId, String departmentId, String tbgradeId, String status, String createTime) {
 		this.studentId = studentId;
 		this.teacherId = teacherId;
 		this.departmentId = departmentId;

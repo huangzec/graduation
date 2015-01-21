@@ -2,6 +2,7 @@ package com.mvc.common;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -70,13 +71,14 @@ public class HResponse {
 	
 	/**
 	 * 格式化特定的评审教师数据
-	 * 123,456,789 => 张三，李四，王五
+	 * 123,456,789 => 123【张三】，456【李四】，789【王五】
 	 *  
 	 * @Description  
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-22 下午04:33:44
 	 * @return String
 	 */
+	@SuppressWarnings("unchecked")
 	public static String formatJudgeValue(String value, HttpServletRequest request)
 	{
 		if(Verify.isEmpty(value) || "null".equals(value)) {
@@ -87,7 +89,7 @@ public class HResponse {
 			String[] ids 	= value.split(",");
 			StringBuffer name 	= new StringBuffer();
 			for(int i = 0; i < ids.length; i++) {
-				name.append(null != dataMap.get(ids[i]) ? dataMap.get(ids[i]).get("name") : "无").append(",");
+				name.append(null != dataMap.get(ids[i]) ? (ids[i] + "【" + dataMap.get(ids[i]).get("name") + "】") : "无").append(",");
 			}
 			name.deleteCharAt(name.length() - 1);
 			
@@ -106,13 +108,43 @@ public class HResponse {
 	 * @return String
 	 */
 	public static String formatDateTime(Date date)
+	{		
+		return formatDateTime(date, "yyyy-MM-dd HH:mm:ss");
+	}
+	
+	/**
+	 * 获取系统当前年份
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @return
+	 */
+	public static String getCurrentYear()
+	{
+		return formatDateTime(new Date(), "yyyy");
+	}
+	
+	/**
+	 * 格式化日期时间
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param date
+	 * @param format
+	 * @return
+	 */
+	public static String formatDateTime(Date date, String format)
 	{
 		if(Verify.isEmpty(date)) {
 			return "";
 		}
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		
-		return sdf.format(date);
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat(format);
+			
+			return sdf.format(date);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			return "";
+		}
 	}
 	
 	/**
@@ -124,13 +156,8 @@ public class HResponse {
 	 * @return String
 	 */
 	public static String formatDate(Date date)
-	{
-		if(Verify.isEmpty(date)) {
-			return "";
-		}
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		
-		return sdf.format(date);
+	{		
+		return formatDateTime(date, "yyyy-MM-dd");
 	}
 	
 	/**
@@ -147,9 +174,29 @@ public class HResponse {
 		if(Verify.isEmpty(value) || "null".equals(value)) {
 			return "";
 		}
-		value = value.replaceFirst("-", " 年 ").replaceFirst("-", " 月 ") + " 日 ";
+		/**
+		 * 去掉时分秒
+		 */
+		String[] temp = value.split(" ");
+		value = temp[0].replaceFirst("-", " 年 ").replaceFirst("-", " 月 ") + " 日 ";
 		
 		return value;
+	}
+	
+	/**
+	 * 今天是星期几
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @return
+	 */
+	@SuppressWarnings("static-access")
+	public static String todayOfWeek()
+	{
+		String[] str 		= {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+        Calendar rightNow 	= Calendar.getInstance();  
+        int day 			= rightNow.get(rightNow.DAY_OF_WEEK);
+        
+        return str[day-1];
 	}
 	
 	/**
@@ -188,7 +235,7 @@ public class HResponse {
 	 */
 	public static void okJSON(String message, String data, HttpServletResponse response)
 	{
-		write("{\"rs\": true, \"message\": \"" + message + "\", \"data\": \"" + data + "\"}", response);
+		write("{\"rs\": true, \"message\": \"" + message + "\", \"data\": " + data + "}", response);
 	}
 	
 	/**

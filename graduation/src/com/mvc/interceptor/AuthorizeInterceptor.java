@@ -1,6 +1,8 @@
 package com.mvc.interceptor;
 
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,15 +10,34 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.mvc.author.enterController;
+import com.mvc.common.HConfig;
+import com.mvc.common.HResponse;
+import com.mvc.exception.VerifyException;
 
 
 
 public class AuthorizeInterceptor extends HandlerInterceptorAdapter {
 
+	/**
+	 * 加载系统配置项
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	private void _loadSysCfg(HttpServletRequest request)
+	{
+		HConfig.ROOT_PATH 	= request.getSession().getServletContext().getRealPath("");
+		try {
+			HConfig.loadCfgFile();
+		} catch (VerifyException e) {
+			e.printStackTrace();
+		}
+	}
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object command) throws Exception {
 	
-		System.out.println("开始访问action--"+request.getRequestURI());
+		_loadSysCfg(request);
+		System.out.println(HResponse.formatDateTime(new Date()) + " 开始访问action--"+request.getRequestURI());
 		//1、请求到登录页面 放行  
 		System.out.println("servletpath " + request.getServletPath());
 	    if(request.getServletPath().startsWith("/user/login.do") || request.getServletPath().startsWith("/user/timeout.do")
@@ -42,7 +63,7 @@ public class AuthorizeInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		
-		System.out.println("访问结束,可关闭--"+request.getRequestURI());
+		System.out.println(HResponse.formatDateTime(new Date()) + " 访问结束,可关闭--"+request.getRequestURI());
 		super.afterCompletion(request, response, handler, ex);
 	}
 

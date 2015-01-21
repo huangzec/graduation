@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Department entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "department", catalog = "graduation")
+@Table(name = "department")
 public class Department implements java.io.Serializable {
 
 	// Fields

@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Reviewresult entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "reviewresult", catalog = "graduation")
+@Table(name = "reviewresult")
 public class Reviewresult implements java.io.Serializable {
 
 	// Fields

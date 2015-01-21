@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,22 +25,34 @@ import com.mvc.common.Verify;
 import com.mvc.dao.SelectfirstDao;
 import com.mvc.entity.Apply;
 import com.mvc.entity.Department;
+import com.mvc.entity.Gradeall;
 import com.mvc.entity.Gradeone;
 import com.mvc.entity.LinkeddataApplyTopicapply;
 import com.mvc.entity.LinkeddataApplyTopicfinish;
 import com.mvc.entity.LinkeddataApplyTopicreport;
+import com.mvc.entity.Message;
+import com.mvc.entity.Opentopicscore;
+import com.mvc.entity.Profession;
 import com.mvc.entity.Selectfirst;
+import com.mvc.entity.Settime;
 import com.mvc.entity.Student;
+import com.mvc.entity.Tbtopic;
 import com.mvc.entity.Topicapply;
 import com.mvc.entity.Topicfinish;
 import com.mvc.entity.Topicreport;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.ApplyService;
+import com.mvc.service.GradeallService;
 import com.mvc.service.GradeoneService;
 import com.mvc.service.LinkeddataApplyTopicapplyService;
 import com.mvc.service.LinkeddataApplyTopicfinishService;
 import com.mvc.service.LinkeddataApplyTopicreportService;
+import com.mvc.service.MessageService;
+import com.mvc.service.OpentopicscoreService;
 import com.mvc.service.ProfessionService;
+import com.mvc.service.SettimeService;
 import com.mvc.service.StudentService;
+import com.mvc.service.TbgradeService;
 import com.mvc.service.TbtopicService;
 import com.mvc.service.TeacherService;
 import com.mvc.service.TopicapplyService;
@@ -89,6 +100,12 @@ public class ApplySiteController {
 	private TbtopicService tbtopicService;
 	
 	@Autowired
+	private SettimeService settimeService;
+	
+	@Autowired
+	private MessageService messageService;
+	
+	@Autowired
 	private LinkeddataApplyTopicapplyService linkeddataApplyTopicapplyService;
 	
 	@Autowired
@@ -96,6 +113,15 @@ public class ApplySiteController {
 	
 	@Autowired
 	private LinkeddataApplyTopicfinishService linkeddataApplyTopicfinishService;
+	
+	@Autowired
+	private OpentopicscoreService opentopicscoreService;
+	
+	@Autowired
+	private GradeallService gradeallService;
+	
+	@Autowired
+	private TbgradeService tbgradeService;
 	
 	private Pagination pagination;
 	private List<Apply> list = new ArrayList<Apply>();
@@ -147,6 +173,7 @@ public class ApplySiteController {
 	/**
 	 * 注册答辩类型Map
 	 */
+	@SuppressWarnings("serial")
 	private static LinkedHashMap<String, String> _typeMap 	= new LinkedHashMap<String, String>(){{
 		put("1", "开题答辩");
 		put("2", "毕业答辩");
@@ -155,6 +182,7 @@ public class ApplySiteController {
 	/**
 	 * 注册状态Map
 	 */
+	@SuppressWarnings("serial")
 	private static LinkedHashMap<String, String> _statusMap 	= new LinkedHashMap<String, String>(){{
 		put("1", "未受理");
 		put("2", "已受理");
@@ -163,6 +191,7 @@ public class ApplySiteController {
 	/**
 	 * 注册同意答辩Map
 	 */
+	@SuppressWarnings("serial")
 	private static LinkedHashMap<String, String> _passMap 	= new LinkedHashMap<String, String>(){{
 		put(
 				"0",
@@ -171,6 +200,16 @@ public class ApplySiteController {
 			);
 		put("1", "不同意");
 		put("2", "<lable style=\"color: red;\">已同意</lable>");
+	}};
+	
+	/**
+	 * 注册学生端同意答辩Map
+	 */
+	@SuppressWarnings("serial")
+	private static LinkedHashMap<String, String> _studentPassMap 	= new LinkedHashMap<String, String>(){{
+		put("0","未处理");
+		put("1", "不同意");
+		put("2", "同意");
 	}};
 	
 	/**
@@ -186,6 +225,20 @@ public class ApplySiteController {
 		request.setAttribute(
 				"type_map", 
 				MapUtil.makeLinkedMapMap(_typeMap)
+				);
+	}
+	
+	/**
+	 * 加载是否同意答辩Map
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 */
+	public static void _assignStudentPassMap(HttpServletRequest request)
+	{
+		request.setAttribute(
+				"pass_map", 
+				MapUtil.makeLinkedMapMap(_studentPassMap)
 				);
 	}
 	
@@ -212,12 +265,14 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 13:27:54
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addview.do")
-	public ModelAndView addView(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView addView(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/add");
+		Student student = studentService.getOneStu("from Student where stuId = '" + (String) request.getSession().getAttribute("user_id") + "'");
 		String prowhere = "select * from profession where `pro_ID` = (" +
 				"select pro_ID from tbclass where cla_ID = (" +
 				"select cla_ID from student where stu_ID = " + request.getSession().getAttribute("user_id") + "))";
@@ -225,16 +280,19 @@ public class ApplySiteController {
 		String selWhere = "from Selectfirst where stuId = '" + request.getSession().getAttribute("user_id") + "' AND selStatus = '1'";
 		Selectfirst selectfirst = selectfirstDao.getOne(selWhere);
 		if(Verify.isEmpty(selectfirst)) {
-			request.setAttribute("message", "你还没被指导老师确认为任务人");
+			throw new VerifyException("你还没被指导老师确认为任务人");
 		}
 		request.setAttribute("profession_map", professionMap);
 		request.setAttribute("selectfirst", selectfirst);
+		request.setAttribute("student", student);
 		_assignTeacherInfo(request, selectfirst);
 		_assignTopicInfo(request, selectfirst);
+		TopicController.assignSelType(request);
+		_assignFinishReport(request);
 		
 		return mav;
 	}
-	
+
 	/**
 	 * 加载课题信息
 	 *  
@@ -242,14 +300,16 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-2 上午10:56:25
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignTopicInfo(HttpServletRequest request, Selectfirst selectfirst)
+	private void _assignTopicInfo(HttpServletRequest request, Selectfirst selectfirst) throws VerifyException
 	{
 		if(Verify.isEmpty(selectfirst)) {
 			return;
 		}
 		String where = "from Tbtopic where topId = '" + selectfirst.getTbtopic().getTopId() + "'";
 		
+		request.setAttribute("topic", tbtopicService.getRecordByWhere(where));
 		request.setAttribute(
 				"topic_map",
 				ArrayUtil.turnRecordToMap("topId", "topName", selectfirstDao.getOne(where))
@@ -284,89 +344,125 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 13:27:54
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/add.do")
-	public ModelAndView openTopicAdd(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView openTopicAdd(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		String userId 	= (String) request.getSession().getAttribute("user_id");
 		String topicId 	= request.getParameter("topic_id");
 		String type 	= request.getParameter("type");
 		Department department 	= (Department) request.getSession().getAttribute("dept");
 		if(Verify.isEmpty(topicId)) {
-			return new ModelAndView("forward:/user/apply/addview.do", "message", "课题编号不能为空");
+			throw new VerifyException("课题编号不能为空");
 		}
 		String where 	= "from Apply where userId = '" + userId 
-			+ "' AND type = '" + type + "' AND pass = '0' AND status = '1'";
+			+ "' AND type = '" + type + "' AND status = '1'";
 		Apply apply 	= applyService.getRecordByWhere(where);
 		if(!Verify.isEmpty(apply)) {
-			return new ModelAndView("forward:/user/apply/addview.do", "message", "你还有该类型未被处理的答辩申请");
+			throw new VerifyException("你还有该类型未被处理的答辩申请");
 		}
-		try {
-			apply 	= new Apply();
-			apply.setUserId(userId);
-			apply.setDepartmentId(department.getDeptId());
-			apply.setType(type);
-			apply.setPass("0");
-			apply.setStatus("1");
-			apply.setCreateTime(HResponse.formatDateTime(new Date()));
-			int applyId = applyService.addOneReturn(apply);
+		String name 	= "学生 " + userId + "【" + request.getSession().getAttribute("user_name").toString() + "】";
+		String content 	= "";
+		String toId 	= "";
+		apply 	= new Apply();
+		apply.setUserId(userId);
+		apply.setDepartmentId(department.getDeptId());
+		apply.setType(type);
+		apply.setPass("0");
+		apply.setStatus("1");
+		apply.setCreateTime(HResponse.formatDateTime(new Date()));
+		int applyId = 0;
+		String swhere 	= "from Selectfirst where stuId = '" + userId + "' AND selStatus ='1' AND deptId = '" 
+				+ department.getDeptId() + "' ";
+		
+		Selectfirst selectfirst = selectfirstDao.getOne(swhere);
+		if(type.equals("1")) {
+			//如果是开题答辩  是否已经通过开题答辩
+			if(_assignIsPassOpen(request)) {
+				throw new VerifyException("你已经通过开题答辩了，不需要再申请开题答辩");
+			}		
+			applyId = applyService.addOneReturn(apply);
 			if(applyId == 0) {
-				return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
+				
+				throw new VerifyException("答辩申请失败");
 			}
 			request.setAttribute("applyId", applyId + "");
-			if(type.equals("1")) {
-				int topicApplyId 	= _assignOpenTopicApply(request);
-				int topicReportId 	= _assignOpenTopicReport(request);
-				if(topicApplyId == 0 || topicReportId == 0) {
-					return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
-				}
-				/**
-				 * 添加答辩申请与答辩申请表关联关系
-				 */
-				LinkeddataApplyTopicapply linkeddataApplyTopicapply = new LinkeddataApplyTopicapply();
-				linkeddataApplyTopicapply.setItemId(applyId + "");
-				linkeddataApplyTopicapply.setRelId(topicApplyId + "");
-				linkeddataApplyTopicapply.setExtend("0");
-				linkeddataApplyTopicapply.setCreateTime(HResponse.formatDateTime(new Date()));
-				int linkeddataApplyId = linkeddataApplyTopicapplyService.addOneReturn(linkeddataApplyTopicapply);
-				if(linkeddataApplyId == 0) {
-					return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
-				}
-				/**
-				 * 添加答辩申请与答辩报告书关联关系
-				 */
-				LinkeddataApplyTopicreport linkeddataApplyTopicreport = new LinkeddataApplyTopicreport();
-				linkeddataApplyTopicreport.setItemId(applyId + "");
-				linkeddataApplyTopicreport.setRelId(topicReportId + "");
-				linkeddataApplyTopicreport.setExtend("0");
-				linkeddataApplyTopicreport.setCreateTime(HResponse.formatDateTime(new Date()));
-				int linkeddataReportId = linkeddataApplyTopicreportService.addOneReturn(linkeddataApplyTopicreport);
-				if(linkeddataReportId == 0) {
-					return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
-				}
-			} else if(type.equals("2")) {
-				int topicFinishId  = _assignOpenTopicFinish(request);
-				if(topicFinishId == 0) {
-					return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
-				}
-				/**
-				 * 添加答辩申请与毕业答辩相关材料关联关系
-				 */
-				LinkeddataApplyTopicfinish linkeddataApplyTopicfinish = new LinkeddataApplyTopicfinish();
-				linkeddataApplyTopicfinish.setItemId(applyId + "");
-				linkeddataApplyTopicfinish.setRelId(topicFinishId + "");
-				linkeddataApplyTopicfinish.setExtend("0");
-				linkeddataApplyTopicfinish.setCreateTime(HResponse.formatDateTime(new Date()));
-				int linkeddataFinishId = linkeddataApplyTopicfinishService.addOneReturn(linkeddataApplyTopicfinish);
-				if(linkeddataFinishId == 0) {
-					return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
-				}
+			int topicApplyId 	= _assignOpenTopicApply(request);
+			int topicReportId 	= _assignOpenTopicReport(request);
+			if(topicApplyId == 0 || topicReportId == 0) {
+				
+				throw new VerifyException("答辩申请失败");
 			}
-			
-			return new ModelAndView("forward:/user/apply/list.do", "message", "答辩申请成功");
-		} catch (Exception e) {
-			return new ModelAndView("forward:/user/apply/addview.do", "message", "答辩申请失败");
+			/**
+			 * 添加答辩申请与答辩申请表关联关系
+			 */
+			LinkeddataApplyTopicapply linkeddataApplyTopicapply = new LinkeddataApplyTopicapply();
+			linkeddataApplyTopicapply.setItemId(applyId + "");
+			linkeddataApplyTopicapply.setRelId(topicApplyId + "");
+			linkeddataApplyTopicapply.setExtend("0");
+			linkeddataApplyTopicapply.setCreateTime(HResponse.formatDateTime(new Date()));
+			int linkeddataApplyId = linkeddataApplyTopicapplyService.addOneReturn(linkeddataApplyTopicapply);
+			if(linkeddataApplyId == 0) {
+				throw new VerifyException("答辩申请失败");
+			}
+			/**
+			 * 添加答辩申请与答辩报告书关联关系
+			 */
+			LinkeddataApplyTopicreport linkeddataApplyTopicreport = new LinkeddataApplyTopicreport();
+			linkeddataApplyTopicreport.setItemId(applyId + "");
+			linkeddataApplyTopicreport.setRelId(topicReportId + "");
+			linkeddataApplyTopicreport.setExtend("0");
+			linkeddataApplyTopicreport.setCreateTime(HResponse.formatDateTime(new Date()));
+			int linkeddataReportId = linkeddataApplyTopicreportService.addOneReturn(linkeddataApplyTopicreport);
+			if(linkeddataReportId == 0) {
+				
+				throw new VerifyException("答辩申请失败");
+			}
+			name += "提交了开题答辩申请";
+			content += name + "，请你及时查看，并确认是否同意其参加答辩";
+			if(!Verify.isEmpty(selectfirst)) {
+				toId = selectfirst.getTeaId();
+			}
+			_assignSendMessage(name, content, toId, request);
+		} else if(type.equals("2")) {
+			//如果是毕业答辩
+			if(_assignIsPassFinish(request)) {
+				//如果已经通过毕业答辩
+				throw new VerifyException("你已经通过毕业答辩了，不需要再申请毕业答辩");
+			}		
+			applyId = applyService.addOneReturn(apply);
+			if(applyId == 0) {
+				
+				throw new VerifyException("答辩申请失败");
+			}
+			request.setAttribute("applyId", applyId + "");
+			int topicFinishId  = _assignOpenTopicFinish(request);
+			if(topicFinishId == 0) {
+				
+				throw new VerifyException("答辩申请失败");
+			}
+			/**
+			 * 添加答辩申请与毕业答辩相关材料关联关系
+			 */
+			LinkeddataApplyTopicfinish linkeddataApplyTopicfinish = new LinkeddataApplyTopicfinish();
+			linkeddataApplyTopicfinish.setItemId(applyId + "");
+			linkeddataApplyTopicfinish.setRelId(topicFinishId + "");
+			linkeddataApplyTopicfinish.setExtend("0");
+			linkeddataApplyTopicfinish.setCreateTime(HResponse.formatDateTime(new Date()));
+			int linkeddataFinishId = linkeddataApplyTopicfinishService.addOneReturn(linkeddataApplyTopicfinish);
+			if(linkeddataFinishId == 0) {
+				throw new VerifyException("答辩申请失败");
+			}
+			name += "提交了毕业答辩申请";
+			content += name + "，请你及时查看，并确认是否同意其参加答辩";
+			if(!Verify.isEmpty(selectfirst)) {
+				toId = selectfirst.getTeaId();
+			}
+			_assignSendMessage(name, content, toId, request);
 		}
+		
+		return new ModelAndView("forward:/user/apply/list.do", "message", "答辩申请成功");	
 	}
 
 	/**
@@ -468,23 +564,70 @@ public class ApplySiteController {
 	}
 	
 	/**
+	 * 加载毕业答辩材料
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private void _assignFinishReport(HttpServletRequest request) throws VerifyException 
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String where = "from Topicfinish where departmentId = '" + department.getDeptId() + 
+				"' AND stuId = '" + userid + "' order by createTime desc ";
+		
+		request.setAttribute(
+				"topicfinish",
+				topicfinishService.getRecordByWhere(where)
+				);
+	}
+	
+	/**
+	 * 加载发送消息
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param name
+	 * @param content
+	 * @param request
+	 */
+	private void _assignSendMessage(String name, String content, String toId, HttpServletRequest request)
+	{
+		String userId 	= (String) request.getSession().getAttribute("user_id");
+		try {
+			Message message = new Message();
+			message.setName(name);
+			message.setContent(content);
+			message.setToId(toId);
+			message.setFromId(userId);
+			short status = 1;
+			message.setStatus(status);
+			message.setCreateTime(HResponse.formatDateTime(new Date()));
+			messageService.saveMessage(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * 数据列表
 	 *  
 	 * @Description  
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 13:27:54
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/list.do")
-	public ModelAndView list(HttpServletRequest request, ModelMap modelMap )
+	public ModelAndView list(HttpServletRequest request, ModelMap modelMap ) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/list");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
 		if(pagination == null){
@@ -512,6 +655,7 @@ public class ApplySiteController {
 		modelMap.put("list", list);
 		modelMap.put("pagination", pagination);
 		_assignTypeMap(request);
+		_assignStudentPassMap(request);
 		_assignStatusMap(request);
 		
 		return mav;
@@ -575,18 +719,21 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-7 上午11:23:17
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/confirm.do")
-	public ModelAndView confirm(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView confirm(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String grade 			= request.getParameter("grade");
 		mav.setViewName("user/apply/confirm");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
 		if(pagination == null){
@@ -601,9 +748,17 @@ public class ApplySiteController {
 			pagination.setCurrentPage(pagination.getTotalPage());
 		}
 		String where = "from Apply where type = '1' AND departmentId = '" + department.getDeptId() + 
-			"' AND userId IN (select stuId from Selectfirst where selStatus = '1' AND teaId = '" + 
-			request.getSession().getAttribute("user_id") + "') order by pass asc ";
+				"' AND userId IN (select stuId from Selectfirst where selStatus = '1' AND teaId = '" + 
+				userid + "'";
+		if(!Verify.isEmpty(grade)) {
+			where += " AND stuId IN (select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (select p.proId from Profession p " +
+					"where p.graId = " + Integer.parseInt(grade) + " AND deptId = '" + department.getDeptId() + 
+					"' ) ) ) ";
+		}		
+		where += " ) order by pass asc ";
 		list = applyService.getAllRecordByPages(where, pagination);
+		_assignGradeInfo(request);
 		if(list == null || list.size() < 1) {
 			
 			return mav;
@@ -627,20 +782,23 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-14 下午10:10:25
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/finishconfirm.do")
-	public ModelAndView finishConfirm(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView finishConfirm(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/finish-confirm");
-		Department department = (Department) request.getSession().getAttribute("dept");
-		if(!(request.getParameter("pageNum") == null))
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String grade 			= request.getParameter("grade");
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
-		};
+		}
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -654,8 +812,16 @@ public class ApplySiteController {
 		}
 		String where = "from Apply where type = '2' AND departmentId = '" + department.getDeptId() + 
 			"' AND userId IN (select stuId from Selectfirst where selStatus = '1' AND teaId = '" + 
-			request.getSession().getAttribute("user_id") + "') order by pass asc ";
+			userid + "' ";
+		if(!Verify.isEmpty(grade)) {
+			where += " AND stuId IN (select s.stuId from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (select p.proId from Profession p " +
+					"where p.graId = " + Integer.parseInt(grade) + " AND deptId = '" + department.getDeptId() + 
+					"' ) ) ) ";
+		}		
+		where += " ) order by pass asc ";
 		list = applyService.getAllRecordByPages(where, pagination);
+		_assignGradeInfo(request);
 		if(list == null || list.size() < 1) {
 			
 			return mav;
@@ -670,6 +836,27 @@ public class ApplySiteController {
 		_assignStudentListMap(list, request);
 		
 		return mav;
+	}
+
+	/**
+	 * 加载年级信息
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-9-26 下午06:00:58
+	 * @return void
+	 * @throws VerifyException 
+	 */
+	private void _assignGradeInfo(HttpServletRequest request) throws VerifyException 
+	{
+		Department department = (Department) request.getSession().getAttribute("dept");
+		String where = "from Tbgrade where deptId = '" + department.getDeptId() + 
+			"' order by graNumber desc";
+		
+		request.setAttribute(
+				"gradeList", 
+				tbgradeService.getAllRowsByWhere(where)
+				);		
 	} 
 
 	/**
@@ -679,8 +866,9 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-12 下午02:24:00
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignStudentListMap(List<Apply> data, HttpServletRequest request) {
+	private void _assignStudentListMap(List<Apply> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}
@@ -701,9 +889,9 @@ public class ApplySiteController {
 	 * @date 2014-9-15 下午01:58:53
 	 * @return void
 	 */
-	private void _assignStudentRecordMap(Topicfinish topicfinish, HttpServletRequest request)
+	private void _assignStudentRecordMap(String stuId, HttpServletRequest request)
 	{
-		Student student = studentService.getOneById(topicfinish.getStuId());
+		Student student = studentService.getOneById(stuId);
 		if(Verify.isEmpty(student)) {
 			return;
 		}
@@ -737,15 +925,30 @@ public class ApplySiteController {
 	@RequestMapping(value="/agree.do")
 	public void agree(HttpServletRequest request, HttpServletResponse response)
 	{
-		String id 	= request.getParameter("id");
-		String pass = request.getParameter("pass");
+		String userId 	= (String) request.getSession().getAttribute("user_id");
+		String id 		= request.getParameter("id");
+		String pass 	= request.getParameter("pass");
+		String toId 	= request.getParameter("userid");
 		Apply apply = applyService.getOneRecordById(Integer.parseInt(id));
 		if(Verify.isEmpty(apply)) {
 			HResponse.errorJSON("记录不存在", response);
 		}
 		try {
 			apply.setPass(pass);
+			if(pass.equals("1")) {
+				apply.setStatus("2");
+			}
 			applyService.editOneApply(apply);
+			String name 	= "你的指导老师 " + userId + " 【" + request.getSession().getAttribute("user_name").toString() + "】";
+			String content 	= "";
+			if(pass.equals("1")) {
+				name += " 不同意你参加答辩";
+				content += name + "，请你完善相关的文档后，再提交答辩申请";
+			}else {
+				name += " 同意你参加答辩";
+				content += name + "， 请你做好答辩的准备，及时查看答辩相关信息";
+			}
+			_assignSendMessage(name, content, toId, request);
 			HResponse.okJSON(response);
 		} catch (Exception e) {
 			HResponse.errorJSON(response);
@@ -766,28 +969,32 @@ public class ApplySiteController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/opentopicword");
 		Department department = (Department) request.getSession().getAttribute("dept");
+		String id 			= request.getParameter("id");
 		String stuid 		= request.getParameter("userid");
-		if(Verify.isEmpty(stuid)) {
+		_assignStudentRecordMap(request);
+		if(Verify.isEmpty(stuid) || Verify.isEmpty(id)) {
 			return mav;
 		}
-		String aplyWhere 	= "from Topicapply where parentId = '" + department.getDeptId() + 
-			"' AND userId = '" + stuid + "' order by createTime desc ";
-		String reportWhere 	= "from Topicreport where departmentId = '" + department.getDeptId() + 
-			"' AND stuId = '" + stuid + "' order by createTime desc ";
-		String selWhere 	= "from Selectfirst where stuId = '" + stuid + "' AND selStatus = '1' AND teaId = '" + 
+		try {
+			String aplyWhere 	= "from Topicapply where id = (" +
+				"select relId from LinkeddataApplyTopicapply where itemId ='" + id + "' )"; 
+			String reportWhere 	= "from Topicreport where id = (" +
+				"select relId from LinkeddataApplyTopicreport where itemId ='" + id + "' )"; 
+			String selWhere 	= "from Selectfirst where stuId = '" + stuid + "' AND selStatus = '1' AND teaId = '" + 
 			request.getSession().getAttribute("user_id") + "'";
-		System.out.println("selwhere " + selWhere);
-		Selectfirst selectfirst = selectfirstDao.getOne(selWhere);
-		String topWhere 	= "from Tbtopic where " ;
-		topWhere += Verify.isEmpty(selectfirst) ? " 1 = 2" : " topId = '" + selectfirst.getTbtopic().getTopId() + "'";
-		Topicreport topicreport = topicreportService.getRecordByWhere(reportWhere);		
-		Topicapply topicapply = topicapplyService.getRecordByWhere(aplyWhere);
-		mav.addObject("topic", tbtopicService.getRecordByWhere(topWhere));
-		mav.addObject("topicapply", topicapply);
-		mav.addObject("topicreport", topicreport);
-		_assignStudentInfo(request, stuid);
-		mav.addObject("teacher", teacherService.getOneTeacherById((String) request.getSession().getAttribute("user_id")));
-		_assignStudentRecordMap(request);
+			Selectfirst selectfirst = selectfirstDao.getOne(selWhere);
+			String topWhere 	= "from Tbtopic where " ;
+			topWhere += Verify.isEmpty(selectfirst) ? " 1 = 2" : " topId = '" + selectfirst.getTbtopic().getTopId() + "'";
+			Topicreport topicreport = topicreportService.getRecordByWhere(reportWhere);		
+			Topicapply topicapply = topicapplyService.getRecordByWhere(aplyWhere);
+			mav.addObject("topic", tbtopicService.getRecordByWhere(topWhere));
+			mav.addObject("topicapply", topicapply);
+			mav.addObject("topicreport", topicreport);
+			_assignStudentInfo(request, stuid);
+			mav.addObject("teacher", teacherService.getOneTeacherById((String) request.getSession().getAttribute("user_id")));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
 	}
@@ -874,17 +1081,18 @@ public class ApplySiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-15 上午09:42:41
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/finishtopicword.do")
-	public ModelAndView finishTopicWord(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView finishTopicWord(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/finish-word");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
 		if(pagination == null){
@@ -955,9 +1163,10 @@ public class ApplySiteController {
 	 * @param request
 	 * @param modelMap
 	 * @return
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/finishreviewtopicword.do")
-	public ModelAndView finishReviewTopicWord(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView finishReviewTopicWord(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/apply/finish-word-detail");
@@ -969,13 +1178,13 @@ public class ApplySiteController {
 		}
 		String where 	= "from Topicfinish where stuId = '" + userId + "' order by createTime desc ";
 		Topicfinish topicfinish = topicfinishService.getRecordByWhere(where);
+		_assignStudentRecordMap(userId, request);
 		if(Verify.isEmpty(topicfinish)) {
 			request.setAttribute("message", "记录不存在");
 			
 			return mav;
 		}
 		request.setAttribute("record", topicfinish);
-		_assignStudentRecordMap(topicfinish, request);
 		
 		return mav;
 	}
@@ -995,15 +1204,53 @@ public class ApplySiteController {
 		mav.setViewName("user/apply/finish-word-detail");
 		String id 	= request.getParameter("id");
 		Topicfinish topicfinish = topicfinishService.getOneRecordById(Integer.parseInt(id));
+		_assignStudentRecordMap(topicfinish.getStuId(), request);
 		if(Verify.isEmpty(topicfinish)) {
 			request.setAttribute("message", "记录不存在");
 			
 			return mav;
 		}
 		request.setAttribute("record", topicfinish);
-		_assignStudentRecordMap(topicfinish, request);
 		
 		return mav;
+	}
+	
+	/**
+	 * 指导老师是否已经评分
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/havescoreteacher.do")
+	public void haveScoreTeacher(HttpServletRequest request, HttpServletResponse response)
+	{
+		String userId 	= request.getParameter("userid");
+		if(Verify.isEmpty(userId)) {
+			HResponse.errorJSON(response);
+			
+			return;
+		}
+		try {
+			String where = "from Gradeone where stuId = '" + userId.trim() + "' ";
+			Gradeone gradeone = gradeoneService.getRecordByWhere(where);
+			if(Verify.isEmpty(gradeone)) {
+				HResponse.errorJSON(response);
+				
+				return;
+			}
+			String data = "[{\"one\": \"" + gradeone.getGoOne() + "\", \"two\": \"" + gradeone.getGoTwo() + 
+					"\" , \"three\": \"" + gradeone.getGoThree() + "\" , \"four\": \"" + gradeone.getGoFour() + 
+					"\" , \"five\": \"" + gradeone.getGoFive()+ "\" , \"six\": \"" + gradeone.getGoSix() + 
+					"\" , \"all\": \"" + gradeone.getGoAll() + "\" , \"content\": \"" + 
+					gradeone.getContent() + "\" }]";
+			
+			HResponse.okJSON(null, data, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			HResponse.errorJSON(response);
+		}
 	}
 	
 	/**
@@ -1017,32 +1264,305 @@ public class ApplySiteController {
 	@RequestMapping(value="/scoreteacher.do")
 	public void scoreTeacher(HttpServletRequest request, HttpServletResponse response)
 	{
+		String userId 		= request.getParameter("userId");
+		String oneScore 	= request.getParameter("one");
+		String twoScore 	= request.getParameter("two");
+		String threeScore 	= request.getParameter("three");
+		String fourScore 	= request.getParameter("four");
+		String fiveScore 	= request.getParameter("five");
+		String sixScore 	= request.getParameter("six");
+		String content 		= request.getParameter("content");
+		if(Verify.isEmpty(userId)) {
+			HResponse.errorJSON("服务器繁忙，请稍后重试", response);
+			
+			return;
+		}
+		String[] score 		= {oneScore, twoScore, threeScore, fourScore, fiveScore};
+		boolean bool = false;
+		boolean isMax = false;
+		for(int i = 0; i < score.length; i ++) {
+			if(!Verify.isScore(score[i])) {
+				HResponse.errorJSON("第 " + (i + 1) + " 项的分数不正确", response);
+				bool = true;
+				break;
+			}
+			if(Float.parseFloat(score[i]) > 30) {
+				HResponse.errorJSON("第 " + (i + 1) + " 项的分数不超过30分", response);
+				isMax = true;
+				break;
+			}
+		}
+		if(bool || isMax) {
+			return;
+		}
+		if(!Verify.isEmpty(sixScore)) {
+			if(!Verify.isScore(sixScore)) {
+				HResponse.errorJSON("第 6 项的分数不正确", response);
+				
+				return;
+			}
+			if(Float.parseFloat(sixScore) > 30) {
+				HResponse.errorJSON("第 6 项的分数不超过30分", response);
+				
+				return;
+			}
+		}
+		if(Verify.isEmpty(content)) {
+			HResponse.errorJSON("评定意见不能为空", response);
+			
+			return;
+		}
 		try{
-			Float one 		= Float.parseFloat(request.getParameter("one"));
-			Float two 		= Float.parseFloat(request.getParameter("two"));
-			Float three 	= Float.parseFloat(request.getParameter("three"));
-			Float four 		= Float.parseFloat(request.getParameter("four"));
-			Float five 		= Float.parseFloat(request.getParameter("five"));
+			Float one 		= Float.parseFloat(oneScore);
+			Float two 		= Float.parseFloat(twoScore);
+			Float three 	= Float.parseFloat(threeScore);
+			Float four 		= Float.parseFloat(fourScore);
+			Float five 		= Float.parseFloat(fiveScore);
+			Float six 		= (float) 0;
 			Float all 		= one + two + three + four + five;
-			String content 	= request.getParameter("content");
-			String userId 	= request.getParameter("userId");
-			Gradeone gradeone = new Gradeone();
+			if(!Verify.isEmpty(sixScore)) {
+				six = Float.parseFloat(sixScore);
+				all = all + six;
+			}
+			if(all > 100) {
+				HResponse.errorJSON("总分不超过100分，请检查各项分值", response);
+				
+				return;
+			}
+			String where 	= "from Gradeone where stuId = '" + userId + "' ";
+			Gradeone gradeone = gradeoneService.getRecordByWhere(where);
+			if(!Verify.isEmpty(gradeone)) {
+				gradeone.setGoOne(one);
+				gradeone.setGoTwo(two);
+				gradeone.setGoThree(three);
+				gradeone.setGoFour(four);
+				gradeone.setGoFive(five);
+				gradeone.setGoSix(six);
+				gradeone.setGoAll(all);
+				gradeone.setContent(content);
+				gradeone.setCreateTime(HResponse.formatDateTime(new Date()));
+				gradeoneService.editOneGradeone(gradeone);
+				HResponse.okJSON(response);
+				
+				return;
+			}
+			gradeone = new Gradeone();
 			gradeone.setStuId(userId);
 			gradeone.setGoOne(one);
 			gradeone.setGoTwo(two);
 			gradeone.setGoThree(three);
 			gradeone.setGoFour(four);
 			gradeone.setGoFive(five);
+			gradeone.setGoSix(six);
 			gradeone.setGoAll(all);
 			gradeone.setContent(content);
 			gradeone.setStatus("1");
 			gradeone.setCreateTime(HResponse.formatDateTime(new Date()));
 			gradeoneService.addOne(gradeone);
+			
 			HResponse.okJSON(response);
 		}catch (Exception e) {
 			e.printStackTrace();
 			
 			HResponse.errorJSON("服务器繁忙，请稍后重试", response);
+		}
+	}
+	
+	/**
+	 * 检查时间设置 和是否已经通过答辩
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/checktime.do")
+	public void checkTime(HttpServletRequest request, HttpServletResponse response)
+	{
+		Department department = (Department) request.getSession().getAttribute("dept");
+		String userid 	= (String) request.getSession().getAttribute("user_id");
+		String mark 	= request.getParameter("mark");
+		if(Verify.isEmpty(mark)) {
+			HResponse.errorJSON("服务器繁忙，请稍后重试", response);
+			return;
+		}
+		String graid = "from Profession where deptId = '" + department.getDeptId() + 
+				"' AND proId = (select c.proId from Tbclass c where c.claId = (" +
+				"select s.claId from Student s where s.stuId = '" + userid + "')) ";
+		String where = "from Settime where deptId = '" + department.getDeptId() + 
+				"' AND mark = '" + mark.trim() + "' AND '" + HResponse.formatDateTime(new Date()) + 
+				"' BETWEEN startTime AND endTime ";
+		try {
+			Profession profession = professionService.getRecordByWhere(graid);
+			if(Verify.isEmpty(profession) ||(!Verify.isEmpty(profession) && Verify.isEmpty(profession.getGraId()))) {
+				HResponse.errorJSON("服务器繁忙，请稍后重试", response);
+				return;
+			}
+			where += " AND graNumber = '" + (profession.getGraId() + "") + "' ";
+			Settime settime 	= settimeService.getOneByWhere(where);
+			if(Verify.isEmpty(settime)) {
+				HResponse.errorJSON("时间暂未开放", response);
+				return;
+			}
+			if(mark.trim().equals("5")) {
+				if(_assignIsPassOpen(request)) {
+					//如果已经通过开题答辩
+					HResponse.errorJSON("你已经通过开题答辩了，不需要再申请开题答辩", response);
+					return;
+				}				
+			}
+			if(mark.trim().equals("6")) {
+				if(_assignIsPassFinish(request)) {
+					//如果已经通过毕业答辩
+					HResponse.errorJSON("你已经通过毕业答辩了，不需要再申请毕业答辩", response);
+					return;
+				}				
+			}
+			
+			HResponse.okJSON(response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			HResponse.errorJSON("服务器繁忙，请稍后重试", response);
+		}
+	}
+	
+	/**
+	 * 是否通过开题答辩
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private boolean _assignIsPassOpen(HttpServletRequest request) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String where = "from Opentopicscore where departmentId = '" + department.getDeptId() + 
+				"' AND studentId = '" + userid + "' order by createTime desc ";
+		Opentopicscore opentopicscore = opentopicscoreService.getRecordByWhere(where);
+		if(!Verify.isEmpty(opentopicscore) && opentopicscore.getScore() > 60) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 是否已经通过毕业答辩 
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @return
+	 * @throws VerifyException
+	 */
+	private boolean _assignIsPassFinish(HttpServletRequest request) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String where = "from Gradeall where departmentId = '" + department.getDeptId() + 
+				"' AND stuId = '" + userid + "' AND status = '1' order by createTime desc ";
+		Gradeall gradeall = gradeallService.getRecordByWhere(where);
+		if(!Verify.isEmpty(gradeall) && gradeall.getGaGrade() > 60) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 检测学生所选课题的类型：1 论文，2 设计，3 其他
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/topictype.do")
+	public void checkTopicType(HttpServletRequest request, HttpServletResponse response)
+	{
+		Department department = (Department) request.getSession().getAttribute("dept");
+		String stuId 	= request.getParameter("stuid");
+		if(Verify.isEmpty(stuId)) {
+			HResponse.errorJSON("学生ID不能为空", response);
+			
+			return; 	
+		}
+		String where = "from Tbtopic where topId = (" +
+				"select s.tbtopic.topId from Selectfirst s where s.stuId = '" + stuId.trim() + 
+				"' AND s.deptId = '" + department.getDeptId() + "')";
+		try {
+			Tbtopic tbtopic = tbtopicService.getRecordByWhere(where);
+			if(Verify.isEmpty(tbtopic) || Verify.isEmpty(tbtopic.getTopType())) {
+				HResponse.errorJSON("该学生所选课题出现异常，请与管理员联系", response);
+				
+				return;
+			}
+			String html = "";
+			if(tbtopic.getTopType().trim().equals("1")) {
+				html = "<table class='table table-bordered'><tr><td>评价项目</td><td>评价指标</td>" +
+						"<td>分值</td><td>评分</td></tr><tr><td>学习态度与工作量</td><td>①学习态度认真，自觉遵守纪律；" +
+						"②工作作风严谨务实，具有良好的团队精神；③工作量饱满，按期圆满完成规定的任务。</td><td>10</td><td>" +
+						"<input type='text' name='one' class='input-mini'/></td></tr><tr><td>文献综述与外文翻译" +
+						"</td><td>①能独立查阅文献和从事其他形式调研；②能较好理解课题任务并提出实施方案；" +
+						"③具有收集、整理各种信息及获取新知识的能力，查阅文献有一定广泛性；④文献综述撰写规范，外文翻译符合规定要求，译文准确，质量好；" +
+						"⑤文献综述、外文翻译与研究课题密切相关，文献数量符合相关要求。</td><td>20</td><td><input type='text' " +
+						"name='two' class='input-mini'/></td></tr><tr><td>研究水平与实际能力</td><td>①能独立开展研究工作；" +
+						"②能熟练掌握和运用所学专业基本理论、基本知识和基本技能分析解决相关理论和实际问题；③实验设计合理，实验数据准确可靠，" +
+						"理论分析与计算正确；④有较强的实际动手能力、经济分析能力和现代技术应用能力。</td><td>30</td><td>" +
+						"<input type='text' name='three' class='input-mini'/></td></tr><tr><td>论文撰写质量</td>" +
+						"<td>①论文结构严谨，层次清晰，结论正确，技术用语准确；②行文流畅，语句通畅；③论文格式符合规范要求；④图表完备、整洁，" +
+						"符号统一，编号齐全。</td><td>30</td><td><input type='text' name='four' class='input-mini'/>" +
+						"</td></tr><tr><td>学术水平与创新</td><td>①具有一定的学术水平或应用价值；②对与课题相关的理论或实际问题有较深刻的" +
+						"认识，有新的见解，有一定的创新。</td><td>10</td><td><input type='text' name='five' " +
+						"class='input-mini'/></td></tr><tr><td colspan='4'><div class='rfloat'>总分：" +
+						"<input type='text' name='all' class='input-mini'/></div></td></tr><tr><td colspan='4'>" +
+						"<div class='lfloat' style='width: 100%;'><label>指导教师评定意见：</label><textarea rows='10' " +
+						"name='content' style='width: 100%;'></textarea></div></td></tr></table>";
+			}else if(tbtopic.getTopType().trim().equals("2")) {
+				html = "<table class='table table-bordered'><tr><td>评价项目</td><td>评价指标</td><td>分值</td><td>评分" +
+						"</td></tr><tr><td>学习态度与工作量</td><td>①学习态度认真，自觉遵守纪律；②工作作风严谨务实，具有良好的团队精神；" +
+						"③工作量饱满，按期圆满完成规定的任务。</td><td>10</td><td><input type='text' name='one' " +
+						"class='input-mini'/></td></tr><tr><td>文献综述与外文翻译</td><td>①能独立查阅文献和从事其他形式调研；" +
+						"②能较好理解课题任务并提出实施方案；③具有收集、整理各种信息及获取新知识的能力，查阅文献有一定广泛性；④文献综述撰写规范，" +
+						"外文翻译符合规定要求，译文准确，质量好；⑤文献综述、外文翻译与研究课题密切相关，文献数量符合相关要求。</td><td>20</td>" +
+						"<td><input type='text' name='two' class='input-mini'/></td></tr><tr><td>研究水平与实际能力" +
+						"</td><td>①能独立开展研究工作；②能熟练掌握和运用所学专业基本理论、基本知识和基本技能分析解决相关理论和实际问题" +
+						"；③论点正确、鲜明，阐述清楚，对研究的问题有较强的分析和概括能力，有一定深度；④论据充分，材料翔实可靠，说服力强。</td>" +
+						"<td>30</td><td><input type='text' name='three' class='input-mini'/></td></tr><tr>" +
+						"<td>论文撰写质量</td><td>①论文结构严谨，逻辑性强，论述层次清晰；②语句通畅，语言准确、生动；③论文格式符合规范要求；" +
+						"④图表完备、整洁，编号齐全。</td><td>30</td><td><input type='text' name='four' " +
+						"class='input-mini'/></td></tr><tr><td>学术水平与创新</td><td>①具有一定的学术水平或应用价值；" +
+						"②对与课题相关的理论或实际问题有较深刻的认识，有新的见解，有一定的创新。</td><td>10</td><td>" +
+						"<input type='text' name='five' class='input-mini'/></td></tr><tr><td colspan='4'>" +
+						"<div class='rfloat'>总分：<input type='text' name='all' class='input-mini'/></div>" +
+						"</td></tr><tr><td colspan='4'><div class='lfloat' style='width: 100%;'><label>" +
+						"指导教师评定意见：</label><textarea rows='10' name='content' style='width: 100%;'>" +
+						"</textarea></div></td></tr></table>";
+			}else if(tbtopic.getTopType().trim().equals("3")) {
+				html = "<table class='table table-bordered'><tr><td>评价项目</td><td>评价指标</td><td>分值</td><td>评分" +
+						"</td></tr><tr><td>学习态度与工作量</td><td>①学习态度认真，自觉遵守纪律；②工作作风严谨务实，具有良好的团队精神；" +
+						"③工作量饱满，按期圆满完成规定的任务。</td><td>10</td><td><input type='text' name='one' " +
+						"class='input-mini'/></td></tr><tr><td>文献综述与外文翻译</td><td>①能独立查阅文献和从事其他形式调研；" +
+						"②能较好理解课题任务并提出实施方案；③具有收集、整理各种信息及获取新知识的能力，查阅文献有一定广泛性；④文献综述撰写规范，" +
+						"外文翻译符合规定要求，译文准确，质量好；⑤文献综述、外文翻译与研究课题密切相关，文献数量符合相关要求。</td><td>20</td>" +
+						"<td><input type='text' name='two' class='input-mini'/></td></tr><tr><td>设计水平与实际能力" +
+						"</td><td>①能独立开展设计工作；②能熟练掌握和运用所学专业基本理论、基本知识和基本技能分析解决相关理论和实际问题；" +
+						"③设计方案合理可行，数据准确可靠，论证充分，理论分析与计算正确；④有较强的实际动手能力、经济分析能力和现代技术应用能力。" +
+						"</td><td>20</td><td><input type='text' name='three' class='input-mini'/></td></tr>" +
+						"<tr><td>设计说明书撰写质量</td><td>①结构严谨，层次清晰，结论正确，技术用语准确；②行文流畅，语句通畅；" +
+						"③格式符合规范要求；④图表完备、整洁，符号统一，编号齐全。</td><td>20</td><td>" +
+						"<input type='text' name='four' class='input-mini'/></td></tr><tr><td>图纸质量</td>" +
+						"<td>①结构合理，工艺可行；②图样绘制与技术要求符合国家标准；③图面质量及工作量符合要求。</td><td>20</td><td>" +
+						"<input type='text' name='five' class='input-mini'/></td></tr><tr><td>学术水平与创新</td>" +
+						"<td>①具有一定的学术水平或应用价值；②对与课题相关的理论或实际问题有较深刻的认识，有新的见解，有一定的创新。</td>" +
+						"<td>10</td><td><input type='text' name='six' class='input-mini'/></td></tr><tr>" +
+						"<td colspan='4'><div class='rfloat'>总分：<input type='text' name='all' " +
+						"class='input-mini'/></div></td></tr><tr><td colspan='4'><div class='lfloat' " +
+						"style='width: 100%;'><label>指导教师评定意见：</label><textarea rows='10' name='content' " +
+						"style='width: 100%;'></textarea></div></td></tr></table>";
+			}
+			HResponse.write("{\"rs\": true, \"html\": \"" + html + "\"}", response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			HResponse.errorJSON("服务器繁忙，请稍后再试", response);
 		}
 	}
 }

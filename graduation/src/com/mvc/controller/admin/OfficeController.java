@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.RequestSetAttribute;
 import com.mvc.entity.Tboffice;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.TbofficeService;
 
 /**
@@ -32,9 +33,10 @@ public class OfficeController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-14 下午7:15:03
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/intoPerfile.do")
-	public ModelAndView intoPerfile(HttpServletRequest request, ModelMap modelMap){
+	public ModelAndView intoPerfile(HttpServletRequest request, ModelMap modelMap) throws VerifyException{
 		String offId = (String) request.getSession().getAttribute("user_id");
 		System.out.println(offId);
 		Tboffice tbOffice = new Tboffice();
@@ -59,9 +61,10 @@ public class OfficeController {
 	 * @author Happy_Jqc@163.com
 	 * @date 2014-7-14 下午7:22:11
 	 * @return String
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/perfile.do")
-	public String perfile(HttpServletRequest request){
+	public String perfile(HttpServletRequest request) throws VerifyException{
 		String offEmail = request.getParameter("email");
 		String offId = (String) request.getSession().getAttribute("user_id");
 		

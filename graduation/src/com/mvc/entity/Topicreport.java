@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Topicreport entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "topicreport", catalog = "graduation")
+@Table(name = "topicreport")
 public class Topicreport implements java.io.Serializable {
 
 	// Fields
@@ -43,10 +43,8 @@ public class Topicreport implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Topicreport(String stuId, String departmentId, String meaning,
-			String content, String research, String deadline,
-			String referencesl, String teacherView, String meeting,
-			String judgeView, String departmentView, String createTime) {
+	public Topicreport(String stuId, String departmentId, String meaning, String content, String research, String deadline, String referencesl,
+			String teacherView, String meeting, String judgeView, String departmentView, String createTime) {
 		this.stuId = stuId;
 		this.departmentId = departmentId;
 		this.meaning = meaning;

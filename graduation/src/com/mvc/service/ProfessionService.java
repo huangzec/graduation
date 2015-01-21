@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.ProfessionDao;
 import com.mvc.entity.Profession;
+import com.mvc.exception.VerifyException;
 
 /**
  * 专业服务层
@@ -41,8 +42,9 @@ public class ProfessionService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午03:49:14
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneProfession(Profession profession) {
+	public void addOneProfession(Profession profession) throws VerifyException {
 		professionDao.save(profession);		
 	}
 
@@ -53,9 +55,10 @@ public class ProfessionService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午04:06:34
 	 * @return List<Profession>
+	 * @throws VerifyException 
 	 */
 	public List<Profession> getAllRecordByPages(String where,
-			Pagination pagination) {
+			Pagination pagination) throws VerifyException {
 		
 		return professionDao.getAllRecordByPages(where, pagination);
 	}
@@ -67,8 +70,9 @@ public class ProfessionService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午05:08:39
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneProfession(Profession profession) {
+	public void removeOneProfession(Profession profession) throws VerifyException {
 		professionDao.remove(profession);		
 	}
 
@@ -79,8 +83,9 @@ public class ProfessionService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午07:05:00
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneProfession(Profession profession) {
+	public void editOneProfession(Profession profession) throws VerifyException {
 		professionDao.update(profession);		
 	}
 
@@ -91,8 +96,9 @@ public class ProfessionService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 上午10:34:30
 	 * @return List
+	 * @throws VerifyException 
 	 */
-	public List getAllRowsByWhere(String where) {
+	public List getAllRowsByWhere(String where) throws VerifyException {
 		
 		return professionDao.getAll(where);
 	}
@@ -108,6 +114,19 @@ public class ProfessionService {
 	public Map<String, String> getLinkedRecordByWhere(String prowhere) {
 		
 		return professionDao.getLinkedRecordByWhere(prowhere);
+	}
+
+	/**
+	 * 通过where条件获取一条记录
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param where
+	 * @return
+	 * @throws VerifyException 
+	 */
+	public Profession getRecordByWhere(String where) throws VerifyException {
+		
+		return professionDao.getOne(where);
 	}
 	
 }

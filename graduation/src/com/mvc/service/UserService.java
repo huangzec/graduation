@@ -11,6 +11,7 @@ import com.mvc.dao.EntityDao;
 import com.mvc.dao.UserDao;
 import com.mvc.entity.Student;
 import com.mvc.entity.User;
+import com.mvc.exception.VerifyException;
 
 @Service
 public class UserService {
@@ -53,8 +54,9 @@ public class UserService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-12 下午02:04:09
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneUser(User user) {
+	public void editOneUser(User user) throws VerifyException {
 		userDao.update(user);
 		
 	}
@@ -66,8 +68,9 @@ public class UserService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-10 下午09:32:26
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOneUser(User user) {
+	public void addOneUser(User user) throws VerifyException {
 		userDao.save(user);
 		
 	}
@@ -92,9 +95,10 @@ public class UserService {
 		return entityDao.getAllRecordByPages(where, pagination);
 	}
 
-	/***********/
+	/**
+	 * @throws VerifyException *********/
 	
-	public User getOneUser(String where) {
+	public User getOneUser(String where) throws VerifyException {
 		//得到一个用户
 		return userDao.getOne(where);
 	}

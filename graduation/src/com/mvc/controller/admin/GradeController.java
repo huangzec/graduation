@@ -12,12 +12,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.mvc.common.ArrayUtil;
+import com.mvc.common.HResponse;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
+import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Profession;
 import com.mvc.entity.Tbgrade;
 import com.mvc.entity.Teacher;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.TbgradeService;
 
 /**
@@ -95,15 +99,15 @@ public class GradeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 上午12:32:25
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/add.do")
-	public ModelAndView add(HttpServletRequest request, HttpServletResponse reHttpServletResponse)
+	public ModelAndView add(HttpServletRequest request, HttpServletResponse reHttpServletResponse) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
 		String number 	= request.getParameter("number");
-		if(number.trim() == null) {
-			mav.addObject("message", "届数不能为空");
+		if(!this._verifyData(request)) {
 			mav.addObject("statusCode", 300);
 			mav.setViewName("public/ajaxDone");
 			
@@ -112,7 +116,7 @@ public class GradeController {
 		String where = "from Tbgrade where 1 = 1 AND deptId ='" +
 		department.getDeptId() + "' AND graNumber = '" + number.trim() + "'";
 		Tbgrade tbgrade = tbgradeService.getRecordByWhere(where);
-		if(tbgrade != null) {
+		if(!Verify.isEmpty(tbgrade)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录已存在");
 			mav.setViewName("public/ajaxDone");
@@ -134,26 +138,50 @@ public class GradeController {
 	}
 	
 	/**
+	 * 数据验证
+	 *  
+	 * @Description  
+	 * @author huangzec@foxmail.com
+	 * @date 2014-7-15 下午03:28:10
+	 * @return boolean
+	 */
+	protected boolean _verifyData(HttpServletRequest request) {
+		String number 	= request.getParameter("number");
+		if(Verify.isEmpty(number)) {
+			request.setAttribute("message", "届数不能为空");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(number, 1, 8)) {
+			request.setAttribute("message", "届数不超过8个字符");
+			
+			return false;
+		}
+		
+		return true;
+	}
+
+	/**
 	 * 年级列表
 	 *  
 	 * @Description  
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午12:54:31
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/list.do")
-	public ModelAndView list(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView list(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -257,23 +285,30 @@ public class GradeController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-15 下午01:50:16
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/edit.do")
-	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
 		String id 		= request.getParameter("id");
 		String number 	= request.getParameter("number");
-		if(number.trim() == null) {
-			mav.addObject("message", "届数不能为空");
+		if(Verify.isEmpty(id)) {
+			mav.addObject("statusCode", 300);
+			mav.addObject("message", "id不能为空");
+			mav.setViewName("public/ajaxDone");
+			
+			return mav;
+		}
+		if(!this._verifyData(request)) {
 			mav.addObject("statusCode", 300);
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
 		Tbgrade tbgrade = tbgradeService.getOneGradeById(Integer.parseInt(id));
-		if(tbgrade == null) {
+		if(Verify.isEmpty(tbgrade)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -283,7 +318,7 @@ public class GradeController {
 		String where = "from Tbgrade where 1 = 1 AND deptId ='" +
 		department.getDeptId() + "' AND graNumber = '" + number.trim() + "'";
 		Tbgrade temptbgrade = tbgradeService.getRecordByWhere(where);
-		if(temptbgrade != null) {
+		if(!Verify.isEmpty(temptbgrade)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录已存在");
 			mav.setViewName("public/ajaxDone");
@@ -302,4 +337,31 @@ public class GradeController {
 		return mav;
 	}
 
+	/**
+	 * 异步加载年级数据
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/ajaxloaddata.do")
+	public void ajaxLoaddata(HttpServletRequest request, HttpServletResponse response)
+	{
+		String dept 	= request.getParameter("dept");
+		if(Verify.isEmpty(dept)) {
+			HResponse.errorJSON(response);
+			
+			return;
+		}
+		String where = "from Tbgrade where deptId = '" + dept.trim() + "' order by graNumber desc ";
+		try {
+			List<Tbgrade> tempList = tbgradeService.getAllRowsByWhere(where);
+			
+			HResponse.okJSON(null, ArrayUtil.listToJson("graId", "graNumber", tempList), response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			HResponse.errorJSON(response);
+		}
+	}
 }

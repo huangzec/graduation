@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.mvc.common.FileUtil;
+import com.mvc.exception.VerifyException;
 
 public class FileTest {
 
@@ -30,7 +31,7 @@ public class FileTest {
 	}
 
 	@Test
-	public void testIsExists() throws NotFoundException {
+	public void testIsExists() throws NotFoundException, VerifyException {
 		FileUtil.isExists("FileUtilTest.java");
 	}
 

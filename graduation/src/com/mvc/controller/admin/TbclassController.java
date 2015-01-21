@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mvc.common.ArrayUtil;
+import com.mvc.common.HResponse;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
 import com.mvc.common.SqlUtil;
@@ -21,6 +22,7 @@ import com.mvc.entity.Department;
 import com.mvc.entity.Profession;
 import com.mvc.entity.Tbclass;
 import com.mvc.entity.Tbgrade;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.ProfessionService;
 import com.mvc.service.TbclassService;
 import com.mvc.service.TbgradeService;
@@ -47,7 +49,7 @@ public class TbclassController {
 	private List<Profession> list = new ArrayList<Profession>();
 	
 	private int pageNum = 1;//页数
-	private int numPerPage = 10;//每页显示多少条
+	private int numPerPage = 20;//每页显示多少条
 	
 	public Pagination getPagination() {
 		return pagination;
@@ -88,14 +90,18 @@ public class TbclassController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 上午09:51:46
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/addview.do")
-	public ModelAndView addView(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView addView(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
 		String where = "from Profession where 1 = 1 AND deptId = '" + department.getDeptId() + "'";
+		String gradeWhere 	= "from Tbgrade where deptId = '" + department.getDeptId() + "' order by graNumber desc ";
 		List professionList = professionService.getAllRowsByWhere(where);
+		List gradeList 		= tbgradeService.getAllRowsByWhere(gradeWhere);
+		mav.addObject("gradeList", gradeList);
 		mav.addObject("professionList", professionList);
 		mav.setViewName("admin/tbclass/add");
 		
@@ -109,23 +115,23 @@ public class TbclassController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 上午09:53:02
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/add.do")
-	public ModelAndView add(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView add(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		String id 		= request.getParameter("id");
 		String name 	= request.getParameter("name");
 		String proId  	= request.getParameter("parent_id");
-		if(id.trim().equals("")) {
+		if(!this._verifyData(request)) {
 			mav.addObject("statusCode", 300);
-			mav.addObject("message", "班级编号不能为空");
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
-		Tbclass tbclass = tbclassService.getOneById(Integer.parseInt(id));
-		if(tbclass != null) {
+		Tbclass tbclass = tbclassService.getRecordByWhere("from Tbclass where claId = '" + id + "' ");
+		if(!Verify.isEmpty(tbclass)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "班级编号已存在");
 			mav.setViewName("public/ajaxDone");
@@ -133,7 +139,7 @@ public class TbclassController {
 			return mav;
 		}
 		tbclass = new Tbclass();
-		tbclass.setClaId(Integer.parseInt(id));
+		tbclass.setClaId(id.trim());
 		tbclass.setClaName(name);
 		tbclass.setProId(proId);
 		try{
@@ -159,15 +165,17 @@ public class TbclassController {
 	public ModelAndView list(HttpServletRequest request, ModelMap modelMap )
 	{
 		ModelAndView mav = new ModelAndView();
-		Department department = (Department) request.getSession().getAttribute("department");
-		if(!(request.getParameter("pageNum") == null))
+		mav.setViewName("admin/tbclass/list");
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String grade 			= request.getParameter("grade");
+		String profession 		= request.getParameter("profession");
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
-		System.out.println("pageNum =  " + pageNum);
 		if(pagination == null){
 			pagination = new Pagination(numPerPage);
 		}
@@ -179,23 +187,83 @@ public class TbclassController {
 		if(pagination.getTotalPage() != 0 && pagination.getCurrentPage() > pagination.getTotalPage()) {
 			pagination.setCurrentPage(pagination.getTotalPage());
 		}
-		String where = "from Tbclass tbc where tbc.proId IN (select pro.proId from Profession pro where pro.deptId = '" + department.getDeptId() + "') order by tbc.claId desc";
-		list = professionService.getAllRecordByPages(where, pagination);
-		if(list == null || list.size() < 1) {
-			mav.setViewName("admin/profession/list");
-			
-			return mav;
+		mav.addObject("grade", grade);
+		mav.addObject("profession", profession);
+		String where = "from Tbclass tbc where tbc.proId IN (select pro.proId from Profession pro where pro.deptId = '" 
+				+ department.getDeptId() + "') order by tbc.claId desc";
+		if(!Verify.isEmpty(grade)) {
+			//如果年级不为空
+			where = "from Tbclass tbc where tbc.proId IN (select pro.proId from Profession pro where pro.deptId = '" 
+					+ department.getDeptId() + "' AND pro.graId = " + Integer.parseInt(grade) +
+					") order by tbc.claId desc";
 		}
-		if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
-			pagination.setCurrentPage(pagination.getCurrentPage() - 1);
-			list = (List<Profession>) professionService.getAllRecordByPages(where, pagination);
+		if(!Verify.isEmpty(grade) && !Verify.isEmpty(profession)) {
+			//如果年级不为空 ，并且专业不为空
+			where = "from Tbclass tbc where tbc.proId = (select pro.proId from Profession pro where pro.deptId = '" 
+					+ department.getDeptId() + "' AND pro.graId = " + Integer.parseInt(grade) +
+					" AND pro.proId = '" + profession + "') order by tbc.claId desc";
 		}
-		RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
-		mav.setViewName("admin/tbclass/list");
-		mav.addObject("department", department);
-		_assignProfessionListMap(list, request);
+		try {
+			_assignTbgradeList(request);
+			_assignProfession(request);
+			list = professionService.getAllRecordByPages(where, pagination);
+			if(list == null || list.size() < 1) {
+				
+				return mav;
+			}
+			if(this.list.size() == 0 && pagination.getCurrentPage() != 1) {
+				pagination.setCurrentPage(pagination.getCurrentPage() - 1);
+				list = (List<Profession>) professionService.getAllRecordByPages(where, pagination);
+			}
+			RequestSetAttribute.setPageAttribute("", pagination, list, modelMap);
+			mav.addObject("department", department);
+			_assignProfessionListMap(list, request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return mav;
+	}
+	
+	/**
+	 * 加载年级列表
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private void _assignTbgradeList(HttpServletRequest request) throws VerifyException 
+	{
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String where 			= "from Tbgrade where deptId = '" + department.getDeptId() + "' order by graNumber desc ";
+		
+		request.setAttribute(
+				"gradeList",
+				tbgradeService.getAllRowsByWhere(where)
+				);		
+	}
+	
+	/**
+	 * 加载专业列表
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException 
+	 */
+	private void _assignProfession(HttpServletRequest request) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String grade 			= request.getParameter("grade");
+		if(Verify.isEmpty(grade)) {
+			return;
+		}
+		String where = "from Profession where deptId = '" + department.getDeptId() + 
+				"' AND graId = " + Integer.parseInt(grade);
+		
+		request.setAttribute(
+				"professionList",
+				professionService.getAllRowsByWhere(where)
+				);
 	}
 	
 	/**
@@ -205,9 +273,10 @@ public class TbclassController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-6 下午09:37:41
 	 * @return void
+	 * @throws VerifyException 
 	 */
 	@SuppressWarnings("unchecked")
-	private void _assignProfessionListMap(List<?> data, HttpServletRequest request) {
+	private void _assignProfessionListMap(List<?> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}
@@ -227,21 +296,22 @@ public class TbclassController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 上午09:58:18
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/delete.do")
-	public ModelAndView delete(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView delete(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		String id 	= request.getParameter("id");
-		if(id == null || id.trim().equals("")) {
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "ID不能为空");
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
-		Tbclass tbclass = tbclassService.getOneById(Integer.parseInt(id));
-		if(tbclass == null) {
+		Tbclass tbclass = tbclassService.getRecordByWhere("from Tbclass where claId = '" + id + "' ");
+		if(Verify.isEmpty(tbclass)) {
 			request.setAttribute("statusCode", 300);
 			request.setAttribute("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -273,22 +343,44 @@ public class TbclassController {
 		ModelAndView mav = new ModelAndView();
 		Department department = (Department) request.getSession().getAttribute("department");
 		String id 	= request.getParameter("id");
-		Tbclass tbclass = tbclassService.getOneById(Integer.parseInt(id));
-		if(tbclass == null) {
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("statusCode", 300);
-			request.setAttribute("message", "记录不存在");
+			request.setAttribute("message", "id不能为空");
 			mav.setViewName("public/ajaxDone");
 			
 			return mav;
 		}
-		String where = "from Profession where 1 = 1 AND deptId = '" + department.getDeptId() + "'";
-		List professionList = professionService.getAllRowsByWhere(where);
-		mav.addObject("professionList", professionList);
-		mav.addObject("department", department);
-		mav.addObject("tbclass", tbclass);
-		mav.setViewName("admin/tbclass/edit");
-		
-		return mav;
+		try {
+			Tbclass tbclass = tbclassService.getRecordByWhere("from Tbclass where claId = '" + id + "' ");
+			if(Verify.isEmpty(tbclass)) {
+				request.setAttribute("statusCode", 300);
+				request.setAttribute("message", "记录不存在");
+				mav.setViewName("public/ajaxDone");
+				
+				return mav;
+			}
+			String where = "from Profession where 1 = 1 AND deptId = '" + department.getDeptId() + "'";
+			_assignTbgradeList(request);
+			String gradeWhere 	= "from Tbgrade where deptId = '" + department.getDeptId() + "' AND graId = (" +
+					"select p.graId from Profession p where p.proId = (" +
+					"select c.proId from Tbclass c where c.claId = '"+ tbclass.getClaId() + "'))";
+			Tbgrade tbgrade 	= tbgradeService.getRecordByWhere(gradeWhere);
+			List professionList = professionService.getAllRowsByWhere(where);
+			mav.addObject("tbgrade", tbgrade);
+			mav.addObject("professionList", professionList);
+			mav.addObject("department", department);
+			mav.addObject("tbclass", tbclass);
+			mav.setViewName("admin/tbclass/edit");
+			
+			return mav;
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("statusCode", 300);
+			request.setAttribute("message", "服务器繁忙，请稍后再试");
+			mav.setViewName("public/ajaxDone");
+			
+			return mav;
+		}
 	}
 	
 	/**
@@ -298,9 +390,10 @@ public class TbclassController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-7-16 上午09:56:41
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/edit.do")
-	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView edit(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		String id 		= request.getParameter("id");
@@ -311,8 +404,8 @@ public class TbclassController {
 			
 			return mav;
 		}
-		Tbclass tbclass = tbclassService.getOneById(Integer.parseInt(id));
-		if(tbclass == null) {
+		Tbclass tbclass = tbclassService.getRecordByWhere("from Tbclass where claId = '" + id + "' ");
+		if(Verify.isEmpty(tbclass)) {
 			mav.addObject("statusCode", 300);
 			mav.addObject("message", "记录不存在");
 			mav.setViewName("public/ajaxDone");
@@ -320,7 +413,7 @@ public class TbclassController {
 			return mav;
 		}
 		tbclass.setClaName(name);
-		tbclass.setProId(request.getParameter("parent_id"));
+		tbclass.setProId(request.getParameter("parent_id").toString());
 		try{
 			tbclassService.editOneTbclass(tbclass);
 			RequestSetAttribute.requestSetAttribute(request, 200, "closeCurrent", "修改成功", "tbclasslist", "/admin/tbclass/list.do");
@@ -343,13 +436,34 @@ public class TbclassController {
 	protected boolean _verifyData(HttpServletRequest request) {
 		String id  	= request.getParameter("id");
 		String name = request.getParameter("name");
-		if(id.trim().equals("")) {
+		String proId  	= request.getParameter("parent_id");
+		if(Verify.isEmpty(id)) {
 			request.setAttribute("message", "班级编号不能为空");
 			
 			return false;
 		}
-		if(name.trim().equals("")) {
+		if(Verify.isEmpty(name)) {
 			request.setAttribute("message", "班级名称不能为空");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(id, 1, 64)) {
+			request.setAttribute("message", "班级编号不能超过64个字符");
+			
+			return false;
+		}
+		if(!Verify.isStrLen(name, 1, 64)) {
+			request.setAttribute("message", "班级名称不能超过64个字符");
+			
+			return false;
+		}
+		if(!Verify.isNumber(id)) {
+			request.setAttribute("message", "班级编号不是一个数字");
+			
+			return false;
+		}
+		if(Verify.isEmpty(proId)) {
+			request.setAttribute("message", "请先添加专业");
 			
 			return false;
 		}
@@ -357,4 +471,37 @@ public class TbclassController {
 		return true;
 	}
 
+	/**
+	 * 异步加载班级数据
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/ajaxloaddata.do")
+	public void ajaxLoaddata(HttpServletRequest request, HttpServletResponse response)
+	{
+		Department department 	= (Department) request.getSession().getAttribute("department");
+		String dept 	= request.getParameter("dept");
+		String grade 	= request.getParameter("grade");
+		String profess 	= request.getParameter("profess");
+		if(Verify.isEmpty(grade)) {
+			return;
+		}
+		if(Verify.isEmpty(profess)) {
+			return;
+		}
+		String where = "from Tbclass c where c.proId = (" +
+				"select p.proId from Profession p where p.graId = " + Integer.parseInt(grade) + 
+				" AND p.deptId = '" + (Verify.isEmpty(dept) ? department.getDeptId() : dept.trim()) + "' AND p.proId = '" + profess + "' )";
+		try {
+			List<Tbclass> tempList = tbclassService.getAllRows(where);
+			
+			HResponse.okJSON(null, ArrayUtil.listToJson("claId", "claName", tempList), response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			HResponse.errorJSON(response);
+		}
+	}
 }

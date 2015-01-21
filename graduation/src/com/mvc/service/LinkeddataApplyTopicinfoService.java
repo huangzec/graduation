@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.mvc.common.Pagination;
 import com.mvc.dao.LinkeddataApplyTopicinfoDao;
 import com.mvc.entity.LinkeddataApplyTopicinfo;
+import com.mvc.exception.VerifyException;
 
 /**
  * 答辩申请与开题答辩信息表关联服务层
@@ -27,8 +28,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 09:56:50
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void addOne(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) {
+	public void addOne(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) throws VerifyException {
 		linkeddataApplyTopicinfoDao.save(linkeddataApplyTopicinfo);		
 	}
 
@@ -52,8 +54,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 09:56:50
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void removeOneLinkeddataApplyTopicinfo(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) {
+	public void removeOneLinkeddataApplyTopicinfo(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) throws VerifyException {
 		linkeddataApplyTopicinfoDao.remove(linkeddataApplyTopicinfo);		
 	}
 
@@ -64,8 +67,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 09:56:50
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	public void editOneLinkeddataApplyTopicinfo(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) {
+	public void editOneLinkeddataApplyTopicinfo(LinkeddataApplyTopicinfo linkeddataApplyTopicinfo) throws VerifyException {
 		linkeddataApplyTopicinfoDao.update(linkeddataApplyTopicinfo);		
 	}
 
@@ -76,8 +80,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 09:56:50
 	 * @return List<LinkeddataApplyTopicinfo>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyTopicinfo> getAllRowsByWhere(String where) {
+	public List<LinkeddataApplyTopicinfo> getAllRowsByWhere(String where) throws VerifyException {
 		
 		return linkeddataApplyTopicinfoDao.getAll(where);
 	}
@@ -89,8 +94,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-10-11 09:56:50
 	 * @return List<LinkeddataApplyTopicinfo>
+	 * @throws VerifyException 
 	 */
-	public List<LinkeddataApplyTopicinfo> getAllRecordByPages(String where, Pagination pagination) {
+	public List<LinkeddataApplyTopicinfo> getAllRecordByPages(String where, Pagination pagination) throws VerifyException {
 		return linkeddataApplyTopicinfoDao.getAllRecordByPages(where, pagination);
 	}
 
@@ -111,8 +117,9 @@ public class LinkeddataApplyTopicinfoService {
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param where
 	 * @return
+	 * @throws VerifyException 
 	 */
-	public LinkeddataApplyTopicinfo getRecordByWhere(String where) {
+	public LinkeddataApplyTopicinfo getRecordByWhere(String where) throws VerifyException {
 		return linkeddataApplyTopicinfoDao.getOne(where);
 	}
 	

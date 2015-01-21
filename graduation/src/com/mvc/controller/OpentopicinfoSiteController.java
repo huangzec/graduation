@@ -16,8 +16,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.mvc.common.ArrayUtil;
 import com.mvc.common.HResponse;
 import com.mvc.common.Pagination;
+import com.mvc.common.Path;
 import com.mvc.common.SqlUtil;
 import com.mvc.common.Verify;
+import com.mvc.dao.SelectfirstDao;
 import com.mvc.entity.Apply;
 import com.mvc.entity.Department;
 import com.mvc.entity.LinkeddataApplyTopicinfo;
@@ -26,8 +28,10 @@ import com.mvc.entity.LinkeddataApplyTopicscore;
 import com.mvc.entity.Meeting;
 import com.mvc.entity.Opentopicinfo;
 import com.mvc.entity.Opentopicscore;
+import com.mvc.entity.Selectfirst;
 import com.mvc.entity.Student;
 import com.mvc.entity.Topicreport;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.ApplyService;
 import com.mvc.service.LinkeddataApplyTopicinfoService;
 import com.mvc.service.LinkeddataApplyTopicreportService;
@@ -36,6 +40,7 @@ import com.mvc.service.MeetingService;
 import com.mvc.service.OpentopicinfoService;
 import com.mvc.service.OpentopicscoreService;
 import com.mvc.service.StudentService;
+import com.mvc.service.TbgradeService;
 import com.mvc.service.TopicreportService;
 
 /**
@@ -74,6 +79,12 @@ public class OpentopicinfoSiteController {
 	
 	@Autowired
 	private ApplyService applyService;
+	
+	@Autowired
+	private SelectfirstDao selectfirstDao;
+	
+	@Autowired
+	private TbgradeService tbgradeService;
 	
 	private Pagination pagination;
 	private List<Opentopicinfo> list = new ArrayList<Opentopicinfo>();
@@ -154,13 +165,14 @@ public class OpentopicinfoSiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-09-05 17:27:13
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/list.do")
-	public ModelAndView list(HttpServletRequest request, ModelMap modelMap )
+	public ModelAndView list(HttpServletRequest request, ModelMap modelMap ) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/Opentopicinfo/list");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
@@ -252,9 +264,10 @@ public class OpentopicinfoSiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-29 下午08:35:36
 	 * @return ModelAndView
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/enteroptscore.do")
-	public ModelAndView enterOptScore(HttpServletRequest request, ModelMap modelMap)
+	public ModelAndView enterOptScore(HttpServletRequest request, ModelMap modelMap) throws VerifyException
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/teacher/enterscore-list");
@@ -278,8 +291,9 @@ public class OpentopicinfoSiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-22 下午03:34:46
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private void _assignStudentListMap(List<Opentopicinfo> data, HttpServletRequest request) {
+	private void _assignStudentListMap(List<Opentopicinfo> data, HttpServletRequest request) throws VerifyException {
 		if(Verify.isEmpty(data)) {
 			return;
 		}
@@ -299,9 +313,10 @@ public class OpentopicinfoSiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-30 下午05:40:28
 	 * @return void
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/enterscorecontent.do")
-	public void enterScoreContent(HttpServletRequest request, HttpServletResponse response)
+	public void enterScoreContent(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		String opid 	= request.getParameter("opid");
 		String where 	= "from LinkeddataApplyTopicinfo where relId = '" + opid + "' ";
@@ -359,8 +374,9 @@ public class OpentopicinfoSiteController {
 	 *  
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param request
+	 * @throws VerifyException 
 	 */
-	private void _assignLinkeddataApplyTopicscore(HttpServletRequest request)
+	private void _assignLinkeddataApplyTopicscore(HttpServletRequest request) throws VerifyException
 	{
 		LinkeddataApplyTopicscore linkeddataApplyTopicscore = new LinkeddataApplyTopicscore();
 		linkeddataApplyTopicscore.setItemId(request.getAttribute("applyid").toString());
@@ -377,8 +393,9 @@ public class OpentopicinfoSiteController {
 	 * @author huangzec@foxmail.com
 	 * @date 2014-9-30 下午06:33:42
 	 * @return void
+	 * @throws VerifyException 
 	 */
-	private boolean _assignMeetingOpentopicReport(HttpServletRequest request)
+	private boolean _assignMeetingOpentopicReport(HttpServletRequest request) throws VerifyException
 	{
 		Department department 	= (Department) request.getSession().getAttribute("dept");
 		String studentId 		= request.getParameter("sid");
@@ -423,6 +440,163 @@ public class OpentopicinfoSiteController {
 			
 			return false;
 		}
+	}
+	
+	/**
+	 * 指导老师查看学生开题情况
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value="/situation.do")
+	public void situation(HttpServletRequest request, HttpServletResponse response)
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String grade 			= request.getParameter("grade");
+		if(Verify.isEmpty(grade)) {
+			HResponse.errorJSON(response);
+			return;
+		}
+		String data 	= "[" +
+				"{\"lable\": \"<a href='" + Path.getBasePath(request) + 
+				"user/opentopicinfo/general.do?grade=" + grade + "'>参加答辩人数： %s  人</a>\", \"data\": %s}, " +
+				"{\"lable\": \"<a href='" + Path.getBasePath(request) + 
+				"user/opentopicinfo/general.do?grade=" + grade + "'>通过答辩人数： %s 人</a>\", \"data\": %s}, " +
+				"{\"lable\": \"<a href='" + Path.getBasePath(request) + 
+				"user/opentopicinfo/general.do?grade=" + grade + "'>未通过答辩人数： %s 人</a>\", \"data\": %s}," +
+				"{\"lable\": \"<a href='" + Path.getBasePath(request) + 
+				"user/opentopicinfo/general.do?grade=" + grade + "'>未参加答辩人数： %s人</a>\", \"data\": %s}]";
+		int total 	= 0;
+		int canjia 	= 0;
+		int tongguo = 0;
+		try {
+			//学生所在年级
+			String where 	= "from Student s where s.claId IN (" +
+					"select c.claId from Tbclass c where c.proId IN (" +
+					"select p.proId from Profession p where p.graId = " + 
+					grade + " AND p.deptId = '" + department.getDeptId() + "')) ";
+			List<Student> stuList = studentService.getAllRows(where);
+			String selWhere = "from Selectfirst where deptId = '" + department.getDeptId() + 
+					"' AND teaId = '" + userid + "' AND selStatus = '1' AND  " + 
+					SqlUtil.whereIn("stuId", "stuId", stuList);
+			String optinfo 	= "from Opentopicinfo where departmentId = '" + department.getDeptId() + "' ";
+			List<Selectfirst> sefList 	= selectfirstDao.getAll(selWhere);
+			if(Verify.isEmpty(sefList)) {
+				HResponse.errorJSON(response);
+				
+				return;
+			}
+			optinfo += " AND " + SqlUtil.whereIn("stuId", "stuId", sefList) + " ";			
+			//查找开题信息
+			List<Opentopicinfo> optinfoList = opentopicinfoService.getAllRowsByWhere(optinfo);
+			total 	= sefList.size();
+			if(Verify.isEmpty(optinfoList)) {
+				data = String.format(data, "0", "0", "0", "0", "0", "0", total, total);
+				HResponse.okJSON(null, data.toString(), response);
+				
+				return;
+			}
+			//查找开题答辩分数
+			String scoreWhere = "from Opentopicscore where " + SqlUtil.whereIn("studentId", "stuId", sefList);
+			List<Opentopicscore> optscoreList 	= opentopicscoreService.getAllRowsByWhere(scoreWhere);
+			if(!Verify.isEmpty(optscoreList)) {
+				canjia = optscoreList.size();
+				for(int i = 0; i < canjia; i ++) {
+					if(optscoreList.get(i).getScore() > 60) {
+						tongguo ++;
+					}
+				}
+				data = String.format(
+						data, canjia, canjia, tongguo, tongguo, (canjia - tongguo),
+						(canjia - tongguo), (total - canjia), (total - canjia)
+						);
+				HResponse.okJSON(null, data.toString(), response);
+				
+				return;
+			}
+			canjia = optinfoList.size();
+			data = String.format(
+					data, canjia, canjia, 0, 0, canjia, canjia, (total - canjia), (total - canjia)
+					);
+			
+			HResponse.okJSON(null, data, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			HResponse.errorJSON(response);
+		}
+	}
+	
+	/**
+	 * 开题答辩详细概况
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws VerifyException 
+	 */
+	@RequestMapping(value="/general.do")
+	public ModelAndView general(HttpServletRequest request, HttpServletResponse response) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String userid 			= (String) request.getSession().getAttribute("user_id");
+		String grade 			= request.getParameter("grade");
+		ModelAndView mav 		= new ModelAndView();
+		mav.setViewName("/user/teacher/general");
+		_assignTbgradeList(request);
+		if(Verify.isEmpty(grade)) {
+			throw new VerifyException("请选择年级");
+		}
+		//学生所在年级
+		String where 	= "from Student s where s.claId IN (" +
+				"select c.claId from Tbclass c where c.proId IN (" +
+				"select p.proId from Profession p where p.graId = " + 
+				grade + " AND p.deptId = '" + department.getDeptId() + "')) ";
+		List<Student> stuList = studentService.getAllRows(where);
+		String selWhere = "from Selectfirst where deptId = '" + department.getDeptId() + 
+				"' AND teaId = '" + userid + "' AND selStatus = '1' AND  " + 
+				SqlUtil.whereIn("stuId", "stuId", stuList);
+		String optinfo 	= "from Opentopicinfo where departmentId = '" + department.getDeptId() + "' ";
+		List<Selectfirst> sefList 	= selectfirstDao.getAll(selWhere);
+		if(Verify.isEmpty(sefList)) {
+			/**
+			 * 如果没有指导学生
+			 */
+			throw new VerifyException("当前还没有指导学生");
+		}
+		//有指导学生
+		optinfo += " AND " + SqlUtil.whereIn("stuId", "stuId", sefList) + " ";			
+		//查找开题信息
+		List<Opentopicinfo> optinfoList = opentopicinfoService.getAllRowsByWhere(optinfo);
+		//查找开题答辩分数
+		String scoreWhere = "from Opentopicscore where " + SqlUtil.whereIn("studentId", "stuId", sefList);
+		List<Opentopicscore> optscoreList 	= opentopicscoreService.getAllRowsByWhere(scoreWhere);
+		request.setAttribute("stuList", stuList);
+		request.setAttribute("sefList", sefList);
+		request.setAttribute("optinfoList", optinfoList);
+		request.setAttribute("optscoreList", optscoreList);
+		request.setAttribute("stuId_map", ArrayUtil.turnListToMap("stuId", "stuName", stuList));
+				
+		return mav;
+	}
+	
+	/**
+	 * 加载年级列表
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @throws VerifyException
+	 */
+	private void _assignTbgradeList(HttpServletRequest request) throws VerifyException
+	{
+		Department department 	= (Department) request.getSession().getAttribute("dept");
+		String where 	= "from Tbgrade where deptId = '" + department.getDeptId() + 
+				"' order by graNumber desc ";
+		
+		request.setAttribute("gradeList", tbgradeService.getAllRowsByWhere(where));
 	}
 	
 }

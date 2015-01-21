@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.File;
 import java.util.regex.Matcher;
+
+import com.mvc.exception.VerifyException;
 
 import javassist.NotFoundException;
 
@@ -77,8 +80,9 @@ public class FileUtil {
 	 * @return void
 	 * @throws NotFoundException 
 	 * @throws IOException 
+	 * @throws VerifyException 
 	 */
-	public static void create(String path, Boolean override) throws NotFoundException, IOException
+	public static void create(String path, Boolean override) throws NotFoundException, IOException, VerifyException
 	{
 		File file 	= FileUtil.isExists(path);
 		if(override) {
@@ -111,6 +115,7 @@ public class FileUtil {
 			writer.flush();
 			writer.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new IOException("文件操作失败 ，信息 : " + e.getMessage() + " 文件： " + path);
 		}
 	}
@@ -146,11 +151,12 @@ public class FileUtil {
 	 * @return File
 	 * @throws NotFoundException 
 	 */
-	public static File isExists(String path) throws NotFoundException {
+	public static File isExists(String path) throws VerifyException {
 		File file 	= new File(path);
 		if(!file.exists()) {
-			throw new NotFoundException("文件不存在 " + path);
+			throw new VerifyException("文件不存在 " + path);
 		}
+		
 		return file;
 	}
 
@@ -168,5 +174,86 @@ public class FileUtil {
 		}
 		
 		return path.replaceAll("/", Matcher.quoteReplacement(File.separator));
+	}
+
+	/**
+	 * 移动指定的文件 
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param _logFilePath
+	 * @param string
+	 * @param b
+	 * @throws VerifyException 
+	 */
+	public static void move(String fromPath, String toPath, boolean isCover) throws VerifyException 
+	{
+		File to 	= new File(toPath);
+		File from 	= FileUtil.isExists(fromPath);
+		if(to.exists()) {
+			if(!isCover) {
+				throw new VerifyException("文件已经存在！路径为：" + toPath);
+			}
+			delete(toPath);
+		}
+		if(false == from.renameTo(to)) {
+			throw new VerifyException("文件上传失败，请查看是否磁盘还有空间！");
+		}
+	}
+
+	/**
+	 * 得到文件大小
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param _logFilePath
+	 * @return
+	 * @throws VerifyException 
+	 */
+	public static double size(String path) throws VerifyException 
+	{
+		File file 	= new File(path);
+		if(!file.exists()) {
+			throw new VerifyException("没有找到对应的文件");
+		}
+		
+		return file.length();
+	}
+
+	/**
+	 * 字节到M的单位转换
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param size
+	 * @return
+	 */
+	public static double byteToMb(double bytes) 
+	{
+		return bytes / 1024 / 1024;
+	}
+
+	/**
+	 * 追加文件内容到文件
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param path
+	 * @param content
+	 * @param isNew
+	 * @throws VerifyException 
+	 */
+	public static void append(String path, String content, boolean isNew) throws VerifyException 
+	{
+		try {
+			File file 	= new File(path);
+			if(!file.exists()) {
+				if(false == isNew) {
+					throw new VerifyException("文件不存在");
+				}
+				file.createNewFile();
+			}
+			FileWriter writer 	= new FileWriter(path, true);
+			writer.write(content);
+			writer.close();
+		} catch (Exception e) {
+			throw new VerifyException("文件操作失败，信息：" + e.getMessage() + "，文件：" + path);
+		}
 	}
 }

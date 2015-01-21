@@ -15,6 +15,7 @@ import com.mvc.common.Path;
 import com.mvc.common.WordUtil;
 import com.mvc.entity.Department;
 import com.mvc.entity.Topicreport;
+import com.mvc.exception.VerifyException;
 import com.mvc.service.TopicreportService;
 
 /**
@@ -37,9 +38,10 @@ public class WordController {
 	 * @author huangzec <huangzec@foxmail.com>
 	 * @param request
 	 * @param response
+	 * @throws VerifyException 
 	 */
 	@RequestMapping(value="/exportword.do")
-	public void exportWord(HttpServletRequest request, HttpServletResponse response)
+	public void exportWord(HttpServletRequest request, HttpServletResponse response) throws VerifyException
 	{
 		Department department = (Department) request.getSession().getAttribute("dept");
 		WordUtil wordUtil = new WordUtil();

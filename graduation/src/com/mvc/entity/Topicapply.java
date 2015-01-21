@@ -11,7 +11,7 @@ import javax.persistence.Table;
  * Topicapply entity. @author MyEclipse Persistence Tools
  */
 @Entity
-@Table(name = "topicapply", catalog = "graduation")
+@Table(name = "topicapply")
 public class Topicapply implements java.io.Serializable {
 
 	// Fields
@@ -34,8 +34,7 @@ public class Topicapply implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Topicapply(String userId, String topicId, String parentId,
-			String openTime, String createTime) {
+	public Topicapply(String userId, String topicId, String parentId, String openTime, String createTime) {
 		this.userId = userId;
 		this.topicId = topicId;
 		this.parentId = parentId;
@@ -44,9 +43,8 @@ public class Topicapply implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Topicapply(String userId, String topicId, String parentId,
-			String openTime, String knowing, String teacherIdea,
-			String paperIdea, String departmentIdea, String createTime) {
+	public Topicapply(String userId, String topicId, String parentId, String openTime, String knowing, String teacherIdea, String paperIdea,
+			String departmentIdea, String createTime) {
 		this.userId = userId;
 		this.topicId = topicId;
 		this.parentId = parentId;

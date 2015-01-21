@@ -114,11 +114,11 @@ public class {entityName}SiteController {
 	{
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("user/{entityNameFirstLow}/list");
-		if(!(request.getParameter("pageNum") == null))
+		if(!Verify.isEmpty(request.getParameter("pageNum")))
 		{
 			pageNum = Integer.parseInt(request.getParameter("pageNum"));
 		}
-		if(!(request.getParameter("numPerPage") == null)) {
+		if(!Verify.isEmpty(request.getParameter("numPerPage"))) {
 			numPerPage = Integer.parseInt(request.getParameter("numPerPage"));
 		};
 		if(pagination == null){

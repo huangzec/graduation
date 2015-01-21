@@ -8,7 +8,10 @@
 		<property name="driverClassName" value="${jdbc.driverClassName}"/>
 		<property name="url" value="${jdbc.url}"/>
 		<property name="username" value="${jdbc.username}"/>
-		<property name="password" value="${jdbc.password}"/>		
+		<property name="password" value="${jdbc.password}"/>	
+		<property name="validationQuery" value="SELECT 1"/>  
+		<property name="testOnBorrow" value="true" />  
+		<property name="testOnReturn" value="false" />  		
 	</bean>
 	
 	<bean class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" id="sessionFactory">
@@ -61,7 +64,7 @@
 	
 	<!--  <context:property-placeholder location="classpath:/hibernate.properties" />-->
 
-	<bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate" p:dataSource-ref="dataSource"/>
+	<!-- <bean class="org.springframework.jdbc.core.JdbcTemplate" id="jdbcTemplate" p:dataSource-ref="dataSource"/>-->
 	
 	<!-- Dao的实现 -->
 	<bean class="com.mvc.dao.EntityDaoImpl" id="entityDao">  
@@ -176,27 +179,42 @@
 		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
 	<bean class="com.mvc.dao.LinkeddataApplyTopicreportDao" id="linkeddataApplyTopicreportDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyTopicapplyDao" id="linkeddataApplyTopicapplyDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyTopicfinishDao" id="linkeddataApplyTopicfinishDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyTopicinfoDao" id="linkeddataApplyTopicinfoDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyTopicscoreDao" id="linkeddataApplyTopicscoreDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyGraduateinfoDao" id="linkeddataApplyGraduateinfoDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyGradethreeDao" id="linkeddataApplyGradethreeDao">
-<property name="sessionFactory" ref="sessionFactory"/>
-</bean>
-<bean class="com.mvc.dao.LinkeddataApplyGradeallDao" id="linkeddataApplyGradeallDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyTopicapplyDao" id="linkeddataApplyTopicapplyDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyTopicfinishDao" id="linkeddataApplyTopicfinishDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyTopicinfoDao" id="linkeddataApplyTopicinfoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyTopicscoreDao" id="linkeddataApplyTopicscoreDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyGraduateinfoDao" id="linkeddataApplyGraduateinfoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyGradethreeDao" id="linkeddataApplyGradethreeDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataApplyGradeallDao" id="linkeddataApplyGradeallDao">
+	<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TballdocDao" id="tballdocDao">
+	<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.LinkeddataMeetingGraduateinfoDao" id="linkeddataMeetingGraduateinfoDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TopicorderreviewDao" id="topicorderreviewDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.TbdocnumDao" id="tbdocnumDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean class="com.mvc.dao.ReviewresultDao" id="reviewresultDao">
 <property name="sessionFactory" ref="sessionFactory"/>
 </bean>
 <bean class="com.mvc.dao.ActorDaoImpl" id="actorDaoImpl">  

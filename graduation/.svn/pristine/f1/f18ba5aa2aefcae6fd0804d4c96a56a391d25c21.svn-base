@@ -1,7 +1,0 @@
-package com.mvc.dao;
-
-import com.mvc.entity.Tbgrade;
-
-public class TbgradeDao extends BaseDao<Tbgrade>{
-
-}

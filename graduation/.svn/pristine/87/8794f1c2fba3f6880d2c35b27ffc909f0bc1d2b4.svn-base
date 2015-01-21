@@ -1,8 +1,0 @@
-.clearfix { clear: both; }
-.normal { font-size: 14px;  background-color: #864765; color:#33c39e; }
- #first-li { color: yellow; }
-.first-li { color: #ff0000; font-weight: bold; }
-.hide { display: none; }
-.red-txt { color: #ff0000; }
-.txt-center { text-align: center; }
-.table ul li{float: left;width: 400px;line-height: 40px;}

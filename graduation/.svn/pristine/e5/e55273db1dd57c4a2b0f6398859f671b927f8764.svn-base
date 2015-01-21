@@ -1,7 +1,0 @@
-package com.mvc.dao;
-
-import com.mvc.entity.Student;
-
-public class StudentDao extends BaseDao<Student> {
-
-}

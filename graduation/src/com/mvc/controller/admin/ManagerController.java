@@ -32,6 +32,7 @@ import com.mvc.common.MapUtil;
 import com.mvc.common.Pagination;
 import com.mvc.common.RequestSetAttribute;
 import com.mvc.common.SqlUtil;
+import com.mvc.common.StringUtil;
 import com.mvc.common.Verify;
 import com.mvc.entity.Department;
 import com.mvc.entity.Deptmanager;
@@ -295,21 +296,36 @@ public class ManagerController {
 	 * @return boolean
 	 */
 	protected boolean verifyData(HttpServletRequest request) {
-		if(request.getParameter("dmId").equals("")){
+		String dmId = request.getParameter("dmId");
+		String dmName = request.getParameter("dmName");
+		String dmEmail = request.getParameter("dmEmail");
+		if(Verify.isEmpty(dmId)){
 			request.setAttribute("message", "管理员编号不能为空！");
 			return false;
 		}
-		if(request.getParameter("orgLookup.id").equals("")){
+		if(Verify.isEmpty(request.getParameter("orgLookup.id"))){
 			request.setAttribute("message", "必须选择系部！");
 			return false;
 		}
-		if(request.getParameter("dmName").equals("")){
+		if(Verify.isEmpty(dmName)){
 			request.setAttribute("message", "姓名不能为空");
 			return false;
 		}
-		if(request.getParameter("dmEmail").equals("")){
+		if(Verify.isEmpty(dmEmail)){
 			request.setAttribute("message", "邮箱不能为空！");
 			return false;			
+		}
+		if(!Verify.isStrLen(dmId, 3, 10)){
+			request.setAttribute("message", "编号长度在3~10.");
+			return false;
+		}
+		if(!Verify.isStrLen(dmName, 2, 14)){
+			request.setAttribute("message", "姓名长度在2~14.");
+			return false;
+		}
+		if(!Verify.isEmail(dmEmail)){
+			request.setAttribute("message", "邮箱格式如：12345@163.com");
+			return false;
 		}
 		return true;
 	}

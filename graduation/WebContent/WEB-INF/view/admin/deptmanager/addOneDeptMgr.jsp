@@ -14,7 +14,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<div class="pageFormContent" layoutH="56">
 			<p>
 				<label>编 号：</label> 
-				<input name="dmId" class="digits required" type="text" size="30" alt="请输入数字" />
+				<input name="dmId" class="digits required" alt="仅为数字且长度3~10" type="text" size="30" />
 			</p>
 			<p>
 				<label>所属系部：</label> 
@@ -29,7 +29,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<div class="divider"></div>
 			<p>
 				<label>姓 名：</label> 
-				<input name="dmName" type="text" size="30" class="required" />
+				<input name="dmName" type="text" size="30" class="required" alt="长度2~14" />
 			</p>
 			<p>
 				<label>性 别：</label> <input type="radio" name="dmSex" value="1" checked />男
@@ -41,8 +41,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					name="dmTel" />
 			</p>
 			<p>
-				<label>电子邮箱：</label> <input type="text" size="30"
-					class="required email" name="dmEmail" />
+				<label>电子邮箱：</label> <input type="text" size="30" class="required email" name="dmEmail" alt="如：123456@163.com"  />
 			</p>
 		</div>
 		<div class="formBar">

@@ -12,7 +12,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <div class="pageHeader">
 	<div class="text-center">
 		学生<%=op.getStuId() %> 
-		【<%=HResponse.formatValue("stuId", op.getStuId(), request) %>】的开题答辩详细安排
+		【<%=HResponse.formatValue("stuId", op.getStuId(), request) %>】的毕业答辩详细安排
 	</div>
 	<div class="divider"></div>
 	<div class="text-center">安排时间：<%=op.getCreateTime() %></div>

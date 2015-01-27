@@ -79,6 +79,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<li><a class="icon" href="javascript:$.printBox('studentlist')"><span>打印</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="<%=basePath %>admin/student/changeview.do?id={sid_teacher}" target="navTab" rel="changeview" title="学生转系"><span>学生转系</span></a></li>
+			<li class="line">line</li>
+			<li><a class="edit" href="<%=basePath %>admin/index/resetpwd.do?id={sid_teacher}&permissions=1" target="dialog"><span>重置密码</span></a></li>
 		</ul>
 	</div>
 	<div id="studentlist">

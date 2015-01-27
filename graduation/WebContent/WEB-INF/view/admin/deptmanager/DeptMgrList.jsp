@@ -65,7 +65,11 @@
 				target="dwzExport" targetType="navTab" title="确定要导出这些记录吗?"><span>导出EXCEL</span>
 			</a></li>
 			<li><a class="icon" href="javascript:$.printBox('w_list_print')"><span>打印</span>
-			</a></li>
+			</a></li><li class="line">line</li>
+			<li><a class="edit" 
+				href="<%=basePath %>admin/index/resetpwd.do?id={sid_user}&permissions=3" target="dialog">
+				<span>重置密码</span></a>
+			</li>
 		</ul>
 	</div>
 

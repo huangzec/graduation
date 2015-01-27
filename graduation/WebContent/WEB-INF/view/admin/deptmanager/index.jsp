@@ -106,20 +106,20 @@ $(function(){
 						<ul class="tree treeFolder">
 							<li><a>答辩管理</a>
 								<ul>
-									<li><a href="<%=basePath %>admin/opentopicinfo/list.do" target="navTab" rel="opentopicinfo">开题答辩安排</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/list.do" target="navTab" rel="graduateinfo">开题答辩安排</a></li>
 									<li><a href="<%=basePath %>admin/revieworder/list.do" target="navTab" rel="opentopicresult">毕业评阅教师安排</a></li>
 									<li><a href="<%=basePath %>admin/graduateinfo/list.do" target="navTab" rel="graduateinfo">毕业答辩安排</a></li>
 								</ul>
 							</li>
 							<li><a>答辩结果与成绩</a>
 								<ul>
-									<li><a href="<%=basePath %>admin/opentopicinfo/optscore.do" target="navTab" rel="opentopicresult">开题答辩成绩</a></li>
-									<li><a href="<%=basePath %>admin/opentopicinfo/optresult.do" target="navTab" rel="opentopicresult">开题答辩概况</a></li>
-									<li><a href="<%=basePath %>admin/opentopicinfo/tableoneresult.do" target="navTab" rel="opentopicresult">表一成绩</a></li>
-									<li><a href="<%=basePath %>admin/opentopicinfo/tabletworesult.do" target="navTab" rel="opentopicresult">表二成绩</a></li>
-									<li><a href="<%=basePath %>admin/opentopicinfo/tablethreeresult.do" target="navTab" rel="opentopicresult">表三成绩</a></li>
-									<li><a href="<%=basePath %>admin/graduateinfo/totalscore.do" target="navTab" rel="opentopicresult">论文(设计)总成绩</a></li>
-									<li><a href="<%=basePath %>admin/graduateinfo/gderesult.do" target="navTab" rel="opentopicresult">毕业答辩概况</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/optscore.do" target="navTab" rel="graduateinfo">开题答辩成绩</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/optresult.do" target="navTab" rel="graduateinfo">开题答辩概况</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/tableoneresult.do" target="navTab" rel="graduateinfo">表一成绩</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/tabletworesult.do" target="navTab" rel="graduateinfo">表二成绩</a></li>
+									<li><a href="<%=basePath %>admin/opentopicinfo/tablethreeresult.do" target="navTab" rel="graduateinfo">表三成绩</a></li>
+									<li><a href="<%=basePath %>admin/graduateinfo/totalscore.do" target="navTab" rel="graduateinfo">论文(设计)总成绩</a></li>
+									<li><a href="<%=basePath %>admin/graduateinfo/gderesult.do" target="navTab" rel="graduateinfo">毕业答辩概况</a></li>
 									<li><a href="<%=basePath %>admin/rejoin/alldoclist.do" target="navTab" rel="graduateinfo">系部所有学生材料</a></li>
 								</ul>
 							</li>

@@ -43,11 +43,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<div class="panelBar">
 		<ul class="toolBar">
 			<li><a class="add" href="<%=basePath %>admin/teacher/addoneview.do" target="navTab"><span>添加</span></a></li>
-			<li><a class="delete" href="demo/common/ajaxDone.html?uid={sid_teacher}" target="ajaxTodo" title="确定要删除吗?"><span>删除</span></a></li>
+			<li><a class="delete" href="<%=basePath %>admin/teacher/delete.do?uid={sid_teacher}" target="ajaxTodo" title="确定要删除吗?"><span>删除</span></a></li>
 			<li><a class="edit" href="<%=basePath %>admin/teacher/editview.do?id={sid_teacher}" target="navTab"><span>修改</span></a></li>
 			<li class="line">line</li>
 			<li><a class="icon" href="<%=basePath %>admin/teacher/export.do" target="dwzExport" targetType="navTab" title="确实要导出这些记录吗?"><span>导出EXCEL</span></a></li>
 			<li><a class="icon" href="javascript:$.printBox('teacherlist')"><span>打印</span></a></li>
+			<li class="line">line</li>
+			<li><a class="edit" href="<%=basePath %>admin/index/resetpwd.do?id={sid_teacher}&permissions=2" target="dialog"><span>重置密码</span></a></li>
 		</ul>
 	</div>
 	<div id="teacherlist">

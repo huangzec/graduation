@@ -11,10 +11,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.mvc.common.HResponse;
+import com.mvc.common.MD5Util;
 import com.mvc.common.RequestSetAttribute;
+import com.mvc.common.StringUtil;
+import com.mvc.common.Verify;
+import com.mvc.entity.Deptmanager;
 import com.mvc.entity.Message;
+import com.mvc.entity.Student;
+import com.mvc.entity.Teacher;
+import com.mvc.entity.User;
 import com.mvc.exception.VerifyException;
+import com.mvc.service.DeptmanagerService;
 import com.mvc.service.MessageService;
+import com.mvc.service.StudentService;
+import com.mvc.service.TeacherService;
+import com.mvc.service.UserService;
 
 /**
  * 后台首页
@@ -27,6 +39,18 @@ public class IndexController {
 	
 	@Autowired
 	private MessageService messageService;
+	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private StudentService studentService;
+	
+	@Autowired
+	private TeacherService teacherService;
+	
+	@Autowired
+	private DeptmanagerService deptmanagerService;
 	
 	/**
 	 * 
@@ -105,5 +129,152 @@ public class IndexController {
 		mav.addObject("unreadList", unreadList);
 		
 		return mav;
+	}
+	
+	/**
+	 * 重置系部管理员、教师、学生密码
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value="/index/resetpwd.do")
+	public ModelAndView resetpwd(HttpServletRequest request, HttpServletResponse response)
+	{
+		ModelAndView mav 	= new ModelAndView();
+		mav.setViewName("admin/common/resetpwd");
+		String permissions 	= request.getParameter("permissions");
+		String id 			= request.getParameter("id");
+		String name 		= "";
+		try {
+			String where = "from User where username = '" + id + "' AND permissions = " + Integer.parseInt(permissions);
+			User user 	= userService.getOneUser(where);
+			if(Verify.isEmpty(user)) {
+				//如果用户还没注册，则先自动注册
+				user = new User();
+				user.setUsername(id.trim());
+				user.setPassword(MD5Util.MD5(id.trim()));
+				user.setPermissions(Integer.parseInt(permissions));
+				userService.addOneUser(user);
+			}
+			if(permissions.trim().equals("1")) {
+				//如果是学生
+				Student stu = studentService.getOneById(id.trim());
+				if(!Verify.isEmpty(stu)) {
+					name = "学生 " + stu.getStuId() + "【" + stu.getStuName() + "】";					
+				}
+			} else if(permissions.trim().equals("2")) {
+				//如果是教师
+				Teacher teacher = teacherService.getOneTeacherById(id.trim());
+				if(!Verify.isEmpty(teacher)) {
+					name  = "教师 " + teacher.getTeaId() + "【" + teacher.getTeaName() + "】";
+				}
+			} else if(permissions.trim().equals("3")) {
+				//如果是系部管理员
+				Deptmanager deptmanager = deptmanagerService.getOne(id.trim());
+				if(!Verify.isEmpty(deptmanager)) {
+					name  = "系部管理员 " + deptmanager.getDmId() + "【" + deptmanager.getDmName() + "】";
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		request.setAttribute("id", id);
+		request.setAttribute("name", name);
+		request.setAttribute("permissions", permissions);
+		
+		return mav;
+	}
+	
+	/**
+	 * 执行重置系部管理员、教师、学生密码
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws VerifyException 
+	 */
+	@RequestMapping(value="/index/reset.do")
+	public ModelAndView reset(HttpServletRequest request, HttpServletResponse response) throws VerifyException
+	{
+		ModelAndView mav 	= new ModelAndView();
+		String id 			= request.getParameter("id");
+		String password		= request.getParameter("password");
+		String permissions 	= request.getParameter("permissions");
+		if(!this._verifyData(request))
+		{
+			mav.addObject("statusCode", 300);
+			mav.setViewName("public/ajaxDone");
+			
+			return mav;
+		}
+		try{
+			String where = "from User where username = '" + id.trim() + 
+					"' AND permissions = " + Integer.parseInt(permissions);
+			User user 	= userService.getOneUser(where);
+			if(Verify.isEmpty(user)) {
+				user = new User();
+				user.setUsername(id.trim());
+				user.setPassword(MD5Util.MD5(password.trim()));
+				user.setPermissions(Integer.parseInt(permissions));
+				userService.addOneUser(user);
+				mav.addObject("statusCode", 200);
+				mav.addObject("message", "密码重置成功");
+				mav.addObject("callbackType", "closeCurrent");
+				mav.setViewName("public/ajaxDone");
+				
+				return mav;
+			}
+			user.setPassword(MD5Util.MD5(password.trim()));
+			userService.editOneUser(user);
+			mav.addObject("statusCode", 200);
+			mav.addObject("message", "密码重置成功");
+			mav.addObject("callbackType", "closeCurrent");
+		}catch (Exception e) {
+			mav.addObject("navTabId", 300);
+			mav.addObject("message", "密码重置失败");
+		}
+		mav.setViewName("public/ajaxDone");
+		
+		return mav;
+	}
+
+	/**
+	 * 验证修改密码数据
+	 *  
+	 * @author huangzec <huangzec@foxmail.com>
+	 * @param request
+	 * @return
+	 */
+	private boolean _verifyData(HttpServletRequest request) 
+	{
+
+		String id 			= request.getParameter("id");
+		String password		= request.getParameter("password");
+		String permissions 	= request.getParameter("permissions");
+		if(Verify.isEmpty(id)) {
+			request.setAttribute("message", "编号不能为空");
+			
+			return false;
+		}
+		if(Verify.isEmpty(password)) {
+			request.setAttribute("message", "新密码不能为空");
+			
+			return false;
+		}
+		if(Verify.isEmpty(permissions)) {
+			request.setAttribute("message", "用户类型不能为空");
+			
+			return false;
+		}
+		if(Verify.isStrLen(permissions, 4, 32)) {
+			request.setAttribute("message", "密码长度在4~32个字符之间");
+			
+			return false;
+		}
+		
+		return true;
 	}
 }
